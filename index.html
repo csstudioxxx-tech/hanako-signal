@@ -56,7 +56,7 @@ header .sub{font-size:11px;color:var(--text3);margin-top:2px}
 .info{font-size:12px;color:var(--text2);margin-top:7px}
 /* pills */
 .pill{font-size:10.5px;font-weight:650;padding:2.5px 9px;border-radius:7px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
-.p-dm{background:var(--accent-soft);color:var(--accent2)}.p-op{background:var(--purple-bg);color:var(--purple)}.p-is{background:var(--green-bg);color:var(--green)}.p-hh{background:var(--amber-bg);color:var(--amber)}
+.p-dm{background:var(--accent-soft);color:var(--accent2)}.p-op{background:var(--purple-bg);color:var(--purple)}.p-is{background:var(--green-bg);color:var(--green)}.p-hh{background:var(--amber-bg);color:var(--amber)}.p-uc{background:var(--bg2);color:var(--text2)}
 .p-pre{background:var(--amber-bg);color:var(--amber)}.p-act{background:var(--green-bg);color:var(--green)}.p-done{background:var(--gray-bg);color:var(--gray-tx)}
 .p-st{background:var(--blue-bg);color:var(--blue)}
 /* forms */
@@ -141,6 +141,7 @@ textarea{resize:vertical;min-height:54px}
 <button id="tb-list" onclick="tab('list')">物件一覧</button>
 <button id="tb-staff" onclick="tab('staff')">入稿担当</button>
 <button id="tb-opt" onclick="tab('opt')">オプション</button>
+<button id="tb-sub" onclick="tab('sub')">基準点以下</button>
 <button id="tb-csv" onclick="tab('csv')">データ取込</button>
 <button id="tb-hist" onclick="tab('hist')">履歴</button>
 <button id="tb-ana" onclick="tab('ana')">反響分析</button>
@@ -160,8 +161,9 @@ textarea{resize:vertical;min-height:54px}
 <div id="v-list" style="display:none"><div class="filt" id="lfilt"></div><div class="filt" id="wfilt"></div><div id="lsort"></div><div id="lbody"></div></div>
 <div id="v-staff" style="display:none"><div id="sbody"></div></div>
 <div id="v-opt" style="display:none"><div id="obody"></div></div>
+<div id="v-sub" style="display:none"><div id="subbody"></div></div>
 <div id="v-csv" style="display:none">
- <div class="drop" id="csvdrop"><div class="di">📊 CSVをドロップ</div><div class="ds">JDS（反響・リアルタイム）／ ビジコン（PV詳細・前々日／日付ごと）</div></div>
+ <div class="drop" id="csvdrop"><div class="di">📊 CSVをドロップ</div><div class="ds">反響報告書（Excel・毎日）／ JDS（反響）／ ビジコン（PV詳細）</div></div>
  <input type="file" id="csvin" accept=".csv" style="display:none">
  <div id="csvpending"></div>
  <div id="csvlog"></div>
@@ -173,14 +175,15 @@ textarea{resize:vertical;min-height:54px}
 </div>
 <div id="toast" class="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const STN=["千葉ニュータウン中央", "流山セントラルパーク", "柏の葉キャンパス", "流山おおたかの森", "伊勢佐木長者町", "たまプラーザ", "元町・中華街", "八千代緑が丘", "小田急相模原", "祖師ヶ谷大蔵", "西新宿五丁目", "読売ランド前", "つつじヶ丘", "ひばりヶ丘", "センター北", "センター南", "三ツ沢上町", "三ツ沢下町", "京成大久保", "京成大和田", "京成津田沼", "京成酒々井", "京王稲田堤", "代々木上原", "八千代中央", "向ヶ丘遊園", "四谷三丁目", "地下鉄成増", "成城学園前", "新百合ヶ丘", "東海大学前", "武蔵小金井", "石神井公園", "船橋日大前", "鎌ヶ谷大仏", "あざみ野", "かしわ台", "さがみ野", "みつわ台", "みどり台", "みのり台", "三軒茶屋", "上石神井", "下総中山", "中央林間", "中野坂上", "中野新橋", "二子新地", "二子玉川", "井土ヶ谷", "京急川崎", "京急蒲田", "京急鶴見", "京成佐倉", "京成成田", "京成稲毛", "京成臼井", "京成船橋", "保土ケ谷", "八千代台", "公津の杜", "北習志野", "千歳烏山", "千歳船橋", "千葉中央", "原木中山", "大泉学園", "大神宮下", "学芸大学", "小竹向原", "川崎大師", "市川大野", "幕張本郷", "愛甲石田", "新検見川", "新鎌ケ谷", "新高円寺", "東久留米", "東小金井", "東神奈川", "東高円寺", "松戸新田", "板橋本町", "柏たなか", "武蔵中原", "武蔵小山", "武蔵小杉", "武蔵新城", "江戸川台", "江戸川橋", "池尻大橋", "海浜幕張", "清澄白河", "港南中央", "白金高輪", "百合ヶ丘", "相模大塚", "相模大野", "相武台前", "稲毛海岸", "自由が丘", "船橋法典", "花小金井", "西八王子", "西日暮里", "都立大学", "金沢八景", "金沢文庫", "門前仲町", "阿佐ケ谷", "駒沢大学", "高根公団", "高田馬場", "鶴見市場", "麻布十番", "一之江", "三ツ境", "三ノ輪", "上大岡", "上星川", "上本郷", "上板橋", "上永谷", "下北沢", "不動前", "中目黒", "中野島", "二俣川", "五反田", "代田橋", "仲町台", "伊勢原", "元住吉", "光が丘", "八丁堀", "八丁畷", "八幡宿", "八王子", "勝どき", "勝田台", "北千住", "北国分", "北小金", "北山田", "北松戸", "北綾瀬", "千葉寺", "南千住", "南林間", "南流山", "南行徳", "吉祥寺", "吉野町", "和田町", "四街道", "国分寺", "国府台", "大久保", "大井町", "大倉山", "大森台", "大森町", "天王台", "天王町", "妙蓮寺", "姉ケ崎", "宮前平", "宮崎台", "宿河原", "小田原", "小田栄", "尾山台", "市が尾", "常盤平", "幡ヶ谷", "平和台", "平和島", "弘明寺", "恵比寿", "我孫子", "新中野", "新丸子", "新八柱", "新子安", "新小岩", "新川崎", "新松戸", "新横浜", "新浦安", "方南町", "早稲田", "明大前", "木更津", "本八幡", "本千葉", "本厚木", "本郷台", "東中山", "東中野", "東十条", "東千葉", "東戸塚", "東松戸", "東白楽", "東船橋", "東陽町", "桜新町", "桜木町", "梅屋敷", "梶が谷", "検見川", "武蔵境", "氷川台", "洋光台", "津田沼", "浅草橋", "海老名", "淵野辺", "港南台", "湘南台", "溝の口", "滝不動", "片倉町", "相模原", "石川町", "祐天寺", "稲田堤", "竹ノ塚", "等々力", "習志野", "茅ケ崎", "茗荷谷", "薬園台", "藤が丘", "袖ケ浦", "西千葉", "西大井", "西小山", "西新井", "西横浜", "西船橋", "西荻窪", "西葛西", "西馬込", "豊四季", "酒々井", "野田市", "錦糸町", "鎌ケ谷", "長津田", "阪東橋", "青葉台", "飯山満", "馬込沢", "高円寺", "鶴ケ峰", "鹿島田", "黄金町", "三咲", "三鷹", "両国", "中井", "中山", "中川", "中野", "久地", "亀戸", "亀有", "五井", "五香", "仙川", "住吉", "佐倉", "保谷", "入谷", "八街", "六実", "六町", "初台", "初石", "前原", "北柏", "千葉", "南柏", "反町", "古淵", "君津", "品川", "国立", "土気", "塚田", "増尾", "大口", "大和", "大塚", "大山", "大崎", "大森", "大網", "大船", "天台", "妙典", "子安", "実籾", "小岩", "小机", "尻手", "山手", "巌根", "川崎", "川間", "市川", "幕張", "平井", "平塚", "平間", "府中", "志津", "愛宕", "成増", "成田", "戸塚", "戸部", "押上", "新柏", "日吉", "星川", "春日", "木場", "東金", "松戸", "柿生", "根岸", "梅郷", "森下", "横浜", "橋本", "池袋", "浅草", "浜野", "浦安", "海神", "清瀬", "渋沢", "湖北", "瀬谷", "王子", "瑞江", "生田", "生麦", "用賀", "田町", "田端", "町屋", "町田", "登戸", "白楽", "目黒", "矢切", "矢向", "矢部", "秦野", "稲毛", "穴川", "立川", "笹塚", "篠崎", "経堂", "綱島", "綾瀬", "練馬", "舞浜", "船堀", "船橋", "茂原", "荻窪", "菊名", "菊川", "葛西", "蒔田", "蒲田", "蔵前", "藤沢", "蘇我", "行徳", "西谷", "要町", "誉田", "調布", "谷津", "豊洲", "赤羽", "辻堂", "追浜", "逆井", "逗子", "運河", "都賀", "金町", "鎌倉", "鎌取", "長後", "長浦", "関内", "馬橋", "馬込", "駒込", "高津", "高田", "鴨宮", "鴨居", "鶴川", "鶴見", "鶴間", "鷺沼", "柏"];
 const ZONES={"三軒茶屋|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10, 11], "o": [3, 4, 5, 6, 7, 8]}, "高円寺|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 6, 7]}, "北千住|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5, 6]}, "池袋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 7]}, "中野|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 5, 7, 8]}, "大井町|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7]}, "新小岩|シングル": {"d": [3, 4, 5, 6], "o": [3, 6]}, "葛西|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 3, 4]}, "笹塚|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "門前仲町|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "大森|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "荻窪|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "学芸大学|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "東中野|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5, 6]}, "高田馬場|シングル": {"d": [3, 4, 5, 6, 7, 9], "o": [3, 4, 5, 6, 7]}, "恵比寿|シングル": {"d": [6, 8, 9, 10, 11, 12, 13], "o": [6, 8, 9, 10]}, "三鷹|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 5]}, "吉祥寺|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 5]}, "両国|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 7, 8]}, "駒沢大学|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "押上|シングル": {"d": [3, 5, 6, 7, 8, 9, 10], "o": [3, 5, 6, 7]}, "亀戸|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7]}, "小岩|シングル": {"d": [2, 3, 4, 5, 6], "o": [2, 3]}, "祐天寺|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 10]}, "清澄白河|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "中野坂上|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10], "o": [3, 5, 6, 7, 10]}, "錦糸町|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7]}, "町屋|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 6]}, "森下|シングル": {"d": [5, 6, 7, 8, 9, 10, 11], "o": [5, 6, 7, 8]}, "武蔵小山|シングル": {"d": [3, 4, 5, 6, 7, 8, 10, 11], "o": [3, 4, 5, 6, 7]}, "大塚|シングル": {"d": [2, 4, 5, 6, 7, 8, 10], "o": [2, 4, 5, 8]}, "中目黒|シングル": {"d": [5, 6, 7, 8, 9, 10, 11, 12], "o": [5, 6, 7, 8, 9, 10, 11]}, "幡ヶ谷|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 8]}, "西荻窪|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 5]}, "目黒|シングル": {"d": [5, 6, 7, 8, 9, 10, 11, 12, 13], "o": [5, 6, 7, 9]}, "町田|シングル": {"d": [1, 2, 3, 4, 5, 6, 7], "o": [1, 4]}, "綾瀬|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5]}, "練馬|シングル": {"d": [1, 2, 3, 4, 5, 6, 7, 8], "o": [1, 2, 3, 4, 6]}, "初台|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 8]}, "阿佐ケ谷|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 5, 6]}, "下北沢|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10], "o": [3, 4, 6, 7]}, "千歳烏山|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 3, 4, 5]}, "駒込|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 5, 6, 7]}, "田端|シングル": {"d": [2, 4, 5, 6, 7], "o": [2, 4, 5, 6, 7]}, "代田橋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7, 8]}, "不動前|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11, 12], "o": [4, 5, 6, 7]}, "池尻大橋|シングル": {"d": [4, 5, 6, 8, 9, 10, 11, 12], "o": [4, 5, 6, 8, 9]}, "東高円寺|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "新中野|シングル": {"d": [2, 3, 4, 5, 6, 7, 8, 9], "o": [2, 3, 4, 8]}, "北綾瀬|シングル": {"d": [2, 3, 4, 5, 6], "o": [2, 3, 4]}, "方南町|シングル": {"d": [2, 3, 4, 5, 6, 7, 8, 9], "o": [2, 3, 4, 5, 6, 7]}, "西小山|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7]}, "明大前|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 6, 7]}, "千歳船橋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5]}, "住吉|シングル": {"d": [5, 6, 7, 8, 9], "o": [5, 6, 7, 8]}, "中野新橋|シングル": {"d": [4, 5, 6, 7, 8, 9], "o": [4, 5, 6, 8]}, "経堂|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 5, 7]}, "五反田|シングル": {"d": [4, 5, 6, 7, 8, 9], "o": [4, 5, 6, 7, 8]}, "都立大学|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 7, 10]}, "蔵前|シングル": {"d": [5, 6, 8, 9, 10, 11], "o": [5, 6, 8]}, "麻布十番|シングル": {"d": [4, 6, 7, 9, 10, 11, 12, 13], "o": [4, 6, 7, 9, 10]}, "西日暮里|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "平井|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4]}, "新高円寺|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [3, 6]}, "調布|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [4]}, "中井|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "用賀|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "大久保|シングル": {"d": [3, 4, 5, 6, 7, 9], "o": [3, 4, 5, 7]}, "浅草橋|シングル": {"d": [5, 7, 8, 9, 10, 11, 12], "o": [5, 7, 8, 9]}, "田町|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7, 9]}, "新小岩|カップル": {"d": [4, 5, 6, 7, 8, 9, 11], "o": [4, 5, 7, 8]}, "葛西|カップル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7, 8]}, "三鷹|カップル": {"d": [5, 6, 7, 8, 9, 10, 11, 12], "o": [5, 6, 7, 8, 9, 10, 11]}, "大森|カップル": {"d": [6, 9, 10, 11, 12, 13, 14, 15, 16], "o": [6, 9, 10, 11, 12]}, "三軒茶屋|カップル": {"d": [5, 11, 13, 14, 15, 16, 18], "o": [5, 11, 13, 14]}, "大井町|カップル": {"d": [8, 11, 12, 13, 14, 15, 16, 18], "o": [8, 11, 12, 13, 16]}, "荻窪|カップル": {"d": [6, 8, 9, 10, 11, 12, 13, 14], "o": [6, 8, 9, 10, 12, 13]}, "目黒|カップル": {"d": [11, 12, 14, 15, 16, 17, 18, 19], "o": [11, 12, 14, 15, 16, 17]}, "中野|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 14, 15], "o": [7, 8, 9, 10, 11, 12, 13, 14]}, "小岩|カップル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 9, 10]}, "武蔵小山|カップル": {"d": [10, 11, 12, 14, 15, 16, 18], "o": [10, 11, 12]}, "学芸大学|カップル": {"d": [10, 11, 12, 13, 14, 16, 17, 18], "o": [10, 11, 12, 13, 14]}, "北千住|カップル": {"d": [5, 7, 9, 10, 11, 12], "o": [5, 7, 9]}, "池袋|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 18], "o": [7, 8, 9, 10, 11]}, "高円寺|カップル": {"d": [6, 7, 8, 10, 11, 12, 13], "o": [6, 7, 8, 10, 11, 12, 13]}, "笹塚|カップル": {"d": [7, 10, 11, 12, 13, 14, 17], "o": [7, 10, 11, 12, 13, 17]}, "両国|カップル": {"d": [6, 8, 10, 11, 12, 13, 14, 15, 16], "o": [6, 8, 10, 11, 12, 13, 14]}, "恵比寿|カップル": {"d": [11, 14, 16, 17, 18, 19, 20], "o": [11, 14, 16, 17]}, "錦糸町|カップル": {"d": [6, 7, 8, 9, 12, 14, 15, 16], "o": [6, 7, 8, 9, 12, 14]}, "都立大学|カップル": {"d": [10, 11, 12, 13, 14, 15, 16, 17], "o": [10, 11, 13, 14, 16]}, "町田|カップル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 6, 8]}, "千歳烏山|カップル": {"d": [6, 7, 8, 9, 10, 11, 12], "o": [6, 7, 10, 11]}, "用賀|カップル": {"d": [5, 9, 10, 11, 12, 13, 14, 17, 18], "o": [5, 9, 10, 11, 17]}, "駒込|カップル": {"d": [7, 10, 11, 12, 13, 15], "o": [7, 10, 11, 12, 13]}, "押上|カップル": {"d": [7, 8, 11, 12, 13, 14, 16], "o": [7, 8, 11, 12, 13]}, "勝どき|カップル": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 17]}, "門前仲町|カップル": {"d": [5, 7, 9, 10, 11, 12, 14, 16], "o": [5, 7, 9, 10, 11, 12, 14]}, "西荻窪|カップル": {"d": [5, 7, 10, 11, 12, 13], "o": [5, 7, 10]}, "吉祥寺|カップル": {"d": [5, 6, 7, 8, 9, 10, 11, 12, 13], "o": [5, 6, 7, 8, 9, 11, 13]}, "麻布十番|カップル": {"d": [12, 14, 15, 16, 17, 18, 19, 20], "o": [12, 14, 15, 16, 17, 18]}, "東中野|カップル": {"d": [6, 9, 10, 11, 12, 13, 14, 18], "o": [6, 9, 10, 11, 12, 13, 14]}, "綾瀬|カップル": {"d": [4, 5, 6, 7, 8, 9, 10, 11, 12], "o": [4, 5, 6, 7, 8, 9, 10, 12]}, "駒沢大学|カップル": {"d": [10, 11, 12, 13, 14, 15, 17], "o": [10, 11, 12, 13]}, "祐天寺|カップル": {"d": [10, 11, 13, 14, 15, 16, 17, 18], "o": [10, 11, 13, 16]}, "西小山|カップル": {"d": [10, 11, 12, 13, 14, 15], "o": [10, 11, 12]}, "経堂|カップル": {"d": [8, 9, 11, 12, 13, 14, 15], "o": [8, 15]}, "池尻大橋|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18, 19], "o": [11, 12, 13, 14, 15, 16]}, "中目黒|カップル": {"d": [9, 13, 15, 16, 17, 18, 19], "o": [9, 13, 15, 16, 17]}, "田端|カップル": {"d": [6, 10, 11, 12], "o": [6, 10, 11]}, "方南町|カップル": {"d": [7, 8, 9, 10, 12, 13, 14, 15, 16], "o": [7, 8, 9, 10, 12, 13]}, "中野坂上|カップル": {"d": [9, 10, 11, 12, 13, 14, 15, 18], "o": [9, 10, 11, 12]}, "蔵前|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18], "o": [11, 12, 14]}, "住吉|カップル": {"d": [3, 8, 9, 10, 11, 12, 13, 15], "o": [3, 8, 9, 10, 11, 12]}, "練馬|カップル": {"d": [6, 7, 8, 9, 10, 11, 14], "o": [6, 7, 8, 9, 10]}, "下北沢|カップル": {"d": [7, 10, 11, 12, 13, 14], "o": [7, 10, 11, 12, 13]}, "森下|カップル": {"d": [9, 10, 11, 12, 13, 14], "o": [9, 10, 11, 12, 13, 14]}, "不動前|カップル": {"d": [11, 12, 13, 14, 15, 17, 18, 19], "o": [11, 12, 13, 15, 17]}, "幡ヶ谷|カップル": {"d": [9, 10, 11, 12, 13, 14, 15], "o": [9, 10, 11, 12, 14]}, "北綾瀬|カップル": {"d": [3, 4, 5, 6, 9, 10], "o": [3, 4, 5, 6, 9]}, "西葛西|カップル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 7, 8]}, "桜新町|カップル": {"d": [7, 8, 10, 11, 12, 13, 14, 15, 16], "o": [7, 8, 10, 11, 12, 14, 15]}, "西日暮里|カップル": {"d": [6, 8, 9, 10, 11, 12, 13], "o": [6, 8, 9, 11]}, "大塚|カップル": {"d": [6, 7, 8, 9, 10, 11, 12], "o": [6, 7, 8, 9, 10, 11, 12]}, "阿佐ケ谷|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 14], "o": [7, 8, 10, 11, 12]}, "亀戸|カップル": {"d": [6, 8, 9, 10, 12, 13, 14], "o": [6, 8, 9, 12]}, "大崎|カップル": {"d": [9, 12, 14, 15, 16, 17, 18, 19], "o": [9, 12, 18]}, "町屋|カップル": {"d": [4, 6, 7, 9, 10, 11, 12], "o": [4, 6, 7, 9, 10, 11]}, "代田橋|カップル": {"d": [6, 9, 11, 12, 13], "o": [6, 9, 11, 13]}, "自由が丘|カップル": {"d": [6, 11, 12, 13, 14, 15, 17], "o": [6, 11, 12, 15, 17]}, "調布|カップル": {"d": [5, 6, 7, 8, 9, 10, 11], "o": [5, 6, 7, 8]}, "清澄白河|カップル": {"d": [4, 9, 11, 13, 15], "o": [4, 9, 11, 13, 15]}, "浅草橋|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18], "o": [11, 12, 13, 14, 15]}, "千歳船橋|カップル": {"d": [6, 8, 9, 10, 11, 12, 13, 14], "o": [6, 8, 9, 10, 14]}, "高田馬場|カップル": {"d": [6, 9, 10, 11, 12, 13, 14], "o": [6, 9, 10, 11, 12]}, "西馬込|カップル": {"d": [6, 8, 9, 10, 12, 13], "o": [6, 8, 9, 10, 12]}, "中野新橋|カップル": {"d": [6, 7, 8, 10, 11, 12, 13, 14, 15, 17], "o": [6, 7, 8, 10, 12, 13, 14, 15]}, "新中野|カップル": {"d": [7, 8, 10, 11, 13, 14], "o": [7, 8, 10, 11]}, "初台|カップル": {"d": [7, 10, 11, 12, 13, 14, 15, 16, 18], "o": [7, 10, 11, 12, 14]}, "代々木上原|カップル": {"d": [11, 12, 13, 15, 16, 18, 19], "o": [11, 12, 13, 15, 16]}, "四谷三丁目|カップル": {"d": [10, 11, 12, 14, 15, 17, 18, 19], "o": [10, 11, 12, 14]}, "葛西|ファミリー": {"d": [9, 10, 11, 12, 13, 18], "o": [9, 10, 11, 12, 13]}, "勝どき|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "三鷹|ファミリー": {"d": [11, 12, 13, 15, 16, 17, 18, 19, 20], "o": [11, 16]}, "町田|ファミリー": {"d": [4, 5, 6, 7, 11, 12, 13, 14, 15, 18], "o": [4, 5, 6, 7]}, "大泉学園|ファミリー": {"d": [7, 8, 9, 10, 11, 12, 13, 17, 18], "o": [7, 10]}, "用賀|ファミリー": {"d": [10, 14, 15, 16, 17, 18, 19, 20], "o": [10, 14, 15, 17]}, "新小岩|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 15], "o": [9, 12, 13]}, "大森|ファミリー": {"d": [11, 13, 14, 15, 16, 17, 18, 19], "o": [11, 13, 14, 15, 16]}, "荻窪|ファミリー": {"d": [12, 13, 15, 17, 18, 19], "o": [12, 13, 15, 17]}, "学芸大学|ファミリー": {"d": [13, 18, 19, 20], "o": [13, 18]}, "千歳烏山|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 18], "o": [9, 10, 11, 12, 13]}, "小岩|ファミリー": {"d": [7, 8, 9, 10, 11, 12, 14, 18], "o": [7, 8, 9, 11, 12, 18]}, "都立大学|ファミリー": {"d": [13, 14, 17, 18, 19, 20], "o": [13, 14, 17]}, "豊洲|ファミリー": {"d": [14, 17, 18, 19, 20], "o": [14, 17]}, "吉祥寺|ファミリー": {"d": [11, 12, 13, 14, 18, 19, 20], "o": [13, 14]}, "目黒|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "大井町|ファミリー": {"d": [13, 14, 15, 16, 18, 19, 20], "o": [13, 14, 15, 16, 18]}, "西馬込|ファミリー": {"d": [12, 13, 14, 15, 16, 17, 18], "o": [12, 13, 17]}, "大崎|ファミリー": {"d": [17, 18, 19, 20], "o": [17, 18]}, "西葛西|ファミリー": {"d": [8, 9, 10, 11, 12, 13, 14, 16, 17], "o": [8, 9, 10, 11, 12, 13, 14, 16]}, "桜新町|ファミリー": {"d": [13, 15, 17, 18, 19, 20], "o": [13, 15, 17, 19]}, "駒沢大学|ファミリー": {"d": [15, 17, 18, 19, 20], "o": [15, 20]}, "千歳船橋|ファミリー": {"d": [11, 12, 14, 15, 16, 17, 18, 19, 20], "o": [11, 12, 14, 15, 16, 17]}, "武蔵小山|ファミリー": {"d": [18, 19, 20], "o": [20]}, "二子玉川|ファミリー": {"d": [12, 14, 16, 17, 18, 19, 20], "o": [12, 14, 16, 17]}, "両国|ファミリー": {"d": [15, 16, 17, 18, 19], "o": [15, 16, 17]}, "田町|ファミリー": {"d": [15, 18, 19, 20], "o": [15, 18]}, "中野|ファミリー": {"d": [14, 15, 16, 17, 18, 19, 20], "o": [14, 15, 16, 17, 18]}, "三軒茶屋|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 18]}, "西荻窪|ファミリー": {"d": [8, 10, 13, 16, 18, 19, 20], "o": [8, 10, 13, 16, 18]}, "調布|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 16, 18], "o": [10, 13, 14]}, "北千住|ファミリー": {"d": [10, 12, 14, 15, 18, 20], "o": [10, 12, 14, 15]}, "経堂|ファミリー": {"d": [12, 14, 15, 16, 17, 18, 19, 20], "o": [12, 14, 15, 16, 17]}, "成城学園前|ファミリー": {"d": [11, 13, 14, 15, 16, 18, 20], "o": [11, 13, 14, 15, 16]}, "恵比寿|ファミリー": {"d": [15, 16, 18, 19, 20], "o": [15, 16, 18]}, "鶴川|ファミリー": {"d": [3, 4, 5, 6, 7, 8, 9, 10, 11], "o": [3, 4, 7, 10]}, "品川|ファミリー": {"d": [16, 19, 20], "o": [16, 19]}, "祐天寺|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "麻布十番|ファミリー": {"d": [14, 16, 18, 19, 20], "o": [14, 16, 18, 19]}, "綾瀬|ファミリー": {"d": [6, 7, 8, 9, 11, 12, 13, 14, 18], "o": [6, 7, 8, 9, 11, 12, 13, 14]}, "錦糸町|ファミリー": {"d": [10, 14, 15, 16, 18, 19], "o": [10, 14, 15, 16]}, "仙川|ファミリー": {"d": [9, 11, 13, 14, 17, 18, 19], "o": [9, 11]}, "町屋|ファミリー": {"d": [10, 11, 12, 13, 14, 16, 18], "o": [10, 11, 12, 13, 14, 16]}, "練馬|ファミリー": {"d": [8, 10, 11, 12, 13, 14, 15, 16, 18, 19], "o": [8, 10, 11, 12, 15, 16]}, "代々木上原|ファミリー": {"d": [17, 18, 19, 20], "o": [17, 18]}, "中目黒|ファミリー": {"d": [14, 15, 18, 19, 20], "o": [14, 15, 18, 19]}, "駒込|ファミリー": {"d": [11, 13, 16, 18, 19, 20], "o": [11, 13, 20]}, "清澄白河|ファミリー": {"d": [16, 17, 18, 19, 20], "o": [16, 17, 18]}, "つつじヶ丘|ファミリー": {"d": [8, 9, 10, 11, 12, 13, 18], "o": [8, 9, 13]}, "東中野|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 17]}, "押上|ファミリー": {"d": [11, 12, 13, 15, 18, 19], "o": [11, 12, 13, 15]}, "笹塚|ファミリー": {"d": [13, 14, 15, 16, 18, 19, 20], "o": [13, 14, 15, 16, 18]}, "北綾瀬|ファミリー": {"d": [6, 9, 10, 11, 12, 13, 14, 15, 16, 18], "o": [6, 9, 10, 13, 14]}, "春日|ファミリー": {"d": [13, 14, 18, 19, 20], "o": [13, 14]}, "自由が丘|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 17]}, "池袋|ファミリー": {"d": [10, 11, 18, 19, 20], "o": [10, 11]}, "光が丘|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 15, 18], "o": [12, 14, 15, 18]}, "門前仲町|ファミリー": {"d": [11, 14, 15, 18, 19, 20], "o": [11, 14, 15]}, "茗荷谷|ファミリー": {"d": [15, 17, 18, 19, 20], "o": [15, 17, 19]}, "田端|ファミリー": {"d": [12, 14, 15, 17, 18, 19], "o": [12, 14, 15]}};
 const RANK={};Object.keys(ZONES).forEach(k=>{RANK[k.split('|')[0]]=1;});
 const SK='ibt_props_v1',HK='ibt_hist_v1',EK='ibt_events_v1';
 const TARGETS={dm:80,op:50,is:50,hh:20,do_inq:100,is_inq:200,total:300};
-const WK_MAP={Demand:'dm',Opportunity:'op',Insight:'is','High-Hold':'hh'};
-const WK_PILL={dm:'p-dm',op:'p-op',is:'p-is',hh:'p-hh'};
+const WK_MAP={Demand:'dm',Opportunity:'op',Insight:'is','High-Hold':'hh','未分類':'uc'};
+const WK_PILL={dm:'p-dm',op:'p-op',is:'p-is',hh:'p-hh',uc:'p-uc'};
 const STATUSES=['先行申込あり','2番手','3番手以降','空き(申込なし)','申込予定','審査中','成約/入居中','募集終了'];
 let PROPS=[],PEND=[],HIST={},EVENTS={};
 let viewYM='';
@@ -202,6 +205,7 @@ function normName(s){return(s||'').replace(/[\s\u3000]+/g,'').trim();}
 function madoriCat(m){if(!m)return'';return/^(1R|1K|1DK|ワンルーム)$/.test(m)?'シングル':(/^(1LDK|2K|2DK)$/.test(m)?'カップル':'ファミリー');}
 function rentToBand(r){r=parseFloat(r);if(isNaN(r))return -1;if(r<3)return 0;if(r>=30)return 20;if(r>=25)return 19;if(r>=20)return 18;return Math.floor(r)-2;}
 function autoWaku(station,madori,rent){var cat=madoriCat(madori),band=rentToBand(rent);var z=ZONES[station+'|'+cat];if(!z||band<0){return parseFloat(rent)>=20?'High-Hold':'Insight';}if(z.o&&z.o.indexOf(band)>=0)return'Opportunity';if(z.d&&z.d.indexOf(band)>=0)return'Demand';return parseFloat(rent)>=20?'High-Hold':'Insight';}
+function autoWakuImport(station,madori,rent){var cat=madoriCat(madori),band=rentToBand(rent);var z=ZONES[station+'|'+cat];if(z&&band>=0){if(z.o&&z.o.indexOf(band)>=0)return'Opportunity';if(z.d&&z.d.indexOf(band)>=0)return'Demand';}return'未分類';}
 function calcAge(y,mo){const n=new Date();return Math.floor((n.getFullYear()*12+n.getMonth()+1-y*12-mo)/12);}
 function finalScore(p){return(+p.scorePre||0)+(p.storePick?4:0)+(p.specArea?2:0)+(p.video?2:0);}
 function kijun(s){return s>=43?'第3':s>=38?'第2':s>=34?'第1':'基準未満';}
@@ -234,6 +238,8 @@ async function load(){
   if(p.csvPV==null)p.csvPV=0;if(p.csvInq==null)p.csvInq=0;if(p.csvInqB==null)p.csvInqB=0;
   if(p.csvAsOf==null)p.csvAsOf='';
   if(p.optReviewed==null)p.optReviewed=false;if(p.compDataAt==null)p.compDataAt='';if(p.optAppliedAt==null)p.optAppliedAt='';
+  if(p.needShoot==null)p.needShoot=false;if(p.shootDate==null)p.shootDate='';if(p.subStdJudge==null)p.subStdJudge='';if(p.subStdAction==null)p.subStdAction='';
+  if(p.suumoListStart==null)p.suumoListStart='';if(p.compTotal==null)p.compTotal='';if(p.waku==null||p.waku==='')p.waku='未分類';
  });
  viewYM=curYM();
 }
@@ -375,8 +381,8 @@ function extractFields(raw,fname){
 
 
 // ---------- tabs ----------
-function tab(t){CURTAB=t;['dash','add','list','staff','opt','csv','hist','ana','cross','otrend'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();}
+function tab(t){CURTAB=t;['dash','add','list','staff','opt','sub','csv','hist','ana','cross','otrend'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();}
 
 // ---------- DASHBOARD ----------
 function monthOptions(){
@@ -416,11 +422,12 @@ function renderDash(){
   var si=0,sp=0;allP.forEach(p=>{si+=+(p.csvInq||0);sp+=+(p.csvPV||0);});
   h+='<div class="note" style="margin:0 2px 8px">合計 反響 '+si+' ・ PV '+sp+' ・ 平均遷移率 '+(sp>0?(si/sp*100).toFixed(1):'0')+'%</div>';
   h+='<div class="filt">'+[['csvInq','反響多い順'],['csvPV','PV多い順'],['pvLow','PV少ない順'],['rate','遷移率順']].map(o=>'<button class="'+(sk===o[0]?'on':'')+'" onclick="window._perfSort=\''+o[0]+'\';renderDash()">'+o[1]+'</button>').join('')+'</div>';
-  h+='<div class="tblwrap"><table class="tbl"><tr><th>枠</th><th>物件</th><th>駅</th><th>賃料</th><th>PV</th><th>反響</th><th>遷移率</th><th>状況</th><th></th></tr>';
+  h+='<div class="tblwrap"><table class="tbl"><tr><th>枠</th><th>物件</th><th>駅</th><th>賃料</th><th>PV</th><th>反響</th><th>遷移率</th><th>掲載開始</th><th>状況</th><th></th></tr>';
   allP.forEach(p=>{
    var pv=+(p.csvPV||0),inq=+(p.csvInq||0),rate=pv>0?(inq/pv*100).toFixed(1)+'%':'-';
    var st=curStatus(p);
-   h+='<tr><td><span class="pill '+WK_PILL[WK_MAP[p.waku]||'is']+'">'+p.waku.slice(0,3)+'</span></td><td>'+lkName(p.id,esc(p.name).slice(0,16))+'</td><td>'+esc(p.station)+'</td><td>'+(p.rent||'-')+'</td><td style="font-weight:650">'+pv+'</td><td style="font-weight:700;color:var(--accent)">'+inq+'</td><td>'+rate+'</td><td>'+(st?'<span class="pill p-st">'+esc((st.memo||'メモ').slice(0,12))+'</span>':'<span class="muted">—</span>')+'</td><td><button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\');renderDash()">終了</button></td></tr>';
+   var startCell=(p.status==='落とし済み')?'<span class="pill p-done">done</span>':(p.suumoListStart?esc(p.suumoListStart):'<span class="muted">—</span>');
+   h+='<tr><td><span class="pill '+WK_PILL[WK_MAP[p.waku]||'is']+'">'+p.waku.slice(0,3)+'</span></td><td>'+lkName(p.id,esc(p.name).slice(0,16))+'</td><td>'+esc(p.station)+'</td><td>'+(p.rent||'-')+'</td><td style="font-weight:650">'+pv+'</td><td style="font-weight:700;color:var(--accent)">'+inq+'</td><td>'+rate+'</td><td style="font-size:11px;white-space:nowrap">'+startCell+'</td><td>'+memoChip(p)+'</td><td><button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\');renderDash()">終了</button></td></tr>';
   });
   h+='</table></div>';
  }else{h+='<div class="empty">掲載中の物件がありません</div>';}
@@ -452,7 +459,7 @@ async function extractInto(file,rec){
 function addBlank(){const r=mkRec();r.pdfName='手動入力';r.auto='手動';PEND.push(r);renderPend();tab('add');}
 function statusChips(idx){return STATUSES.map(s=>'<button type="button" class="chip" onclick="pendStat('+idx+',\''+s+'\',this)">'+s+'</button>').join('');}
 function pendStat(i,s,el){PEND[i].pendStatus=(PEND[i].pendStatus===s?'':s);[...el.parentNode.children].forEach(c=>c.classList.remove('on'));if(PEND[i].pendStatus)el.classList.add('on');}
-function wakuChips(i){const opts=['Demand','Opportunity','Insight','High-Hold'];return '<div class="chips">'+opts.map(w=>'<button type="button" class="chip'+(PEND[i].waku===w?' on':'')+'" onclick="setPendWaku('+i+',\''+w+'\')">'+w+'</button>').join('')+'</div>';}
+function wakuChips(i){const opts=['Demand','Opportunity','Insight','High-Hold','未分類'];return '<div class="chips">'+opts.map(w=>'<button type="button" class="chip'+(PEND[i].waku===w?' on':'')+'" onclick="setPendWaku('+i+',\''+w+'\')">'+w+'</button>').join('')+'</div>';}
 function setPendWaku(i,w){PEND[i].waku=w;renderPend();}
 function autoPill(a){const c=(a.indexOf('読取不可')>=0||a.indexOf('要手動')>=0)?'p-pre':(a==='手動'?'p-st':'p-act');return '<span class="pill '+c+'">'+esc(a)+'</span>';}
 function renderPend(){
@@ -492,8 +499,8 @@ async function savePend(){
    structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,phone:p.phone,holiday:p.holiday,
    propNo:p.propNo,pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',
    uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,
-   statusLog:log,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',
-   csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:''});
+   statusLog:log,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
+   csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
   if(p.pdfData)gset('pdf_'+id,p.pdfData).catch(()=>{});});
   await save();PEND=[];renderPend();toast('登録しました');tab('dash');
  };
@@ -541,7 +548,7 @@ function infoCard(p,agg){
  var stz=curStatus(p),fsc=p.scorePre?finalScore(p):null;
  var evalg='<div class="ig"><div class="ih">評価・状況</div><div class="fl">'
   +g('名寄せスコア（オプション込）',fsc!=null?fsc:'—')+g('基準',fsc!=null?(kijun(fsc)==='基準未満'?'基準未満':kijun(fsc)+'基準'):'—')+g('素点',p.scorePre||'—')
-  +'</div><div class="note" style="margin-top:6px"><b>物件状況メモ：</b>'+(stz?esc(stz.memo||'')+' <span class="muted">／ '+relTime(stz.ts)+'</span>':'未記録')+'</div></div>';
+  +'</div><div class="note" style="margin-top:6px"><b>物件状況メモ：</b>'+(stz?esc(stz.memo||'')+' <span class="muted">／ '+relTime(stz.ts)+'</span>':'未記録')+' <span class="lk" style="font-size:11px" onclick="event.stopPropagation();openMemo(\''+p.id+'\')">編集</span></div></div>';
  return '<div class="infocard">'
   +'<div class="ig"><div class="ih">物件概要</div><div class="fl">'+g('物件名',p.name)+g('間取り',p.madori)+g('構造',p.structure)+g('築年数',p.age)+g('面積',p.area)+g('階数',p.floor)+'</div></div>'
   +'<div class="ig"><div class="ih">立地</div><div class="fl">'+g('住所',p.address)+g('沿線',p.line)+g('駅',p.station)+g('徒歩',p.walkMin)+g('備考',p.nearby)+'</div></div>'
@@ -551,7 +558,7 @@ function infoCard(p,agg){
   +evalg
   +perf
   +'<div class="ig"><div class="ih">分析メモ</div><textarea onchange="setAnaMemo(\''+p.id+'\',this.value)" placeholder="この物件の分析・気づきを記録（自動保存）">'+esc(p.analysisMemo||'')+'</textarea></div>'
-  +'<div class="ig"><div class="ih">掲載情報</div><div class="fl">'+g('物件番号',p.propNo)+g('SUUMOコード',p.suumoCode)+g('PV(月)',p.csvPV)+g('反響(月)',p.csvInq)+g('得点',p.csvScore)+g('UP日',p.uploadDate)+'</div></div></div>';
+  +'<div class="ig"><div class="ih">掲載情報</div><div class="fl">'+g('物件番号',p.propNo)+g('SUUMOコード',p.suumoCode)+g('SUUMO掲載開始日',p.status==='落とし済み'?'done':(p.suumoListStart||''))+g('競合数(合計)',p.compTotal)+g('PV(月)',p.csvPV)+g('反響(月)',p.csvInq)+g('得点',p.csvScore)+g('UP日',p.uploadDate)+'</div></div></div>';
 }
 function statusBlock(p){
  const st=curStatus(p);
@@ -584,21 +591,44 @@ async function addStatus(id){
 async function viewPdf(id){try{var d=await gget('pdf_'+id,null);if(d&&typeof d==='string'&&d.length>100){window.open('data:application/pdf;base64,'+d);return;}}catch(e){}toast('PDFが保存されていません');}
 
 // ---------- LIST ----------
-let listFilt='全て',wakuFilt='全枠',listSort='スコア',rentMin='',rentMax='';
+let listFilt='全て',wakuFilt='全枠',listSort='スコア',rentMin='',rentMax='',listGroupUp=false,listUpDate='全て';
 function setListSort(v){listSort=v;renderList();}
 function setRent(which,v){if(which==='min')rentMin=v;else rentMax=v;renderList();}
+function toggleGroupUp(){listGroupUp=!listGroupUp;renderList();}
+function setUpDate(v){listUpDate=v;renderList();}
+function listCard(p,_a){
+ const wc=WK_PILL[WK_MAP[p.waku]||'is'];
+ const sc=p.status==='要入稿'?'p-pre':p.status==='掲載中'?'p-act':'p-done';
+ const fs=p.scorePre?'最終'+finalScore(p)+'('+kijun(finalScore(p))+')':'';
+ const ss=pstat(p,_a);const ds=daysSince(p.listDate);
+ let metrics='';
+ if(p.status==='掲載中'){const psc=propScore(ss);metrics='<div class="info" style="margin-top:4px;color:var(--text2)">'+[(ds!=null?'掲載'+ds+'日':'掲載日未記録'),(ss.hasData?'PV '+ss.avg.toFixed(1)+'/日':'PV データなし'),(ss.hasData?'反響 '+(ss.inq/ss.d).toFixed(2)+'/日':'反響 0/日')].join(' ・ ')+' </div><div style="margin-top:4px">物件スコア '+tierPill(psc)+'</div>';}
+ return '<div class="card"><div class="hd" onclick="this.parentNode.querySelector(\'.det\').classList.toggle(\'show\')"><span class="pill '+wc+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+'<span class="pill '+sc+'">'+p.status+'</span></div>'
+  +'<div class="info">'+[p.station,p.madori,p.rent?p.rent+'万':'',fs].filter(Boolean).join(' ・ ')+'</div>'
+  +metrics
+  +'<div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="muted" style="font-size:11px">状況メモ:</span>'+memoChip(p)+'<span class="muted" style="font-size:10.5px">登録 '+(p.uploadDate||'—')+'</span></div>'
+  +'<div class="det">'+infoCard(p,_a)+'<button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button>'+statusBlock(p)
+  +'<div class="row" style="gap:6px;margin-top:10px">'
+  +(p.status==='掲載中'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\')">落とし済み</button>':'')
+  +(p.status==='落とし済み'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'掲載中\')">掲載中に戻す</button>':'')
+  +(p.status==='要入稿'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'掲載中\')">掲載中にする</button>':'')
+  +'<button class="btn-sm btn-danger" onclick="delProp(\''+p.id+'\')">削除</button></div></div></div>';
+}
 function renderList(){
  recompute();const _a=anaAgg();
  document.getElementById('lfilt').innerHTML=['全て','要入稿','掲載中','落とし済み'].map(s=>'<button class="'+(listFilt===s?'on':'')+'" onclick="listFilt=\''+s+'\';renderList()">'+s+'</button>').join('');
- document.getElementById('wfilt').innerHTML=['全枠','Demand','Opportunity','Insight','High-Hold'].map(s=>'<button class="'+(wakuFilt===s?'on':'')+'" onclick="wakuFilt=\''+s+'\';renderList()">'+s+'</button>').join('');
+ document.getElementById('wfilt').innerHTML=['全枠','Demand','Opportunity','Insight','High-Hold','未分類'].map(s=>'<button class="'+(wakuFilt===s?'on':'')+'" onclick="wakuFilt=\''+s+'\';renderList()">'+s+'</button>').join('');
  let ps=PROPS;
  if(listFilt!=='全て')ps=ps.filter(p=>p.status===listFilt);
  if(wakuFilt!=='全枠')ps=ps.filter(p=>p.waku===wakuFilt);
+ if(listUpDate!=='全て')ps=ps.filter(p=>(p.uploadDate||'未設定')===listUpDate);
  const rmin=parseFloat(rentMin),rmax=parseFloat(rentMax);
  if(!isNaN(rmin))ps=ps.filter(p=>{const r=parseFloat(p.rent);return !isNaN(r)&&r>=rmin;});
  if(!isNaN(rmax))ps=ps.filter(p=>{const r=parseFloat(p.rent);return !isNaN(r)&&r<=rmax;});
+ const upDates=Array.from(new Set(PROPS.map(p=>p.uploadDate||'未設定'))).sort((a,b)=>b.localeCompare(a));
  const SORTS=['スコア','反響数','PV/日','反響/日','掲載日数','賃料高い','賃料安い','新着'];
- document.getElementById('lsort').innerHTML='<div class="fg" style="margin-bottom:8px"><div><label>賃料(万) 下限〜上限</label><div class="row" style="gap:6px"><input type="number" inputmode="decimal" placeholder="下限" value="'+rentMin+'" onchange="setRent(\'min\',this.value)" style="padding:8px"><span style="align-self:center">〜</span><input type="number" inputmode="decimal" placeholder="上限" value="'+rentMax+'" onchange="setRent(\'max\',this.value)" style="padding:8px"></div></div><div><label>並び替え</label><select onchange="setListSort(this.value)">'+SORTS.map(o=>'<option'+(listSort===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div></div>';
+ document.getElementById('lsort').innerHTML='<div class="fg" style="margin-bottom:8px"><div><label>賃料(万) 下限〜上限</label><div class="row" style="gap:6px"><input type="number" inputmode="decimal" placeholder="下限" value="'+rentMin+'" onchange="setRent(\'min\',this.value)" style="padding:8px"><span style="align-self:center">〜</span><input type="number" inputmode="decimal" placeholder="上限" value="'+rentMax+'" onchange="setRent(\'max\',this.value)" style="padding:8px"></div></div><div><label>並び替え</label><select onchange="setListSort(this.value)">'+SORTS.map(o=>'<option'+(listSort===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div></div>'
+  +'<div class="fg" style="margin-bottom:8px"><div><label>アップロード日で絞り込み</label><select onchange="setUpDate(this.value)"><option'+(listUpDate==='全て'?' selected':'')+'>全て</option>'+upDates.map(d=>'<option'+(listUpDate===d?' selected':'')+'>'+d+'</option>').join('')+'</select></div><div style="display:flex;align-items:flex-end"><button class="btn '+(listGroupUp?'btn-pri':'btn-sec')+'" style="width:100%" onclick="toggleGroupUp()">'+(listGroupUp?'✓ アップロード日ごと':'アップロード日ごと表示')+'</button></div></div>';
  const sv=p=>pstat(p,_a);
  ps=ps.slice().sort((a,b)=>{
   const A=sv(a),B=sv(b);
@@ -613,24 +643,13 @@ function renderList(){
   return 0;
  });
  if(!ps.length){document.getElementById('lbody').innerHTML='<div class="empty">該当なし</div>';return;}
- document.getElementById('lbody').innerHTML=ps.map(p=>{
-  const wc=WK_PILL[WK_MAP[p.waku]||'is'];
-  const sc=p.status==='要入稿'?'p-pre':p.status==='掲載中'?'p-act':'p-done';
-  const fs=p.scorePre?'最終'+finalScore(p)+'('+kijun(finalScore(p))+')':'';
-  const st=curStatus(p);
-  const ss=pstat(p,_a);const ds=daysSince(p.listDate);
-  let metrics='';
-  if(p.status==='掲載中'){const psc=propScore(ss);metrics='<div class="info" style="margin-top:4px;color:var(--text2)">'+[(ds!=null?'掲載'+ds+'日':'掲載日未記録'),(ss.hasData?'PV '+ss.avg.toFixed(1)+'/日':'PV データなし'),(ss.hasData?'反響 '+(ss.inq/ss.d).toFixed(2)+'/日':'反響 0/日')].join(' ・ ')+' </div><div style="margin-top:4px">物件スコア '+tierPill(psc)+'</div>';}
-  return '<div class="card"><div class="hd" onclick="this.parentNode.querySelector(\'.det\').classList.toggle(\'show\')"><span class="pill '+wc+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+'<span class="pill '+sc+'">'+p.status+'</span></div>'
-   +'<div class="info">'+[p.station,p.madori,p.rent?p.rent+'万':'',fs].filter(Boolean).join(' ・ ')+'</div>'
-   +metrics
-   +(st?'<div style="margin-top:6px"><span class="pill p-st">状況</span> <span class="muted" style="font-size:11px">'+esc((st.memo||'').slice(0,30))+(st.memo&&st.memo.length>30?'…':'')+' / '+relTime(st.ts)+'</span></div>':'')
-   +'<div class="det">'+infoCard(p,_a)+'<button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button>'+statusBlock(p)
-   +'<div class="row" style="gap:6px;margin-top:10px">'
-   +(p.status==='掲載中'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\')">落とし済み</button>':'')
-   +(p.status==='落とし済み'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'掲載中\')">掲載中に戻す</button>':'')
-   +(p.status==='要入稿'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'掲載中\')">掲載中にする</button>':'')
-   +'<button class="btn-sm btn-danger" onclick="delProp(\''+p.id+'\')">削除</button></div></div></div>';}).join('');
+ if(listGroupUp){
+  const groups={};ps.forEach(p=>{const k=p.uploadDate||'未設定';(groups[k]=groups[k]||[]).push(p);});
+  const keys=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+  document.getElementById('lbody').innerHTML=keys.map(k=>'<div class="sec-h" style="margin-top:14px">アップロード日：'+k+'（'+groups[k].length+'件）</div>'+groups[k].map(p=>listCard(p,_a)).join('')).join('');
+ }else{
+  document.getElementById('lbody').innerHTML=ps.map(p=>listCard(p,_a)).join('');
+ }
 }
 async function chgStatus(id,st){const p=PROPS.find(x=>x.id===id);if(!p)return;p.status=st;await save();const cur=document.querySelector('.tabs button.on').id.replace('tb-','');if(cur==='list')renderList();else if(cur==='dash')renderDash();}
 async function delProp(id){if(!confirm('削除しますか？'))return;PROPS=PROPS.filter(p=>p.id!==id);await save();renderList();}
@@ -644,7 +663,7 @@ function renderStaff(){
   const wc=WK_PILL[WK_MAP[p.waku]||'is'];const st=curStatus(p);
   return '<div class="card"><div class="hd" onclick="this.parentNode.querySelector(\'.det\').classList.toggle(\'show\')"><span class="pill '+wc+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+'<span class="pill p-pre">要入稿</span></div>'
    +'<div class="info">'+[p.station,p.madori,p.rent?p.rent+'万':'','納期 '+p.deadline].filter(Boolean).join(' ・ ')+'</div>'
-   +(st?'<div style="margin-top:6px"><span class="pill p-st">'+esc((st.memo||'メモ').slice(0,18))+'</span> <span class="muted" style="font-size:11px">'+relTime(st.ts)+'</span></div>':'')
+   +'<div style="margin-top:6px;display:flex;align-items:center;gap:6px"><span class="muted" style="font-size:11px">状況メモ:</span>'+memoChip(p)+'</div>'
    +'<div class="det">'+infoCard(p,_a)+'<button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button>'+statusBlock(p)
    +'<hr class="divider"><div style="font-size:11.5px;font-weight:700;color:var(--accent2);margin-bottom:4px">SUUMO入稿後に記録</div>'
    +'<div class="fg"><div><label>掲載日</label><input type="date" id="ld_'+p.id+'" value="'+today()+'"></div><div><label>写真数</label><input type="number" id="ph_'+p.id+'" value="0"></div></div>'
@@ -677,6 +696,38 @@ async function setOpt(id,which,ck){const p=PROPS.find(x=>x.id===id);if(!p)return
  const has=p.storePick||p.specArea||p.video;
  if(has&&!p.optAppliedAt)p.optAppliedAt=today();if(!has)p.optAppliedAt='';
  recompute();await save();renderOpt();
+}
+// ---------- 基準点以下（オプション前33点以下）----------
+let subShootFilt='全て',subJudgeFilt='全て';
+function setSubF(kind,v){if(kind==='s')subShootFilt=v;else subJudgeFilt=v;renderSub();}
+async function setShoot(id,ck){const p=PROPS.find(x=>x.id===id);if(!p)return;p.needShoot=ck;await save();renderSub();}
+async function setShootDate(id,v){const p=PROPS.find(x=>x.id===id);if(!p)return;p.shootDate=v;await save();}
+async function setSubJudge(id,v){const p=PROPS.find(x=>x.id===id);if(!p)return;p.subStdJudge=(p.subStdJudge===v?'':v);await save();renderSub();}
+async function setSubAction(id,v){const p=PROPS.find(x=>x.id===id);if(!p)return;p.subStdAction=v;await save();}
+function renderSub(){
+ let list=PROPS.filter(p=>p.scorePre!==''&&p.scorePre!=null&&Number(p.scorePre)<=33).sort((a,b)=>Number(a.scorePre)-Number(b.scorePre));
+ const total=list.length,shootN=list.filter(p=>p.needShoot).length,chkN=list.filter(p=>p.subStdJudge==='要確認').length,okN=list.filter(p=>p.subStdJudge==='許容').length;
+ let L=list;
+ if(subShootFilt==='要撮影のみ')L=L.filter(p=>p.needShoot);else if(subShootFilt==='要撮影なしのみ')L=L.filter(p=>!p.needShoot);
+ if(subJudgeFilt==='要確認')L=L.filter(p=>p.subStdJudge==='要確認');else if(subJudgeFilt==='許容')L=L.filter(p=>p.subStdJudge==='許容');else if(subJudgeFilt==='未設定')L=L.filter(p=>!p.subStdJudge);
+ let h='<div class="note" style="margin:0 2px 10px">オプション前スコアが<b>33点以下（第1基準34点に未達）</b>の物件一覧です。撮影・オプション・基準点以下の許容などの対応を管理します。<br>全'+total+'件 ／ 要撮影'+shootN+'件 ／ 要確認'+chkN+'件 ／ 許容'+okN+'件</div>';
+ h+='<div class="qlabel">撮影フィルタ</div><div class="chips">'+['全て','要撮影のみ','要撮影なしのみ'].map(s=>'<button type="button" class="chip'+(subShootFilt===s?' on':'')+'" onclick="setSubF(\'s\',\''+s+'\')">'+s+'</button>').join('')+'</div>';
+ h+='<div class="qlabel">判定フィルタ</div><div class="chips">'+['全て','要確認','許容','未設定'].map(s=>'<button type="button" class="chip'+(subJudgeFilt===s?' on':'')+'" onclick="setSubF(\'j\',\''+s+'\')">'+s+'</button>').join('')+'</div>';
+ if(!L.length){h+='<div class="empty">該当する物件はありません</div>';document.getElementById('subbody').innerHTML=h;return;}
+ const _a=anaAgg();
+ L.forEach(p=>{
+  const fs=finalScore(p),kj=kijun(fs),ss=pstat(p,_a),ds=daysSince(p.listDate);
+  const jPill=p.subStdJudge==='要確認'?'<span class="pill p-pre">要確認</span>':p.subStdJudge==='許容'?'<span class="pill p-done">許容</span>':'';
+  h+='<div class="card'+(p.needShoot?' needfix':'')+'"><div class="hd"><span class="pill '+(WK_PILL[WK_MAP[p.waku]||'is'])+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+(p.needShoot?'<span class="pill p-pre">要撮影</span>':'')+jPill+'</div>';
+  h+='<div class="info">'+[p.station,p.rent?p.rent+'万':'',(ds!=null?'掲載'+ds+'日':''),(ss.hasData?'PV '+ss.avg.toFixed(1)+'/日':'')].filter(Boolean).join(' ・ ')+'</div>';
+  h+='<div style="margin-top:4px"><span class="pill p-st">素点 '+p.scorePre+'</span> <span class="pill '+(kj==='基準未満'?'p-pre':'p-st')+'">オプション込 '+fs+'（'+(kj==='基準未満'?'基準未満':kj+'基準')+'）</span></div>';
+  h+='<div class="ck" style="margin-top:8px"><input type="checkbox" '+(p.needShoot?'checked':'')+' onchange="setShoot(\''+p.id+'\',this.checked)"><label>要撮影タグ</label></div>';
+  h+='<div class="qlabel">撮影可能日（内見可能日）</div><input type="date" value="'+(p.shootDate||'')+'" onchange="setShootDate(\''+p.id+'\',this.value)" style="padding:8px">';
+  h+='<div class="qlabel">基準点以下の判定</div><div class="chips">'+[['要確認','要確認'],['許容','基準点以下を許容']].map(o=>'<button type="button" class="chip'+(p.subStdJudge===o[0]?' on':'')+'" onclick="setSubJudge(\''+p.id+'\',\''+o[0]+'\')">'+o[1]+'</button>').join('')+'</div>';
+  h+='<div class="qlabel">基準点以下へのアクション（メモ）</div><textarea onchange="setSubAction(\''+p.id+'\',this.value)" placeholder="例：CM追加で34点に乗せる／撮影し直して再評価／このまま様子見">'+esc(p.subStdAction||'')+'</textarea>';
+  h+='</div>';
+ });
+ document.getElementById('subbody').innerHTML=h;
 }
 function renderOpt(){
  const _a=anaAgg();
@@ -741,8 +792,9 @@ function setupCSV(){const dz=document.getElementById('csvdrop'),inp=document.get
  dz.addEventListener('click',()=>inp.click());
  ['dragenter','dragover'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('over');}));
  ['dragleave','dragend'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove('over');}));
- dz.addEventListener('drop',ev=>{ev.preventDefault();dz.classList.remove('over');if(ev.dataTransfer.files[0])processCSV(ev.dataTransfer.files[0]);});
- inp.addEventListener('change',ev=>{if(ev.target.files[0])processCSV(ev.target.files[0]);inp.value='';});}
+ dz.addEventListener('drop',ev=>{ev.preventDefault();dz.classList.remove('over');const f=ev.dataTransfer.files[0];if(f)routeImport(f);});
+ inp.addEventListener('change',ev=>{if(ev.target.files[0])routeImport(ev.target.files[0]);inp.value='';});}
+function routeImport(file){const n=(file.name||'').toLowerCase();if(n.endsWith('.xls')||n.endsWith('.xlsx')){processHankyo(file);}else{processCSV(file);}}
 function readCSVText(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{
  try{const u=new Uint8Array(r.result);
   if(u[0]===0xEF&&u[1]===0xBB&&u[2]===0xBF){res(new TextDecoder('utf-8').decode(u));return;}
@@ -768,6 +820,66 @@ async function processCSV(file){
  if(colFind(hdr,['受信日時'])>=0){processJDS(hdr,rows);return;}
  if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){promptBijikon(hdr,rows);return;}
  log('CSVの形式を認識できませんでした。JDS（反響）または ビジコン（PV詳細）を入れてください。','err');
+}
+async function processHankyo(file){
+ if(typeof XLSX==='undefined'){log('Excel解析の準備中です。数秒おいて、もう一度ファイルを入れてください。','err');return;}
+ let wb;try{const buf=await file.arrayBuffer();wb=XLSX.read(buf,{type:'array'});}catch(e){log('Excelの読込に失敗しました。','err');return;}
+ const ws=wb.Sheets[wb.SheetNames[0]];if(!ws){log('シートが見つかりません。','err');return;}
+ const M=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});
+ const norm=s=>String(s==null?'':s).replace(/\s/g,'');
+ let hr=-1;for(let i=0;i<Math.min(M.length,15);i++){if((M[i]||[]).some(c=>norm(c)==='物件名')){hr=i;break;}}
+ if(hr<0){log('反響報告書の形式を認識できませんでした。SUUMOの「空室物件//反響報告書」のExcelを入れてください。','err');return;}
+ const H=M[hr].map(norm);
+ const col=(name)=>{let i=H.indexOf(norm(name));if(i<0)i=H.findIndex(h=>h.indexOf(norm(name))>=0);return i;};
+ const I={name:col('物件名'),room:col('部屋番号'),mad:col('間取'),rent:col('現在賃料(万円)'),line:col('沿線'),station:H.indexOf('駅'),walk:col('交通'),
+   code:col('物件コード'),score:col('住戸名寄点数'),comp:col('競合物件数（合計）'),first:col('初回掲載日'),
+   sa:col('得意なエリア'),sp:col('店舗案内ピックアップ'),cm:col('動画・ＣＭ')};
+ if(I.rent<0)I.rent=col('現在賃料');
+ const secRow=M[hr-1]?M[hr-1].map(norm):[];
+ let dstart=-1;for(let c=0;c<secRow.length;c++){if(/\d{2}年\d{2}月\d{2}日～\d{2}年\d{2}月\d{2}日/.test(secRow[c])){dstart=c;break;}}
+ I.pv=dstart>=0?dstart+3:-1;I.inq=dstart>=0?dstart+7:-1;
+ let repDate=twoDaysAgo();if(dstart>=0){const m=secRow[dstart].match(/\d{2}年\d{2}月\d{2}日～(\d{2})年(\d{2})月(\d{2})日/);if(m)repDate='20'+m[1]+'-'+m[2]+'-'+m[3];}
+ if(I.name<0||I.pv<0){log('必要な列（物件名・当日PV）が見つかりませんでした。','err');return;}
+ let matched=0,created=0,total=0;
+ for(let r=hr+1;r<M.length;r++){
+  const row=M[r];if(!row)continue;const name=String(row[I.name]||'').trim();if(!name)continue;total++;
+  const code=String(row[I.code]||'').replace(/[^0-9A-Za-z]/g,'');
+  const room=String(row[I.room]||'').trim();
+  const rentN=parseFloat(String(I.rent>=0?row[I.rent]:'').replace(/[^0-9.]/g,''));const rent=isNaN(rentN)?'':String(rentN);
+  const mad=String(I.mad>=0?row[I.mad]:'').trim();
+  const station=String(I.station>=0?row[I.station]:'').trim();
+  const line=String(I.line>=0?row[I.line]:'').trim();
+  const wm=((String(I.walk>=0?row[I.walk]:'').match(/(\d+)\s*分/)||[])[1])||'';
+  const sp=String(I.sp>=0?row[I.sp]:'').indexOf('◆')>=0,sa=String(I.sa>=0?row[I.sa]:'').indexOf('◆')>=0,cm=String(I.cm>=0?row[I.cm]:'').indexOf('◆')>=0;
+  const score=I.score>=0?(parseInt(String(row[I.score]||'').replace(/[^0-9]/g,''))):NaN;
+  const comp=I.comp>=0?String(row[I.comp]||'').trim():'';
+  const first=I.first>=0?parseDate(String(row[I.first]||'')):'';
+  const pv=parseInt(String(row[I.pv]||'').replace(/[^0-9]/g,''))||0;
+  const inq=I.inq>=0?(parseInt(String(row[I.inq]||'').replace(/[^0-9]/g,''))||0):0;
+  let p=findProp(name,code,room);
+  if(!p){
+   p={id:'p'+nowTS()+'_'+r,name:name,room:room,line:line,station:station,walkMin:wm,madori:mad,rent:rent,
+     status:'掲載中',waku:autoWakuImport(station,mad,rent||'0'),pdf:'',propNo:'',suumoCode:code,uploadDate:today(),
+     statusLog:[],listDate:first||'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',
+     storePick:sp,specArea:sa,video:cm,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',
+     needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',analysisMemo:'',
+     csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:first||'',compTotal:comp};
+   PROPS.push(p);created++;
+  }else{matched++;if(code&&!p.suumoCode)p.suumoCode=code;}
+  if(first){if(!p.suumoListStart)p.suumoListStart=first;if(!p.listDate)p.listDate=first;}
+  if(!HIST[repDate])HIST[repDate]={};
+  HIST[repDate][p.id]={pv:pv,inqB:inq};
+  Object.keys(EVENTS).forEach(k=>{if(k.indexOf('X|'+repDate+'|'+p.id+'|')===0)delete EVENTS[k];});
+  for(let j=0;j<inq;j++)EVENTS['X|'+repDate+'|'+p.id+'|'+j]={date:repDate,name:name,code:code,propId:p.id};
+  if(!p.csvAsOf||repDate>=p.csvAsOf){
+   p.csvAsOf=repDate;p.storePick=sp;p.specArea=sa;p.video=cm;
+   if(!isNaN(score)){p.csvScore=String(score);const opt=(sp?4:0)+(sa?2:0)+(cm?2:0);p.scorePre=String(Math.max(0,score-opt));}
+   if(comp!=='')p.compTotal=comp;
+   if(!p.madori&&mad)p.madori=mad;if((p.rent===''||p.rent==null)&&rent!=='')p.rent=rent;if(!p.station&&station)p.station=station;
+  }
+ }
+ recompute();saveAll();
+ log('反響報告書取込：'+repDate+'分 '+total+'行（更新'+matched+'件／新規'+created+'件）。PV・反響・オプション・名寄点数・掲載開始日を反映しました。','ok');
 }
 function processJDS(hdr,rows){
  const di=colFind(hdr,['受信日時']);
@@ -908,7 +1020,7 @@ function tierPill(sc){if(sc==null)return '<span class="pill p-pre">スコア -</
 function daysSince(ds){if(!ds)return null;const t=new Date(String(ds).replace(/-/g,'/')),n=new Date();return Math.floor((n-t)/86400000);}
 let anaWaku='全',anaMad='全',anaBand='全',anaPvThr=5;
 const ANA_BANDS=[['〜8万',0,8],['8〜10',8,10],['10〜12',10,12],['12〜15',12,15],['15〜20',15,20],['20万〜',20,99999]];
-const WKLABEL={'Demand':'デマンド','Opportunity':'オポ','High-Hold':'ハイ','Insight':'その他'};
+const WKLABEL={'Demand':'デマンド','Opportunity':'オポ','High-Hold':'ハイ','Insight':'その他','未分類':'未分類'};
 function bandLabel(r){if(isNaN(r))return'不明';for(const b of ANA_BANDS){if(r>=b[1]&&r<b[2])return b[0];}return'不明';}
 function setAna(kind,v){if(kind==='w')anaWaku=v;else if(kind==='m')anaMad=v;else anaBand=v;renderAna();}
 function anaChips(kind,cur,opts){return '<div class="chips">'+opts.map(o=>'<button type="button" class="chip'+(cur===o?' on':'')+'" onclick="setAna(\''+kind+'\',\''+o+'\')">'+o+'</button>').join('')+'</div>';}
@@ -1039,7 +1151,7 @@ function renderCross(){
  let h='<div class="note" style="margin:0 2px 10px">複数選択（タップで複数ON）と範囲指定（空欄＝制限なし）を組み合わせ、当てはまる掲載中物件の成績を確認できます。</div>';
  h+='<div class="card">';
  h+='<div class="qlabel">間取り（複数選択可）</div>'+cxChips('mad',cxMad,[['シングル','シングル'],['カップル','カップル'],['ファミリー','ファミリー']]);
- h+='<div class="qlabel">枠（複数選択可）</div>'+cxChips('waku',cxWaku,[['Demand','デマンド'],['Opportunity','オポ'],['Insight','その他'],['High-Hold','ハイ']]);
+ h+='<div class="qlabel">枠（複数選択可）</div>'+cxChips('waku',cxWaku,[['Demand','デマンド'],['Opportunity','オポ'],['Insight','その他'],['High-Hold','ハイ'],['未分類','未分類']]);
  h+='<div class="qlabel">バス・トイレ別（複数選択可）</div>'+cxChips('bt',cxBT,[['y','あり'],['n','なし']]);
  h+='<div class="qlabel">独立洗面台（複数選択可）</div>'+cxChips('wash',cxWash,[['y','あり'],['n','なし']]);
  h+='<div class="qlabel">駅徒歩（分）｜下限〜上限・空欄＝制限なし</div><div class="row" style="gap:6px"><input type="number" inputmode="numeric" placeholder="下限なし" value="'+cxWalkMin+'" onchange="cxNum(\'wmin\',this.value)" style="padding:8px"><span style="align-self:center">〜</span><input type="number" inputmode="numeric" placeholder="上限なし" value="'+cxWalkMax+'" onchange="cxNum(\'wmax\',this.value)" style="padding:8px"></div>';
@@ -1134,8 +1246,8 @@ function loadSample(){
    mgmtCo:'株式会社サンプル管理',phone:'03-0000-0000',holiday:'水曜',propNo:'',pubDate:'',nearby:'',btSep:bt?'あり':'',washStand:wash?'あり':'',floor:(i%4+1)+'階',
    deposit:'1ヶ月',keyMoney:_rnd()<0.5?'1ヶ月':'なし',uploadDate:_isoBack(age||5),deadline:nextSun(),rawText:'',commentA:'',commentB:'',analysisMemo:'',prospect:'',
    statusLog:[],listDate:status==='要入稿'?'':_isoBack(age),belowCount:String(2+Math.floor(_rnd()*9)),t1Count:String(3+Math.floor(_rnd()*10)),t2Count:String(1+Math.floor(_rnd()*6)),t3Count:String(Math.floor(_rnd()*4)),photoCount:String(5+Math.floor(_rnd()*6)),
-   scorePre:status==='掲載中'?(28+Math.round(_rnd()*16)):'',storePick:_rnd()<0.35,specArea:false,video:_rnd()<0.3,optReviewed:_rnd()<0.4,optReviewedAt:'',compDataAt:_isoBack(2),optAppliedAt:'',
-   csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:''};
+   scorePre:status==='掲載中'?(28+Math.round(_rnd()*16)):'',storePick:_rnd()<0.35,specArea:false,video:_rnd()<0.3,optReviewed:_rnd()<0.4,optReviewedAt:'',compDataAt:_isoBack(2),optAppliedAt:'',needShoot:_rnd()<0.45,shootDate:'',subStdJudge:(_rnd()<0.3?'要確認':(_rnd()<0.4?'許容':'')),subStdAction:'',
+   csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:(status==='掲載中'?_isoBack(age):''),compTotal:''};
   if(i%37===0)p.statusLog=[{memo:'先行申込あり、2番手で打診可',ts:nowTS()}];
   if(i%29===0)p.analysisMemo='同価格帯で上位。反響率も高め。オプション追加余地を検討。';
   props.push(p);
@@ -1172,6 +1284,25 @@ function openProp(id){
  document.body.appendChild(ov);
  ov.querySelector('#_px').onclick=()=>ov.remove();
  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+}
+function refreshCurrentTab(){tab(CURTAB||'dash');}
+function memoChip(p){const st=curStatus(p);const txt=st&&st.memo?esc(st.memo.slice(0,14))+(st.memo.length>14?'…':''):'＋メモ';const cls=st&&st.memo?'pill p-st':'pill';return '<span class="'+cls+' lk" style="cursor:pointer" onclick="event.stopPropagation();openMemo(\''+p.id+'\')">'+txt+'</span>';}
+function openMemo(id){
+ const p=PROPS.find(x=>x.id===id);if(!p)return;
+ const st=curStatus(p);
+ const ov=document.createElement('div');ov.className='ovl';
+ let hist='';
+ if(p.statusLog&&p.statusLog.length){hist='<div class="qlabel">更新履歴（'+p.statusLog.length+'件）</div><div class="tline">'+p.statusLog.slice().reverse().map(e=>'<div class="te"><div class="tt">'+esc(e.memo||'')+'</div><div class="td">'+fmtTS(e.ts)+'</div></div>').join('')+'</div>';}
+ ov.innerHTML='<div class="modal big"><div class="mhd"><b>物件状況メモ</b><button class="x" id="_mx">×</button></div><div class="mbody">'
+  +'<div style="font-size:12px;color:var(--text2);margin-bottom:6px">'+esc(p.name)+'</div>'
+  +'<textarea id="_mt" placeholder="申込状況・客付け状況などを記録" style="min-height:90px">'+esc(st?(st.memo||''):'')+'</textarea>'
+  +'<div class="row" style="gap:6px;margin-top:8px"><button class="btn btn-pri" style="flex:1" id="_ms">上書き保存</button><button class="btn btn-sec" style="flex:1" id="_ma">追記して保存</button></div>'
+  +hist+'</div></div>';
+ document.body.appendChild(ov);
+ const close=()=>ov.remove();
+ ov.querySelector('#_mx').onclick=close;ov.onclick=e=>{if(e.target===ov)close();};
+ ov.querySelector('#_ms').onclick=async()=>{const v=ov.querySelector('#_mt').value.trim();if(!p.statusLog)p.statusLog=[];const cur=curStatus(p);if(v){if(cur){cur.memo=v;cur.ts=nowTS();}else p.statusLog.push({memo:v,ts:nowTS()});}await save();close();toast('メモを保存しました');refreshCurrentTab();};
+ ov.querySelector('#_ma').onclick=async()=>{const v=ov.querySelector('#_mt').value.trim();if(!v){toast('メモを入力してください');return;}if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:v,ts:nowTS()});await save();close();toast('メモを追記しました');refreshCurrentTab();};
 }
 function uiConfirm(msg,onYes){
  const ov=document.createElement('div');ov.className='ovl';
