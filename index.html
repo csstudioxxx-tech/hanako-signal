@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>花子-Hanako signal｜運を、構造化する。</title>
+<title>花子-Hanako signal｜入稿効果の検証・データ管理</title>
 <style>
 :root{
  --bg:#f7f7f5;--surface:#ffffff;--text:#37352f;--text2:#6b6a66;--text3:#9b9a97;
@@ -134,7 +134,7 @@ textarea{resize:vertical;min-height:54px}
 .fade{animation:fade .4s ease both}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 </style></head><body>
-<header><h1><span class="dot"></span>花子シグナル <span style="font-size:11px;color:var(--text3);font-weight:600">β</span></h1><div class="sub">運を、構造化する。</div></header>
+<header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span></h1><div class="sub">運を、構造化する。</div></header>
 <div class="tabs">
 <button id="tb-dash" class="on" onclick="tab('dash')">ダッシュボード</button>
 <button id="tb-add" onclick="tab('add')">物件追加</button>
@@ -142,6 +142,7 @@ textarea{resize:vertical;min-height:54px}
 <button id="tb-staff" onclick="tab('staff')">入稿担当</button>
 <button id="tb-opt" onclick="tab('opt')">オプション</button>
 <button id="tb-sub" onclick="tab('sub')">基準点以下</button>
+<button id="tb-drop" onclick="tab('drop')">落とし選定</button>
 <button id="tb-csv" onclick="tab('csv')">データ取込</button>
 <button id="tb-hist" onclick="tab('hist')">履歴</button>
 <button id="tb-ana" onclick="tab('ana')">反響分析</button>
@@ -162,8 +163,9 @@ textarea{resize:vertical;min-height:54px}
 <div id="v-staff" style="display:none"><div id="sbody"></div></div>
 <div id="v-opt" style="display:none"><div id="obody"></div></div>
 <div id="v-sub" style="display:none"><div id="subbody"></div></div>
+<div id="v-drop" style="display:none"><div id="dropbody"></div></div>
 <div id="v-csv" style="display:none">
- <div class="drop" id="csvdrop"><div class="di">📊 CSVをドロップ</div><div class="ds">反響報告書（Excel・毎日）／ JDS（反響）／ ビジコン（PV詳細）</div></div>
+ <div class="drop" id="csvdrop"><div class="di">📊 CSV / Excelをドロップ</div><div class="ds">ビジコン＝PV（アプリ・スマホ込）／ 反響報告書(Excel)＝反響・オプション ／ JDS＝反響</div></div>
  <input type="file" id="csvin" accept=".csv" style="display:none">
  <div id="csvpending"></div>
  <div id="csvlog"></div>
@@ -381,8 +383,8 @@ function extractFields(raw,fname){
 
 
 // ---------- tabs ----------
-function tab(t){CURTAB=t;['dash','add','list','staff','opt','sub','csv','hist','ana','cross','otrend'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();}
+function tab(t){CURTAB=t;['dash','add','list','staff','opt','sub','drop','csv','hist','ana','cross','otrend'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();}
 
 // ---------- DASHBOARD ----------
 function monthOptions(){
@@ -588,14 +590,17 @@ async function addStatus(id){
  const cur=document.querySelector('.tabs button.on').id.replace('tb-','');
  if(cur==='list')renderList();else if(cur==='staff')renderStaff();else if(cur==='dash')renderDash();
 }
+async function pickPdf(id){var inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,.pdf';inp.onchange=function(){if(inp.files&&inp.files[0])attachPdf(id,inp.files[0]);};inp.click();}
+async function attachPdf(id,f){if(!/pdf/i.test(f.type)&&!/\.pdf$/i.test(f.name)){toast('PDFファイルを選んでください');return;}try{var ab=await f.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);await gset('pdf_'+id,btoa(bs));toast('PDFを保存しました（この端末に保存）');}catch(e){toast('PDFの保存に失敗しました');}}
 async function viewPdf(id){try{var d=await gget('pdf_'+id,null);if(d&&typeof d==='string'&&d.length>100){window.open('data:application/pdf;base64,'+d);return;}}catch(e){}toast('PDFが保存されていません');}
 
 // ---------- LIST ----------
-let listFilt='全て',wakuFilt='全枠',listSort='スコア',rentMin='',rentMax='',listGroupUp=false,listUpDate='全て';
+let listFilt='全て',wakuFilt='全枠',listSort='スコア',rentMin='',rentMax='',listGroupUp=false,upFrom='',upTo='',lsFrom='',lsTo='';
 function setListSort(v){listSort=v;renderList();}
 function setRent(which,v){if(which==='min')rentMin=v;else rentMax=v;renderList();}
+function setDateF(kind,v){if(kind==='upFrom')upFrom=v;else if(kind==='upTo')upTo=v;else if(kind==='lsFrom')lsFrom=v;else lsTo=v;renderList();}
+function clearDateF(){upFrom='';upTo='';lsFrom='';lsTo='';renderList();}
 function toggleGroupUp(){listGroupUp=!listGroupUp;renderList();}
-function setUpDate(v){listUpDate=v;renderList();}
 function listCard(p,_a){
  const wc=WK_PILL[WK_MAP[p.waku]||'is'];
  const sc=p.status==='要入稿'?'p-pre':p.status==='掲載中'?'p-act':'p-done';
@@ -607,7 +612,7 @@ function listCard(p,_a){
   +'<div class="info">'+[p.station,p.madori,p.rent?p.rent+'万':'',fs].filter(Boolean).join(' ・ ')+'</div>'
   +metrics
   +'<div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="muted" style="font-size:11px">状況メモ:</span>'+memoChip(p)+'<span class="muted" style="font-size:10.5px">登録 '+(p.uploadDate||'—')+'</span></div>'
-  +'<div class="det">'+infoCard(p,_a)+'<button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button>'+statusBlock(p)
+  +'<div class="det">'+infoCard(p,_a)+'<button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button><button class="pdfbtn" onclick="pickPdf(\''+p.id+'\')">📎 PDFを追加/差し替え</button>'+statusBlock(p)
   +'<div class="row" style="gap:6px;margin-top:10px">'
   +(p.status==='掲載中'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\')">落とし済み</button>':'')
   +(p.status==='落とし済み'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'掲載中\')">掲載中に戻す</button>':'')
@@ -621,14 +626,17 @@ function renderList(){
  let ps=PROPS;
  if(listFilt!=='全て')ps=ps.filter(p=>p.status===listFilt);
  if(wakuFilt!=='全枠')ps=ps.filter(p=>p.waku===wakuFilt);
- if(listUpDate!=='全て')ps=ps.filter(p=>(p.uploadDate||'未設定')===listUpDate);
+ if(upFrom)ps=ps.filter(p=>(p.uploadDate||'')>=upFrom);
+ if(upTo)ps=ps.filter(p=>(p.uploadDate||'')<=upTo);
+ if(lsFrom)ps=ps.filter(p=>(p.suumoListStart||'')>=lsFrom);
+ if(lsTo)ps=ps.filter(p=>(p.suumoListStart||'')<=lsTo);
  const rmin=parseFloat(rentMin),rmax=parseFloat(rentMax);
  if(!isNaN(rmin))ps=ps.filter(p=>{const r=parseFloat(p.rent);return !isNaN(r)&&r>=rmin;});
  if(!isNaN(rmax))ps=ps.filter(p=>{const r=parseFloat(p.rent);return !isNaN(r)&&r<=rmax;});
- const upDates=Array.from(new Set(PROPS.map(p=>p.uploadDate||'未設定'))).sort((a,b)=>b.localeCompare(a));
  const SORTS=['スコア','反響数','PV/日','反響/日','掲載日数','賃料高い','賃料安い','新着'];
  document.getElementById('lsort').innerHTML='<div class="fg" style="margin-bottom:8px"><div><label>賃料(万) 下限〜上限</label><div class="row" style="gap:6px"><input type="number" inputmode="decimal" placeholder="下限" value="'+rentMin+'" onchange="setRent(\'min\',this.value)" style="padding:8px"><span style="align-self:center">〜</span><input type="number" inputmode="decimal" placeholder="上限" value="'+rentMax+'" onchange="setRent(\'max\',this.value)" style="padding:8px"></div></div><div><label>並び替え</label><select onchange="setListSort(this.value)">'+SORTS.map(o=>'<option'+(listSort===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div></div>'
-  +'<div class="fg" style="margin-bottom:8px"><div><label>アップロード日で絞り込み</label><select onchange="setUpDate(this.value)"><option'+(listUpDate==='全て'?' selected':'')+'>全て</option>'+upDates.map(d=>'<option'+(listUpDate===d?' selected':'')+'>'+d+'</option>').join('')+'</select></div><div style="display:flex;align-items:flex-end"><button class="btn '+(listGroupUp?'btn-pri':'btn-sec')+'" style="width:100%" onclick="toggleGroupUp()">'+(listGroupUp?'✓ アップロード日ごと':'アップロード日ごと表示')+'</button></div></div>';
+  +'<div class="fg" style="margin-bottom:8px"><div><label>アップロード日（範囲）</label><div class="row" style="gap:6px"><input type="date" value="'+upFrom+'" onchange="setDateF(\'upFrom\',this.value)" style="padding:8px"><span style="align-self:center">〜</span><input type="date" value="'+upTo+'" onchange="setDateF(\'upTo\',this.value)" style="padding:8px"></div></div><div><label>SUUMO掲載開始日（範囲）</label><div class="row" style="gap:6px"><input type="date" value="'+lsFrom+'" onchange="setDateF(\'lsFrom\',this.value)" style="padding:8px"><span style="align-self:center">〜</span><input type="date" value="'+lsTo+'" onchange="setDateF(\'lsTo\',this.value)" style="padding:8px"></div></div></div>'
+  +'<div class="fg" style="margin-bottom:8px"><div style="display:flex;align-items:flex-end"><button class="btn btn-sec" style="width:100%" onclick="clearDateF()">日付をクリア</button></div><div style="display:flex;align-items:flex-end"><button class="btn '+(listGroupUp?'btn-pri':'btn-sec')+'" style="width:100%" onclick="toggleGroupUp()">'+(listGroupUp?'✓ アップロード日ごと':'アップロード日ごと表示')+'</button></div></div>';
  const sv=p=>pstat(p,_a);
  ps=ps.slice().sort((a,b)=>{
   const A=sv(a),B=sv(b);
@@ -664,7 +672,7 @@ function renderStaff(){
   return '<div class="card"><div class="hd" onclick="this.parentNode.querySelector(\'.det\').classList.toggle(\'show\')"><span class="pill '+wc+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+'<span class="pill p-pre">要入稿</span></div>'
    +'<div class="info">'+[p.station,p.madori,p.rent?p.rent+'万':'','納期 '+p.deadline].filter(Boolean).join(' ・ ')+'</div>'
    +'<div style="margin-top:6px;display:flex;align-items:center;gap:6px"><span class="muted" style="font-size:11px">状況メモ:</span>'+memoChip(p)+'</div>'
-   +'<div class="det">'+infoCard(p,_a)+'<button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button>'+statusBlock(p)
+   +'<div class="det">'+infoCard(p,_a)+'<button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button><button class="pdfbtn" onclick="pickPdf(\''+p.id+'\')">📎 PDFを追加/差し替え</button>'+statusBlock(p)
    +'<hr class="divider"><div style="font-size:11.5px;font-weight:700;color:var(--accent2);margin-bottom:4px">SUUMO入稿後に記録</div>'
    +'<div class="fg"><div><label>掲載日</label><input type="date" id="ld_'+p.id+'" value="'+today()+'"></div><div><label>写真数</label><input type="number" id="ph_'+p.id+'" value="0"></div></div>'
    +'<div class="fg"><div><label>基準値以下</label><input type="number" id="b0_'+p.id+'"></div><div><label>第1基準</label><input type="number" id="b1_'+p.id+'"></div></div>'
@@ -729,6 +737,43 @@ function renderSub(){
  });
  document.getElementById('subbody').innerHTML=h;
 }
+// ---------- 落とし選定（掲載を落とすべきランキング）----------
+let dropOnlyData=false,dropSort='score';
+function setDropFilt(){dropOnlyData=!dropOnlyData;renderDrop();}
+function setDropSort(v){dropSort=v;renderDrop();}
+function renderDrop(){
+ const a=anaAgg();
+ let L=PROPS.filter(p=>p.status==='掲載中').map(p=>({p:p,ss:pstat(p,a),ds:daysSince(p.listDate)}));
+ L.forEach(r=>{r.score=dropScore(r.p,r.ss);});
+ if(dropOnlyData)L=L.filter(r=>r.ss.hasData);
+ if(dropSort==='days')L.sort((x,y)=>((y.ds==null?-1:y.ds)-(x.ds==null?-1:x.ds))||(x.score-y.score));else L.sort((x,y)=>x.score-y.score); // 既定: -100が上（最も落とすべき）
+ const n=L.length;
+ let h='<div class="note" style="margin:0 2px 10px">掲載中の物件を「落とすべき順」に並べています。<b>落としSCOREは 1（残す）〜 −100（最も落とすべき）</b>。反響の少なさ・詳細PVの低さ・掲載の長さ・低賃料を加味して算出します。上位ほど整理候補です。</div>';
+ h+='<div class="chips" style="margin-bottom:8px"><button type="button" class="chip'+(!dropOnlyData?' on':'')+'" onclick="setDropFilt()">全件</button><button type="button" class="chip'+(dropOnlyData?' on':'')+'" onclick="setDropFilt()">PV/反響データ有りのみ</button></div>';
+ h+='<div class="qlabel">並び替え</div><div class="chips" style="margin-bottom:8px"><button type="button" class="chip'+(dropSort==='score'?' on':'')+'" onclick="setDropSort(\'score\')">落としSCORE順</button><button type="button" class="chip'+(dropSort==='days'?' on':'')+'" onclick="setDropSort(\'days\')">掲載日数が長い順</button></div>';
+ if(!n){h+='<div class="empty">掲載中の物件がありません</div>';document.getElementById('dropbody').innerHTML=h;return;}
+ h+='<div class="tblwrap"><table class="tbl"><tr><th>順</th><th>物件</th><th>枠</th><th>掲載日数</th><th>一覧PV/日</th><th>詳細PV/日</th><th>問合せ</th><th>賃料</th><th>落としSCORE</th><th></th></tr>';
+ L.forEach((r,i)=>{
+  const sc=r.score;const col=sc<=-60?'var(--red)':sc<=-20?'var(--amber)':'var(--green)';
+  const wpill='<span class="pill '+(WK_PILL[WK_MAP[r.p.waku]||'is'])+'">'+r.p.waku.slice(0,3)+'</span>';
+  h+='<tr>'
+   +'<td style="color:var(--text3)">'+(i+1)+'</td>'
+   +'<td>'+lkName(r.p.id,esc(r.p.name).slice(0,14))+'</td>'
+   +'<td>'+wpill+'</td>'
+   +'<td>'+(r.ds!=null?r.ds+'日':'-')+'</td>'
+   +'<td>'+(r.ss.hasData?r.ss.lvAvg.toFixed(1):'-')+'</td>'
+   +'<td>'+(r.ss.hasData?r.ss.avg.toFixed(1):'-')+'</td>'
+   +'<td style="font-weight:650;color:var(--accent)">'+r.ss.inq+'</td>'
+   +'<td>'+(r.p.rent?r.p.rent+'万':'-')+'</td>'
+   +'<td style="font-weight:800;color:'+col+'">'+sc+'</td>'
+   +'<td><button class="btn-sm" onclick="dropProp(\''+r.p.id+'\')">落とす</button></td>'
+   +'</tr>';
+ });
+ h+='</table></div>';
+ h+='<div class="note" style="margin-top:8px">※一覧PV/日は反響報告書（PCベース）の一覧数から算出しています。詳細PV/日はビジコン（アプリ・スマホ込）由来です。SCOREの重み付け（反響40%・詳細PV25%・掲載日数25%・賃料10%）は調整できます。</div>';
+ document.getElementById('dropbody').innerHTML=h;
+}
+async function dropProp(id){const p=PROPS.find(x=>x.id===id);if(!p)return;uiConfirm(esc(p.name)+' を「落とし済み」にしますか？',async()=>{p.status='落とし済み';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'落とし選定より落とし済みに変更',ts:nowTS()});await save();renderDrop();toast('落とし済みにしました');});}
 function renderOpt(){
  const _a=anaAgg();
  const TOKU=['世田谷区','渋谷区','杉並区','中野区','目黒区'];
@@ -837,7 +882,7 @@ async function processHankyo(file){
  if(I.rent<0)I.rent=col('現在賃料');
  const secRow=M[hr-1]?M[hr-1].map(norm):[];
  let dstart=-1;for(let c=0;c<secRow.length;c++){if(/\d{2}年\d{2}月\d{2}日～\d{2}年\d{2}月\d{2}日/.test(secRow[c])){dstart=c;break;}}
- I.pv=dstart>=0?dstart+3:-1;I.inq=dstart>=0?dstart+7:-1;
+ I.pv=dstart>=0?dstart+3:-1;I.inq=dstart>=0?dstart+7:-1;I.lv=dstart>=0?dstart+1:-1;
  let repDate=twoDaysAgo();if(dstart>=0){const m=secRow[dstart].match(/\d{2}年\d{2}月\d{2}日～(\d{2})年(\d{2})月(\d{2})日/);if(m)repDate='20'+m[1]+'-'+m[2]+'-'+m[3];}
  if(I.name<0||I.pv<0){log('必要な列（物件名・当日PV）が見つかりませんでした。','err');return;}
  let matched=0,created=0,total=0;
@@ -855,6 +900,7 @@ async function processHankyo(file){
   const comp=I.comp>=0?String(row[I.comp]||'').trim():'';
   const first=I.first>=0?parseDate(String(row[I.first]||'')):'';
   const pv=parseInt(String(row[I.pv]||'').replace(/[^0-9]/g,''))||0;
+  const lv=I.lv>=0?(parseInt(String(row[I.lv]||'').replace(/[^0-9]/g,''))||0):0;
   const inq=I.inq>=0?(parseInt(String(row[I.inq]||'').replace(/[^0-9]/g,''))||0):0;
   let p=findProp(name,code,room);
   if(!p){
@@ -868,7 +914,7 @@ async function processHankyo(file){
   }else{matched++;if(code&&!p.suumoCode)p.suumoCode=code;}
   if(first){if(!p.suumoListStart)p.suumoListStart=first;if(!p.listDate)p.listDate=first;}
   if(!HIST[repDate])HIST[repDate]={};
-  HIST[repDate][p.id]={pv:pv,inqB:inq};
+  HIST[repDate][p.id]=Object.assign(HIST[repDate][p.id]||{},{inqB:inq}); // pv(PCのみ)は取り込まない。PVはビジコンから
   Object.keys(EVENTS).forEach(k=>{if(k.indexOf('X|'+repDate+'|'+p.id+'|')===0)delete EVENTS[k];});
   for(let j=0;j<inq;j++)EVENTS['X|'+repDate+'|'+p.id+'|'+j]={date:repDate,name:name,code:code,propId:p.id};
   if(!p.csvAsOf||repDate>=p.csvAsOf){
@@ -879,7 +925,7 @@ async function processHankyo(file){
   }
  }
  recompute();saveAll();
- log('反響報告書取込：'+repDate+'分 '+total+'行（更新'+matched+'件／新規'+created+'件）。PV・反響・オプション・名寄点数・掲載開始日を反映しました。','ok');
+ log('反響報告書取込：'+repDate+'分 '+total+'行（更新'+matched+'件／新規'+created+'件）。反響・オプション・名寄点数・競合数・掲載開始日を反映（PVはPC閲覧のみのため取り込まず、PVはビジコンから取得します）。','ok');
 }
 function processJDS(hdr,rows){
  const di=colFind(hdr,['受信日時']);
@@ -922,6 +968,7 @@ function applyBijikon(){
   name:colFind(hdr,['物件名']),room:colFind(hdr,['部屋番号','号室']),code:colFind(hdr,['物件コード','SUUMO物件コード','管理番号']),
   pv:colFind(hdr,['合計詳細PV(合計)','合計詳細PV','詳細PV(合計)','PV']),
   inq:colFind(hdr,['問い合わせ(合計)','問い合わせ合計','問い合わせ']),
+  lv:colFind(hdr,['合計一覧PV(合計)','一覧PV(合計)','合計一覧PV','一覧PV','一覧表示(合計)','表示回数','掲載確認数']),
   score:colFind(hdr,['住戸名寄せ点数','スコア']),
   b0:colFind(hdr,['【基準値未満】競合物件数']),b1:colFind(hdr,['【第1基準値】競合物件数']),
   b2:colFind(hdr,['【第2基準値】競合物件数']),b3:colFind(hdr,['【第3基準値】競合物件数']),
@@ -938,7 +985,8 @@ function applyBijikon(){
   if(code&&!p.suumoCode)p.suumoCode=code;
   const pv=I.pv>=0?(+(row[I.pv]||0)||0):0;
   const inq=I.inq>=0?(+(row[I.inq]||0)||0):0;
-  HIST[date][p.id]={pv:pv,inqB:inq};
+  const lv=I.lv>=0?(+(row[I.lv]||0)||0):0;
+  HIST[date][p.id]=Object.assign(HIST[date][p.id]||{},{pv:pv,inqB:inq,listv:lv});
   if(!p.csvAsOf||date>=p.csvAsOf){ // latest-wins state
    p.csvAsOf=date;
    if(I.score>=0)p.csvScore=row[I.score]||'';
@@ -1000,12 +1048,23 @@ function histExport(){
 
 // ---------- 反響分析 ----------
 function anaAgg(){
- const pv={},days={},inq={};
- Object.keys(HIST).forEach(d=>{const o=HIST[d];Object.keys(o).forEach(pid=>{pv[pid]=(pv[pid]||0)+(+o[pid].pv||0);days[pid]=(days[pid]||0)+1;});});
+ const pv={},days={},inq={},lv={};
+ Object.keys(HIST).forEach(d=>{const o=HIST[d];Object.keys(o).forEach(pid=>{pv[pid]=(pv[pid]||0)+(+o[pid].pv||0);lv[pid]=(lv[pid]||0)+(+o[pid].listv||0);days[pid]=(days[pid]||0)+1;});});
  Object.keys(EVENTS).forEach(k=>{const e=EVENTS[k];if(e.propId)inq[e.propId]=(inq[e.propId]||0)+1;});
- return{pv,days,inq};
+ return{pv,days,inq,lv};
 }
-function pstat(p,a){const pv=a.pv[p.id]||0,d=a.days[p.id]||0,iq=a.inq[p.id]||0;return{p:p,pv:pv,d:d,avg:d>0?pv/d:0,inq:iq,rate:pv>0?iq/pv:0,walk:parseInt(p.walkMin)||null,rent:parseFloat(p.rent),bt:!!p.btSep,wash:!!p.washStand,hasData:d>0};}
+function pstat(p,a){const pv=a.pv[p.id]||0,d=a.days[p.id]||0,iq=a.inq[p.id]||0,lv=(a.lv&&a.lv[p.id])||0;return{p:p,pv:pv,d:d,avg:d>0?pv/d:0,lv:lv,lvAvg:d>0?lv/d:0,inq:iq,rate:pv>0?iq/pv:0,walk:parseInt(p.walkMin)||null,rent:parseFloat(p.rent),bt:!!p.btSep,wash:!!p.washStand,hasData:d>0};}
+// 落としSCORE: 1（残す）〜 -100（最も落とすべき）
+function dropScore(p,ss){
+ const days=daysSince(p.listDate);
+ const inqDay=ss.d>0?ss.inq/ss.d:0, pvDay=ss.avg, rent=parseFloat(p.rent)||0;
+ const fInq=1-Math.min(inqDay/0.3,1);          // 反響が少ないほど落とす
+ const fPv =1-Math.min(pvDay/5,1);             // 詳細PV/日が少ないほど落とす
+ const fDay=days!=null?Math.min(days/45,1):0.3;// 掲載が長いほど落とす
+ const fRent=1-Math.min(rent/20,1);            // 低額ほど落とす（高額は残す）
+ const risk=0.40*fInq+0.30*fPv+0.15*fDay+0.15*fRent; // 0..1
+ return Math.round(1-101*risk);                 // 1..-100
+}
 function amean(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:0;}
 function propScore(s){
  if(!s||!s.hasData)return null;
@@ -1256,7 +1315,7 @@ function loadSample(){
   let basePV=13+(walk<=10?5:(walk>=13?-6:-2))+(bt?3:-5)+(wash?1:0)+Math.round((9-rent)*0.7)+(cat==='ファミリー'?-4:(cat==='カップル'?-1:0));
   if(basePV<1)basePV=1;
   let totPV=0;
-  for(let n=(age<24?age:24);n>=rangeEnd;n--){const date=_isoBack(n);const pv=Math.max(0,Math.round(basePV+(_rnd()*6-3)));hist[date]=hist[date]||{};hist[date][id]={pv:pv,inqB:Math.round(pv*0.5)};totPV+=pv;}
+  for(let n=(age<24?age:24);n>=rangeEnd;n--){const date=_isoBack(n);const pv=Math.max(0,Math.round(basePV+(_rnd()*6-3)));hist[date]=hist[date]||{};hist[date][id]={pv:pv,inqB:Math.round(pv*0.5),listv:Math.round(pv*(3+_rnd()*3))};totPV+=pv;}
   let rate=0.05;if(cat==='ファミリー')rate=0.018;else if(rent>=20)rate=0.012;else if(cat==='カップル')rate=0.03;
   if(walk>10)rate*=0.6;if(!bt)rate*=0.6;
   let R=Math.round(totPV*rate);
@@ -1280,7 +1339,7 @@ function lkName(id,text){return '<span class="lk" onclick="event.stopPropagation
 function openProp(id){
  const p=PROPS.find(x=>x.id===id);if(!p)return;
  const ov=document.createElement('div');ov.className='ovl';
- ov.innerHTML='<div class="modal big"><div class="mhd"><b>'+esc(p.name)+'</b><button class="x" id="_px">×</button></div><div class="mbody">'+infoCard(p)+'<button class="pdfbtn" style="margin-top:10px" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button></div></div>';
+ ov.innerHTML='<div class="modal big"><div class="mhd"><b>'+esc(p.name)+'</b><button class="x" id="_px">×</button></div><div class="mbody">'+infoCard(p)+'<button class="pdfbtn" style="margin-top:10px" onclick="viewPdf(\''+p.id+'\')">📄 PDFを見る</button><button class="pdfbtn" style="margin-top:10px" onclick="pickPdf(\''+p.id+'\')">📎 PDFを追加/差し替え</button></div></div>';
  document.body.appendChild(ov);
  ov.querySelector('#_px').onclick=()=>ov.remove();
  ov.onclick=e=>{if(e.target===ov)ov.remove();};
