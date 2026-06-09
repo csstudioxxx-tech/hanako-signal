@@ -976,12 +976,13 @@ function applyBijikon(){
   sa:colFind(hdr,['得意なエリア枠掲載']),vd:colFind(hdr,['動画掲載']),cm:colFind(hdr,['物件CM掲載'])
  };
  if(!HIST[date])HIST[date]={};
- let matched=0;const total=rows.length;
+ let matched=0;const total=rows.length;const seen={};
  rows.forEach(row=>{
   const name=I.name>=0?(row[I.name]||'').trim():'';if(!name)return;
   const room=I.room>=0?(row[I.room]||'').trim():'';
   const code=I.code>=0?(row[I.code]||'').trim():'';
-  const p=findProp(name,code,room);if(!p)return;matched++;
+  const p=findProp(name,code,room);if(!p)return;matched++;seen[p.id]=1;
+  if(p.status!=='掲載中'){p.status='掲載中';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン掲載確認により掲載中に更新',ts:nowTS()});}
   if(code&&!p.suumoCode)p.suumoCode=code;
   const pv=I.pv>=0?(+(row[I.pv]||0)||0):0;
   const inq=I.inq>=0?(+(row[I.inq]||0)||0):0;
@@ -999,9 +1000,11 @@ function applyBijikon(){
    if(I.vd>=0||I.cm>=0)p.video=(I.vd>=0&&(row[I.vd]||'').indexOf('○')>=0)||(I.cm>=0&&(row[I.cm]||'').indexOf('○')>=0);
   }
  });
+ let ended=0;
+ PROPS.forEach(p=>{if(p.status==='掲載中'&&!seen[p.id]){p.status='落とし済み';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン未掲載のため掲載終了',ts:nowTS()});ended++;}});
  recompute();saveAll();
  bijikonPending=null;document.getElementById('csvpending').innerHTML='';
- log('ビジコン取込：'+date+' 分、'+total+'行中 '+matched+'物件にマッチ。PV・状態を更新しました。','ok');
+ log('ビジコン取込：'+date+'分。掲載中'+matched+'件／掲載終了'+ended+'件に更新。PV・一覧PV・オプション・名寄点数・競合数も反映しました。','ok');
 }
 function log(msg,kind){
  const c=kind==='err'?'p-pre':kind==='ok'?'p-act':'p-st';
@@ -1024,7 +1027,7 @@ function renderHist(){
   +'<div class="stat"><div class="t">合計PV</div><div class="n">'+totPV+'</div></div>'
   +'<div class="stat"><div class="t">合計反響(JDS)</div><div class="n">'+totIn+'</div></div>'
   +'<div class="stat"><div class="t">平均遷移率</div><div class="n">'+(totPV>0?(totIn/totPV*100).toFixed(1):'0')+'<small>%</small></div></div></div>';
- h+='<div class="bk" style="margin-top:0;margin-bottom:6px"><button class="btn btn-sec" onclick="histExport()">履歴をCSV書出</button></div>';
+ h+='<div class="bk" style="margin-top:0;margin-bottom:6px"><button class="btn btn-sec" onclick="histExport()">日別履歴CSV</button> <button class="btn btn-sec" onclick="propExport()">物件サマリーCSV</button></div>';
  h+='<div class="sec-h">日別 PV（ビジコン）</div>';
  if(dk.length){h+='<div class="card">';dk.forEach(d=>{h+='<div class="hbar"><div class="hl">'+d.slice(5)+'</div><div class="ht"><div class="hf" style="width:'+(days[d].pv/maxPV*100)+'%;background:var(--accent)"></div></div><div class="hv">'+days[d].pv+'</div></div>';});h+='</div>';}
  else h+='<div class="empty">この月のビジコン履歴はまだありません</div>';
@@ -1034,13 +1037,23 @@ function renderHist(){
  h+='<div class="note" style="margin-top:12px">PV・反響は日付ごとにすべて保存しています。「CSV書出」で全期間の生データを取り出して分析に使えます。</div>';
  document.getElementById('hbody').innerHTML=h;
 }
+function propExport(){
+ const a=anaAgg();
+ const opt=v=>v?'○':'×';
+ const rows=[['物件名','部屋','駅','沿線','間取り','賃料(万)','枠','状態','SUUMO掲載開始日','掲載日数','累計詳細PV','累計一覧PV','累計反響','平均詳細PV/日','平均一覧PV/日','反響/日','名寄せスコア(最新)','競合数合計','店ピク','得エリ','CM','物件番号','SUUMOコード','登録日']];
+ PROPS.forEach(p=>{const ss=pstat(p,a);const ds=daysSince(p.listDate);const comp=[p.belowCount,p.t1Count,p.t2Count,p.t3Count].map(x=>parseInt(x)||0).reduce((x,y)=>x+y,0);
+  rows.push([p.name,p.room||'',p.station||'',p.line||'',p.madori||'',p.rent||'',p.waku||'',p.status||'',p.suumoListStart||p.listDate||'',(ds!=null?ds:''),ss.pv,ss.lv,ss.inq,ss.avg.toFixed(2),ss.lvAvg.toFixed(2),(ss.d>0?(ss.inq/ss.d).toFixed(3):'0'),p.csvScore||p.scorePre||'',comp,opt(p.storePick),opt(p.specArea),opt(p.video),p.propNo||'',p.suumoCode||'',p.uploadDate||'']);});
+ const csv='\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const a2=document.createElement('a');a2.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a2.download='bukken_summary.csv';a2.click();
+ toast('物件サマリーをCSVで書き出しました');
+}
 function histExport(){
- const pid2name={};PROPS.forEach(p=>pid2name[p.id]={n:p.name,s:p.station,m:p.madori});
+ const pid2name={};PROPS.forEach(p=>pid2name[p.id]={n:p.name,s:p.station,m:p.madori,r:p.rent||''});
  const rec={}; // key date|pid -> {pv,inq,name}
- Object.keys(HIST).forEach(d=>{const o=HIST[d];Object.keys(o).forEach(pid=>{const k=d+'|'+pid;rec[k]=rec[k]||{date:d,pid:pid,pv:0,inq:0,name:''};rec[k].pv=+o[pid].pv||0;});});
- Object.keys(EVENTS).forEach(k=>{const e=EVENTS[k];if(!e.date)return;const pid=e.propId||('未:'+e.name);const kk=e.date+'|'+pid;rec[kk]=rec[kk]||{date:e.date,pid:pid,pv:0,inq:0,name:e.propId?'':e.name};rec[kk].inq++;});
- const rows=[['日付','物件名','駅','間取り','PV','反響(JDS)']];
- Object.keys(rec).sort().forEach(k=>{const r=rec[k];const info=pid2name[r.pid]||{n:r.name||r.pid,s:'',m:''};rows.push([r.date,info.n,info.s,info.m,r.pv,r.inq]);});
+ Object.keys(HIST).forEach(d=>{const o=HIST[d];Object.keys(o).forEach(pid=>{const k=d+'|'+pid;rec[k]=rec[k]||{date:d,pid:pid,pv:0,lv:0,inq:0,name:''};rec[k].pv=+o[pid].pv||0;rec[k].lv=+o[pid].listv||0;});});
+ Object.keys(EVENTS).forEach(k=>{const e=EVENTS[k];if(!e.date)return;const pid=e.propId||('未:'+e.name);const kk=e.date+'|'+pid;rec[kk]=rec[kk]||{date:e.date,pid:pid,pv:0,lv:0,inq:0,name:e.propId?'':e.name};rec[kk].inq++;});
+ const rows=[['日付','物件名','駅','間取り','賃料(万)','詳細PV','一覧PV','反響(JDS)']];
+ Object.keys(rec).sort().forEach(k=>{const r=rec[k];const info=pid2name[r.pid]||{n:r.name||r.pid,s:'',m:'',r:''};rows.push([r.date,info.n,info.s,info.m,info.r,r.pv,r.lv,r.inq]);});
  const csv='\uFEFF'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='pv_hankyo_history.csv';a.click();
  toast('履歴をCSVで書き出しました');
