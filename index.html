@@ -147,23 +147,24 @@ textarea{resize:vertical;min-height:54px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}@media(max-width:760px){.grid4{grid-template-columns:repeat(2,1fr)}}.pcard{background:#fff;border:1px solid var(--line,#ececec);border-radius:12px;padding:12px}.pcard .lab{font-size:12px;color:#9a9a9a;font-weight:700}.pcard .rng{font-size:10px;color:#b0b0b0}.pcard .big{font-size:22px;font-weight:800;margin:5px 0 2px}.pcard .sm{font-size:11.5px;color:#5a5a5a}.pcard .kpiline{font-size:11px;color:#8a8a8a;margin-top:3px}.repbars{display:flex;align-items:flex-end;gap:4px;height:130px;margin:6px 2px}.rbar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}.rbc{width:62%;background:linear-gradient(180deg,#3b82f6,#93c5fd);border-radius:3px 3px 0 0}.rbd{font-size:9px;color:#9a9a9a;margin-top:3px;text-align:center}.rbv{font-size:8.5px;color:#8a8a8a;margin-bottom:2px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.two{grid-template-columns:1fr}}.ai{background:linear-gradient(180deg,#fbfbff,#fff);border:1px solid #e3e6f5}.ai h4{font-size:13px;margin:14px 0 3px;font-weight:800}.ai p{margin:4px 0;font-size:13px}.ai ol{margin:4px 0 4px 2px;padding-left:18px}.ai li{font-size:13px;margin:5px 0}.ai .lead{font-size:13px;background:#f4f6ff;border-left:3px solid var(--accent,#2563eb);padding:9px 11px;border-radius:0 8px 8px 0}.pill.pg{background:#e7f6ec;color:#1a7f37}.pill.pr{background:#fdeaea;color:#dc2626}.btnrow{display:flex;gap:8px;flex-wrap:wrap}
 .jtoggle{cursor:pointer;color:var(--accent,#2563eb);font-weight:650;font-size:13px;display:inline-flex;align-items:center;margin-top:10px;user-select:none}.jtoggle svg{transition:transform .15s ease}.jtoggle.open svg{transform:rotate(90deg)}
 .obs{display:inline-flex;gap:3px}.ob{font-size:10px;padding:1px 5px;border-radius:5px;background:#eee;color:#c2c2c2;font-weight:700}.ob.on{background:#e7f0ff;color:#2563eb}
+.tlab{display:inline-block;font-size:9px;font-weight:800;line-height:1.45;padding:0 5px;border-radius:6px;margin-right:5px;vertical-align:1.5px;letter-spacing:.02em}.tlab-up{background:#e6f0ff;color:#2563eb}.tlab-nyu{background:#fff1e0;color:#c2700a}.tlab-beta{background:#eceef1;color:#9aa0a6}
 </style></head><body>
 <header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span></h1><div class="sub">運を、構造化する。</div></header>
 <div class="tabs">
 <button id="tb-dash" class="on" onclick="tab('dash')">ダッシュボード</button>
-<button id="tb-add" onclick="tab('add')">物件追加</button>
 <button id="tb-list" onclick="tab('list')">物件一覧</button>
-<button id="tb-review" onclick="tab('review')">確認待ち<span class="badge" id="rvbadge" style="display:none"></span></button>
-<button id="tb-report" onclick="tab('report')">現状レポート</button>
-<button id="tb-staff" onclick="tab('staff')">入稿担当</button>
-<button id="tb-opt" onclick="tab('opt')">オプション</button>
-<button id="tb-sub" onclick="tab('sub')">基準点以下</button>
-<button id="tb-drop" onclick="tab('drop')">落とし選定</button>
-<button id="tb-csv" onclick="tab('csv')">データ取込</button>
-<button id="tb-hist" onclick="tab('hist')">履歴</button>
-<button id="tb-ana" onclick="tab('ana')">反響分析</button>
-<button id="tb-cross" onclick="tab('cross')">条件分析</button>
-<button id="tb-otrend" onclick="tab('otrend')">オプション遷移</button>
+<button id="tb-add" onclick="tab('add')"><span class="tlab tlab-up">up</span>物件追加</button>
+<button id="tb-csv" onclick="tab('csv')"><span class="tlab tlab-up">up</span>データ取り込み</button>
+<button id="tb-review" onclick="tab('review')"><span class="tlab tlab-nyu">入稿</span>確認待ち<span class="badge" id="rvbadge" style="display:none"></span></button>
+<button id="tb-staff" onclick="tab('staff')"><span class="tlab tlab-nyu">入稿</span>入稿担当PAGE</button>
+<button id="tb-drop" onclick="tab('drop')"><span class="tlab tlab-beta">β</span>落とし選定</button>
+<button id="tb-sub" onclick="tab('sub')"><span class="tlab tlab-beta">β</span>基準点以下</button>
+<button id="tb-hist" onclick="tab('hist')"><span class="tlab tlab-beta">β</span>履歴</button>
+<button id="tb-cross" onclick="tab('cross')"><span class="tlab tlab-beta">β</span>条件分析</button>
+<button id="tb-opt" onclick="tab('opt')"><span class="tlab tlab-beta">β</span>オプション</button>
+<button id="tb-otrend" onclick="tab('otrend')"><span class="tlab tlab-beta">β</span>オプション遷移</button>
+<button id="tb-ana" onclick="tab('ana')"><span class="tlab tlab-beta">β</span>反響分析</button>
+<button id="tb-report" onclick="tab('report')"><span class="tlab tlab-beta">β</span>現状レポート</button>
 </div>
 <div class="wrap">
 <div id="v-dash"></div>
@@ -1382,7 +1383,7 @@ function fmtRent(v){return ''+(Math.round(v*100)/100);}
 function rentMan(p){return (p&&p.rent!=null&&p.rent!=='')?fmtRent(totalRent(p))+'万':'';}
 function rentDash(p){return totalRent(p)>0?fmtRent(totalRent(p))+'万':'-';}
 function totFromParts(rm,mg){var r=parseFloat(rm);if(isNaN(r))r=0;var m=parseFloat(String(mg==null?'':mg).replace(/[^0-9.]/g,''));if(isNaN(m))m=0;return r+m/10000;}
-function pstat(p,a){const pv=a.pv[p.id]||0,d=a.days[p.id]||0,iq=a.inq[p.id]||0,lv=(a.lv&&a.lv[p.id])||0;return{p:p,pv:pv,d:d,avg:d>0?pv/d:0,lv:lv,lvAvg:d>0?lv/d:0,inq:iq,rate:pv>0?iq/pv:0,walk:parseInt(p.walkMin)||null,rent:totalRent(p),bt:!!p.btSep,wash:!!p.washStand,hasData:d>0};}
+function pstat(p,a){const pv=a.pv[p.id]||0,d=a.days[p.id]||0,iq=a.inq[p.id]||0,lv=(a.lv&&a.lv[p.id])||0;return{p:p,pv:pv,d:d,avg:d>0?pv/d:0,lv:lv,lvAvg:d>0?lv/d:0,inq:iq,rate:pv>0?iq/pv:0,walk:parseInt(p.walkMin)||null,rent:totalRent(p),bt:!!p.btSep,wash:!!p.washStand,pet:!!p.petOk,dep0:!!p.dep0,key0:!!p.key0,alock:!!p.autoLock,dbox:!!p.delivBox,burner:!!p.twoBurner,hasData:d>0};}
 // 落としSCORE: 1（残す）〜 -100（最も落とすべき）
 function dropScore(p,ss){
  const days=daysSince(p.listDate);
@@ -1516,10 +1517,10 @@ function renderAna(){
  document.getElementById('anabody').innerHTML=h;
 }
 // ---------- 条件分析（クロス） ----------
-let cxBT=[],cxWash=[],cxMad=[],cxWaku=[],cxWalkMin='',cxWalkMax='',cxRentLo='',cxRentHi='';
-function cxToggle(kind,v){const m={bt:cxBT,wash:cxWash,mad:cxMad,waku:cxWaku}[kind];const i=m.indexOf(v);if(i>=0)m.splice(i,1);else m.push(v);renderCross();}
+let cxBT=[],cxWash=[],cxPet=[],cxDep0=[],cxKey0=[],cxAlock=[],cxDbox=[],cxBurner=[],cxMad=[],cxWaku=[],cxWalkMin='',cxWalkMax='',cxRentLo='',cxRentHi='';
+function cxToggle(kind,v){const m={bt:cxBT,wash:cxWash,pet:cxPet,dep0:cxDep0,key0:cxKey0,alock:cxAlock,dbox:cxDbox,burner:cxBurner,mad:cxMad,waku:cxWaku}[kind];const i=m.indexOf(v);if(i>=0)m.splice(i,1);else m.push(v);renderCross();}
 function cxNum(kind,v){if(kind==='wmin')cxWalkMin=v;else if(kind==='wmax')cxWalkMax=v;else if(kind==='rlo')cxRentLo=v;else cxRentHi=v;renderCross();}
-function cxReset(){cxBT=[];cxWash=[];cxMad=[];cxWaku=[];cxWalkMin='';cxWalkMax='';cxRentLo='';cxRentHi='';renderCross();}
+function cxReset(){cxBT=[];cxWash=[];cxPet=[];cxDep0=[];cxKey0=[];cxAlock=[];cxDbox=[];cxBurner=[];cxMad=[];cxWaku=[];cxWalkMin='';cxWalkMax='';cxRentLo='';cxRentHi='';renderCross();}
 function cxChips(kind,arr,opts){return '<div class="chips">'+opts.map(o=>'<button type="button" class="chip'+(arr.indexOf(o[0])>=0?' on':'')+'" onclick="cxToggle(\''+kind+'\',\''+o[0]+'\')">'+o[1]+'</button>').join('')+'</div>';}
 function renderCross(){
  const a=anaAgg();
@@ -1528,6 +1529,12 @@ function renderCross(){
  const L=base.filter(s=>{
   if(cxBT.length){if(cxBT.indexOf(s.bt?'y':'n')<0)return false;}
   if(cxWash.length){if(cxWash.indexOf(s.wash?'y':'n')<0)return false;}
+  if(cxPet.length){if(cxPet.indexOf(s.pet?'y':'n')<0)return false;}
+  if(cxDep0.length){if(cxDep0.indexOf(s.dep0?'y':'n')<0)return false;}
+  if(cxKey0.length){if(cxKey0.indexOf(s.key0?'y':'n')<0)return false;}
+  if(cxAlock.length){if(cxAlock.indexOf(s.alock?'y':'n')<0)return false;}
+  if(cxDbox.length){if(cxDbox.indexOf(s.dbox?'y':'n')<0)return false;}
+  if(cxBurner.length){if(cxBurner.indexOf(s.burner?'y':'n')<0)return false;}
   if(cxMad.length&&cxMad.indexOf(madoriCat(s.p.madori))<0)return false;
   if(cxWaku.length&&cxWaku.indexOf(s.p.waku)<0)return false;
   if(!isNaN(wmin)&&(s.walk==null||s.walk<wmin))return false;
@@ -1542,6 +1549,12 @@ function renderCross(){
  h+='<div class="qlabel">枠（複数選択可）</div>'+cxChips('waku',cxWaku,[['Demand','デマンド'],['Opportunity','オポ'],['Insight','その他'],['High-Hold','ハイ'],['未分類','未分類']]);
  h+='<div class="qlabel">バス・トイレ別（複数選択可）</div>'+cxChips('bt',cxBT,[['y','あり'],['n','なし']]);
  h+='<div class="qlabel">独立洗面台（複数選択可）</div>'+cxChips('wash',cxWash,[['y','あり'],['n','なし']]);
+ h+='<div class="qlabel">ペット相談可（複数選択可）</div>'+cxChips('pet',cxPet,[['y','あり'],['n','なし']]);
+ h+='<div class="qlabel">敷金0（複数選択可）</div>'+cxChips('dep0',cxDep0,[['y','あり'],['n','なし']]);
+ h+='<div class="qlabel">礼金0（複数選択可）</div>'+cxChips('key0',cxKey0,[['y','あり'],['n','なし']]);
+ h+='<div class="qlabel">オートロック（複数選択可）</div>'+cxChips('alock',cxAlock,[['y','あり'],['n','なし']]);
+ h+='<div class="qlabel">宅配ボックス（複数選択可）</div>'+cxChips('dbox',cxDbox,[['y','あり'],['n','なし']]);
+ h+='<div class="qlabel">2口コンロ（複数選択可）</div>'+cxChips('burner',cxBurner,[['y','あり'],['n','なし']]);
  h+='<div class="qlabel">駅徒歩（分）｜下限〜上限・空欄＝制限なし</div><div class="row" style="gap:6px"><input type="number" inputmode="numeric" placeholder="下限なし" value="'+cxWalkMin+'" onchange="cxNum(\'wmin\',this.value)" style="padding:8px"><span style="align-self:center">〜</span><input type="number" inputmode="numeric" placeholder="上限なし" value="'+cxWalkMax+'" onchange="cxNum(\'wmax\',this.value)" style="padding:8px"></div>';
  h+='<div class="qlabel">家賃（万円）｜下限〜上限・空欄＝制限なし</div><div class="row" style="gap:6px"><input type="number" inputmode="decimal" placeholder="下限なし" value="'+cxRentLo+'" onchange="cxNum(\'rlo\',this.value)" style="padding:8px"><span style="align-self:center">〜</span><input type="number" inputmode="decimal" placeholder="上限なし" value="'+cxRentHi+'" onchange="cxNum(\'rhi\',this.value)" style="padding:8px"></div>';
  h+='<button class="btn-sm" style="margin-top:8px" onclick="cxReset()">条件をクリア</button></div>';
@@ -1550,6 +1563,12 @@ function renderCross(){
  if(cxWaku.length)cond.push('枠['+cxWaku.map(w=>WKLABEL[w]||w).join('・')+']');
  if(cxBT.length)cond.push('BT別['+cxBT.map(v=>v==='y'?'あり':'なし').join('・')+']');
  if(cxWash.length)cond.push('独立洗面台['+cxWash.map(v=>v==='y'?'あり':'なし').join('・')+']');
+ if(cxPet.length)cond.push('ペット相談可['+cxPet.map(v=>v==='y'?'あり':'なし').join('・')+']');
+ if(cxDep0.length)cond.push('敷金0['+cxDep0.map(v=>v==='y'?'あり':'なし').join('・')+']');
+ if(cxKey0.length)cond.push('礼金0['+cxKey0.map(v=>v==='y'?'あり':'なし').join('・')+']');
+ if(cxAlock.length)cond.push('オートロック['+cxAlock.map(v=>v==='y'?'あり':'なし').join('・')+']');
+ if(cxDbox.length)cond.push('宅配ボックス['+cxDbox.map(v=>v==='y'?'あり':'なし').join('・')+']');
+ if(cxBurner.length)cond.push('2口コンロ['+cxBurner.map(v=>v==='y'?'あり':'なし').join('・')+']');
  if(!isNaN(wmin)||!isNaN(wmax))cond.push('徒歩'+(isNaN(wmin)?'':wmin+'分')+'〜'+(isNaN(wmax)?'':wmax+'分'));
  if(!isNaN(rlo)||!isNaN(rhi))cond.push('家賃'+(isNaN(rlo)?'':rlo+'万')+'〜'+(isNaN(rhi)?'':rhi+'万'));
  h+='<div class="note" style="margin:10px 2px 8px"><b>条件：</b>'+(cond.length?cond.join(' ＆ '):'指定なし（掲載中すべて）')+'</div>';
