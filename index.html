@@ -242,12 +242,17 @@ async function apiGet(){const r=await fetch(API+(API.indexOf('?')>=0?'&':'?')+'a
 let _pushT=null,_pushing=false,_again=false;
 function schedulePush(){if(!API)return;clearTimeout(_pushT);_pushT=setTimeout(doPush,500);}
 async function doPush(){if(!API)return;if(_pushing){_again=true;return;}_pushing=true;try{await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({props:PROPS,hist:HIST,events:EVENTS})});}catch(e){}_pushing=false;if(_again){_again=false;schedulePush();}}
+
+var _IDBp=null;
+function idbOpen(){if(_IDBp)return _IDBp;_IDBp=new Promise(function(res,rej){try{var r=indexedDB.open('hanako_pdf',1);r.onupgradeneeded=function(){r.result.createObjectStore('pdfs');};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};}catch(e){rej(e);}});return _IDBp;}
+function idbSet(k,v){return idbOpen().then(function(db){return new Promise(function(res,rej){var tx=db.transaction('pdfs','readwrite');tx.objectStore('pdfs').put(v,k);tx.oncomplete=function(){res(true);};tx.onerror=function(){rej(tx.error);};});});}
+function idbGet(k){return idbOpen().then(function(db){return new Promise(function(res){var tx=db.transaction('pdfs','readonly');var rq=tx.objectStore('pdfs').get(k);rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){res(undefined);};});});}
 async function gget(k,def){
- if(k.indexOf('pdf_')===0){try{const r=localStorage.getItem(k);return r?JSON.parse(r):def;}catch(e){return def;}}
+ if(k.indexOf('pdf_')===0){try{const r=await idbGet(k);if(r!=null)return r;}catch(e){}try{const r2=localStorage.getItem(k);return r2?JSON.parse(r2):def;}catch(e){}return def;}
  try{if(window.storage){const r=await window.storage.get(k);return r&&r.value?JSON.parse(r.value):def;}}catch(e){}
  try{const r=localStorage.getItem(k);return r?JSON.parse(r):def;}catch(e){}return def;}
 async function gset(k,v){
- if(k.indexOf('pdf_')===0){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}return;}
+ if(k.indexOf('pdf_')===0){try{await idbSet(k,v);return;}catch(e){}try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}return;}
  if(API){schedulePush();return;}
  try{if(window.storage){await window.storage.set(k,JSON.stringify(v));return;}}catch(e){}
  try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
@@ -487,7 +492,7 @@ async function extractInto(file,rec){
   rec.auto=!okread?'読取不可（手入力）':(manual?('要手動対応'+(mr?'：'+mr:'')):'自動読取');
   if(rec.station&&rec.madori)rec.waku=autoWaku(rec.station,rec.madori,String(totFromParts(rec.rent,rec.mgmtFee)||'0'));
   rec.rawText=raw.normalize('NFKC').replace(/\u2ec4/g,'\u897f').slice(0,2000);
-  try{const ab2=await file.arrayBuffer();if(file.size<3000000){const u8=new Uint8Array(ab2);let bs='';for(let j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);rec.pdfData=btoa(bs);}}catch(ee){}
+  try{const ab2=await file.arrayBuffer();if(file.size<30000000){const u8=new Uint8Array(ab2);let bs='';for(let j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);rec.pdfData=btoa(bs);}}catch(ee){}
  }catch(e){rec.auto='読取不可（手入力）';}
  renderPend();}
 function addBlank(){const r=mkRec();r.pdfName='手動入力';r.auto='手動';PEND.push(r);renderPend();tab('add');}
@@ -635,7 +640,7 @@ async function addStatus(id){
 }
 async function pickPdf(id){var inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,.pdf';inp.onchange=function(){if(inp.files&&inp.files[0])attachPdf(id,inp.files[0]);};inp.click();}
 async function attachPdf(id,f){if(!/pdf/i.test(f.type)&&!/\.pdf$/i.test(f.name)){toast('PDFファイルを選んでください');return;}try{var ab=await f.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);await gset('pdf_'+id,btoa(bs));toast('PDFを保存しました（この端末に保存）');}catch(e){toast('PDFの保存に失敗しました');}}
-async function viewPdf(id){var _pp=PROPS.find(function(x){return x.id===id;});if(_pp&&_pp.driveUrl){window.open(_pp.driveUrl,'_blank');return;}try{var d=await gget('pdf_'+id,null);if(d&&typeof d==='string'&&d.length>100){var bin=atob(d);var u8=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));var w=window.open(url,'_blank');if(!w){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}setTimeout(function(){URL.revokeObjectURL(url);},60000);return;}}catch(e){}toast('PDFが保存されていません');}
+async function viewPdf(id){var _pp=PROPS.find(function(x){return x.id===id;});if(_pp&&_pp.driveUrl){window.open(_pp.driveUrl,'_blank');return;}try{var d=await gget('pdf_'+id,null);if(d&&typeof d==='string'&&d.length>100){var bin=atob(d);var u8=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));var w=window.open(url,'_blank');if(!w){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}setTimeout(function(){URL.revokeObjectURL(url);},60000);return;}}catch(e){}toast('この端末にPDFが見つかりません（別の端末でアップロードした、または保存できていない可能性があります）');}
 
 // ---------- 確認待ち（未確認 + ビジコンズレ）+ インライン編集 ----------
 function inEd(id,field,val,ph,typ){return '<input class="ined" type="'+(typ||'text')+'" value="'+esc(val==null?'':String(val))+'" placeholder="'+(ph||'')+'" onchange="editProp(\''+id+'\',\''+field+'\',this.value)">';}
