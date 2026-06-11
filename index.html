@@ -156,7 +156,7 @@ textarea{resize:vertical;min-height:54px}
 <button id="tb-add" onclick="tab('add')"><span class="tlab tlab-up">up</span>物件追加</button>
 <button id="tb-csv" onclick="tab('csv')"><span class="tlab tlab-up">up</span>データ取り込み</button>
 <button id="tb-review" onclick="tab('review')"><span class="tlab tlab-nyu">入稿</span>確認待ち<span class="badge" id="rvbadge" style="display:none"></span></button>
-<button id="tb-staff" onclick="tab('staff')"><span class="tlab tlab-nyu">入稿</span>入稿担当PAGE</button>
+<button id="tb-staff" onclick="tab('staff')"><span class="tlab tlab-nyu">入稿</span>入稿担当PAGE<span class="badge" id="stbadge" style="display:none"></span></button>
 <button id="tb-drop" onclick="tab('drop')"><span class="tlab tlab-beta">β</span>落とし選定</button>
 <button id="tb-sub" onclick="tab('sub')"><span class="tlab tlab-beta">β</span>基準点以下</button>
 <button id="tb-hist" onclick="tab('hist')"><span class="tlab tlab-beta">β</span>履歴</button>
@@ -185,7 +185,7 @@ textarea{resize:vertical;min-height:54px}
 <div id="v-report" style="display:none"><div id="reportbody"></div></div>
 <div id="v-csv" style="display:none">
  <div class="drop" id="csvdrop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M4 20V10M10 20V4M16 20v-7M20 20H3"/></svg>CSV / Excelをドロップ</div><div class="ds">ビジコン＝PV（アプリ・スマホ込）／ 反響報告書(Excel)＝反響・オプション ／ JDS＝反響</div></div>
- <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-sec" onclick="bijikonDriveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからビジコン取込</button></div>
+ <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-sec" onclick="bijikonDriveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからビジコン取込</button><button class="btn btn-sec" onclick="testDrive()">ドライブ保存テスト</button></div>
  <input type="file" id="csvin" accept=".csv" style="display:none">
  <div id="csvpending"></div>
  <div id="csvlog"></div>
@@ -536,6 +536,7 @@ function renderPend(){
   +'<label>紹介コメント(B)</label><textarea oninput="PEND['+i+'].commentB=this.value">'+esc(p.commentB)+'</textarea>'
   +'</div></div>';}).join('');
 }
+async function testDrive(){if(!API){alert('共有設定（GASのURL）が未設定です。物件追加→共有設定で設定してください。');return;}toast('ドライブ保存をテスト中…');try{var body=JSON.stringify({action:'savePdf',name:'_接続テスト_'+Date.now()+'.pdf',date:today(),data:btoa('%PDF-1.4\n% hanako test\n')});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var t=await r.text();var ok=false,url='';try{var d=JSON.parse(t);ok=d&&d.ok;url=d&&d.url||'';}catch(e){}alert((ok?'成功：ドライブに保存できました。\n日付フォルダ（'+today()+'）の中を確認してください。\n'+url:'失敗：GASからの応答↓\n'+t.slice(0,600))+'\n\n（成功なのにDBが消えた場合はdoPostの分岐位置を確認）');}catch(e){alert('通信エラー：'+e.message+'\n→ GASを「新バージョン」で再デプロイしたか、URLが正しいか、Drive権限を承認したかを確認してください。');}}
 async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var body=JSON.stringify({action:'savePdf',name:((prop.name||prop.pdfName||'maisoku')+'').replace(/[\\/:*?"<>|]/g,'_').slice(0,80)+'.pdf',date:(prop.uploadDate||today()),data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
 function pendDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
 async function savePend(){
@@ -661,7 +662,7 @@ function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
  if(r.photo!=null&&r.photo!==''&&String(p.photoCount||'')!==String(r.photo||''))d.push({f:'photoCount',label:'写真数',cur:p.photoCount||'',bj:r.photo||''});
  return d;}
 function bjMismatch(p){return !!(p.bjRef && !p.bjOkAt && bjDiff(p).length>0);}
-function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length+PROPS.filter(bjMismatch).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}}catch(e){}}
+function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length+PROPS.filter(bjMismatch).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿';}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}}catch(e){}}
 function rvFields(p){
  var f=function(field,label,typ){return '<div class="rvf"><label>'+label+'</label>'+inEd(p.id,field,p[field],'',typ)+'</div>';};
  var statusSel='<div class="rvf"><label>状態</label>'+inSel(p.id,'status',p.status,['掲載中','要入稿','落とし済み'])+'</div>';
