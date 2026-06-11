@@ -500,9 +500,11 @@ function renderPend(){
  document.getElementById('pcnt').textContent='（'+PEND.length+'件）';
  el.innerHTML=PEND.map((p,i)=>{
   const fix=(p.auto&&(p.auto.indexOf('要手動')>=0||p.auto.indexOf('読取不可')>=0));
+  const dup=pendDup(p);
   return '<div class="card'+(fix?' needfix':'')+'">'
-  +'<div class="spread"><span class="nm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'+esc(p.pdfName)+'</span><div class="row" style="gap:6px">'+autoPill(p.auto)+'<button class="btn-sm btn-danger" onclick="PEND.splice('+i+',1);renderPend()">削除</button></div></div>'
+  +'<div class="spread"><span class="nm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'+esc(p.pdfName)+'</span><div class="row" style="gap:6px">'+(dup?'<span class="pill pr" style="align-self:center">重複</span>':'')+autoPill(p.auto)+'<button class="btn-sm btn-danger" onclick="PEND.splice('+i+',1);renderPend()">削除</button></div></div>'
   +'<div class="info">'+[p.station,p.walkMin?'徒歩'+p.walkMin:'',p.madori,rentMan(p)].filter(Boolean).join(' ・ ')+'</div>'
+  +(dup?'<div class="warnbox">'+ic('warn')+'この物件は号室含めて既に登録済みです。登録時はスキップされます。</div>':'')
   +(fix?'<div class="warnbox">'+ic('warn')+'自動読取が不確実です'+(p.auto.indexOf('：')>=0?'（'+esc(p.auto.split('：')[1])+'）':'')+'。下の詳細で駅・条件をご確認のうえ手修正してください。</div>':'')
   +'<div class="qlabel">枠の振り分け（必須・タップで選択）</div>'+wakuChips(i)
   +'<div class="qlabel">物件状況メモ（申込状況・客付け状況など）</div><textarea oninput="PEND['+i+'].pendMemo=this.value" placeholder="例：先行申込1番手あり、2番手で打診可">'+esc(p.pendMemo)+'</textarea>'
@@ -528,9 +530,12 @@ function renderPend(){
   +'<label>紹介コメント(B)</label><textarea oninput="PEND['+i+'].commentB=this.value">'+esc(p.commentB)+'</textarea>'
   +'</div></div>';}).join('');
 }
+function pendDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
 async function savePend(){
  const doSave=async()=>{
+ var skipped=[];
  PEND.forEach(p=>{
+  if(pendDup(p)){skipped.push(p.name||p.pdfName);return;}
   const id='PR'+Date.now()+Math.random().toString(36).slice(2,5);
   const log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});
   PROPS.push({id:id,status:'要入稿',confirmed:false,bjRef:null,bjOkAt:'',waku:p.waku||'Insight',suumoCode:'',
@@ -541,7 +546,7 @@ async function savePend(){
    statusLog:log,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
    csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
   if(p.pdfData)gset('pdf_'+id,p.pdfData).catch(()=>{});});
-  await save();PEND=[];renderPend();toast('登録しました');tab('dash');
+  await save();var _added=PEND.length-skipped.length;PEND=[];renderPend();toast(skipped.length?(_added+'件登録（重複'+skipped.length+'件はスキップ）'):'登録しました（'+_added+'件）');tab('dash');
  };
  const noMemo=PEND.filter(p=>!p.pendMemo||!p.pendMemo.trim()).length;
  if(noMemo>0)uiConfirm('メモ未入力の物件が'+noMemo+'件あります。このまま登録しますか？（あとから「物件一覧」で追加できます）',doSave);
