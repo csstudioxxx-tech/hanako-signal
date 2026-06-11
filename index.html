@@ -155,8 +155,8 @@ textarea{resize:vertical;min-height:54px}
 <button id="tb-list" onclick="tab('list')">物件一覧</button>
 <button id="tb-add" onclick="tab('add')"><span class="tlab tlab-up">up</span>物件追加</button>
 <button id="tb-csv" onclick="tab('csv')"><span class="tlab tlab-up">up</span>データ取り込み</button>
-<button id="tb-review" onclick="tab('review')"><span class="tlab tlab-nyu">入稿</span>確認待ち<span class="badge" id="rvbadge" style="display:none"></span></button>
-<button id="tb-staff" onclick="tab('staff')"><span class="tlab tlab-nyu">入稿</span>入稿担当PAGE<span class="badge" id="stbadge" style="display:none"></span></button>
+<button id="tb-review" onclick="tab('review')"><span class="tlab tlab-nyu">入稿</span>要データ確認<span class="badge" id="rvbadge" style="display:none"></span></button>
+<button id="tb-staff" onclick="tab('staff')"><span class="tlab tlab-nyu">入稿</span>要入稿<span class="badge" id="stbadge" style="display:none"></span></button>
 <button id="tb-drop" onclick="tab('drop')"><span class="tlab tlab-beta">β</span>落とし選定</button>
 <button id="tb-sub" onclick="tab('sub')"><span class="tlab tlab-beta">β</span>基準点以下</button>
 <button id="tb-hist" onclick="tab('hist')"><span class="tlab tlab-beta">β</span>履歴</button>
@@ -662,7 +662,7 @@ function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
  if(r.photo!=null&&r.photo!==''&&String(p.photoCount||'')!==String(r.photo||''))d.push({f:'photoCount',label:'写真数',cur:p.photoCount||'',bj:r.photo||''});
  return d;}
 function bjMismatch(p){return !!(p.bjRef && !p.bjOkAt && bjDiff(p).length>0);}
-function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length+PROPS.filter(bjMismatch).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿';}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}}catch(e){}}
+function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length+PROPS.filter(bjMismatch).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}}catch(e){}}
 function rvFields(p){
  var f=function(field,label,typ){return '<div class="rvf"><label>'+label+'</label>'+inEd(p.id,field,p[field],'',typ)+'</div>';};
  var statusSel='<div class="rvf"><label>状態</label>'+inSel(p.id,'status',p.status,['掲載中','要入稿','落とし済み'])+'</div>';
@@ -725,7 +725,7 @@ async function driveImport(){
    add++;
   });
   recompute();await saveAll();updateBadges();
-  toast(add>0?(add+'件をドライブから取り込みました（確認待ちへ）'):'新しいPDFはありませんでした');
+  toast(add>0?(add+'件をドライブから取り込みました（要データ確認へ）'):'新しいPDFはありませんでした');
   if(add>0)tab('review');
  }catch(e){toast('ドライブ取込エラー: '+e.message);}
 }
@@ -974,7 +974,7 @@ async function delProp(id){if(!confirm('削除しますか？'))return;PROPS=PRO
 // ---------- STAFF ----------
 function renderStaff(){
  const _a=anaAgg();
- const pre=PROPS.filter(p=>p.status==='要入稿');
+ const pre=PROPS.filter(p=>p.status==='要入稿'&&p.confirmed!==false);
  if(!pre.length){document.getElementById('sbody').innerHTML='<div class="empty">要入稿の物件はありません</div>';return;}
  document.getElementById('sbody').innerHTML=pre.map(p=>{
   const wc=WK_PILL[WK_MAP[p.waku]||'is'];const st=curStatus(p);
@@ -1087,7 +1087,7 @@ function renderOpt(){
  const _a=anaAgg();
  const TOKU=['世田谷区','渋谷区','杉並区','中野区','目黒区'];
  let active=PROPS.filter(p=>p.status==='掲載中'&&p.scorePre);
- if(!active.length){document.getElementById('obody').innerHTML='<div class="empty">掲載中でスコアが入力された物件がありません。<br>入稿担当タブでスコアを入力してください。</div>';return;}
+ if(!active.length){document.getElementById('obody').innerHTML='<div class="empty">掲載中でスコアが入力された物件がありません。<br>要入稿タブでスコアを入力してください。</div>';return;}
  if(optReviewFilt==='要検討')active=active.filter(p=>!p.optReviewed);
  else if(optReviewFilt==='検討済み')active=active.filter(p=>p.optReviewed);
  if(optOptFilt==='オプション有り')active=active.filter(p=>hasOpt(p));
