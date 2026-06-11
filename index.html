@@ -255,7 +255,7 @@ async function load(){
  else{PROPS=await gget(SK,[]);HIST=await gget(HK,{});EVENTS=await gget(EK,{});}
  PROPS.forEach(p=>{
   if(!p.statusLog)p.statusLog=[];
-  if(p.suumoCode==null)p.suumoCode='';
+  if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
   if(p.csvPV==null)p.csvPV=0;if(p.csvInq==null)p.csvInq=0;if(p.csvInqB==null)p.csvInqB=0;
   if(p.csvAsOf==null)p.csvAsOf='';
   if(p.optReviewed==null)p.optReviewed=false;if(p.compDataAt==null)p.compDataAt='';if(p.optAppliedAt==null)p.optAppliedAt='';
@@ -364,6 +364,7 @@ function findName(txt,fname){
   if(n.length>=2&&n.length<=28&&/[一-龥ぁ-んァ-ヴA-Za-z]/.test(n)&&NG.indexOf(n)<0)return n;}
  return cleanFname(fname);
 }
+function findMgmtCo(src){var t=(src||'').normalize('NFKC').replace(/[ \t\u3000]+/g,' ');var re=/([^\s\d：:\/｜|（）()「」【】、，,。]{2,24}(?:株式会社|合同会社|有限会社)|(?:株式会社|合同会社|有限会社)[^\s\d：:\/｜|（）()「」【】、，,。]{2,24})\s*((?:[^\s\d：:\/｜|（）()「」【】、，,。]{1,12})?(?:支店|支社|営業所|営業部|センター|出張所))?/g;var best='',m;while((m=re.exec(t))!==null){var f=m[0].replace(/\s+/g,'');if(f.length>best.length)best=f;if(re.lastIndex===m.index)re.lastIndex++;}return best;}
 function extractFields(raw,fname){
  var txt=raw.normalize('NFKC').replace(/\u2ec4/g,'\u897f').replace(/[\s\u3000]+/g,'');
  var f={},m;
@@ -383,16 +384,24 @@ function extractFields(raw,fname){
  var sc=findStructure(txt);if(sc)f.structure=sc;
  var ad=findAddress(txt);if(ad)f.address=ad;
  f.name=findName(txt,fname);
+ var _rm=txt.match(/(\d{1,4})号室/);if(_rm)f.room=_rm[1]+'号室';
+ if(f.name){var _sp=f.name.match(/^(.+?)[\s\u3000･・\-]*?(\d{1,4})(号室?)?$/);if(_sp&&_sp[1]&&_sp[1].length>=2&&!/^\d+$/.test(_sp[1])){if(!f.room)f.room=_sp[2]+(_sp[3]&&_sp[3].indexOf('号')>=0?_sp[3]:'号室');f.name=_sp[1].replace(/[\s\u3000･・\-]+$/,'');}}
  m=txt.match(/管理費(?:等)?[:：]?([\d,]+)円/);if(m)f.mgmtFee=m[1]+'円';
  m=txt.match(/敷金[:：]?(なし|無|[\d.]+[ヶケか]?月分?|[\d.]+万円|賃料の[\d.]+[ヶケか]月分?|[\d,]+円)/);if(m)f.deposit=m[1];
  m=txt.match(/礼金[:：]?(なし|無|[\d.]+[ヶケか]?月分?|[\d.]+万円|賃料の[\d.]+[ヶケか]月分?|[\d,]+円)/);if(m)f.keyMoney=m[1];
  m=txt.match(/TEL[:：]?([\d\-()]{8,16})/);if(m)f.phone=m[1].replace(/[()]/g,'-');
- var cos=txt.match(/(?:株式会社|有限会社)[一-龥ぁ-んァ-ヴA-Za-z・]{2,16}/g);if(cos)f.mgmtCo=cos[cos.length-1];
+ var _co=findMgmtCo(raw);if(_co)f.mgmtCo=_co;
  m=txt.match(/(\d+)階部分/);if(m)f.floor=m[1]+'階';else{m=txt.match(/所在階[:：]?(\d+)階/);if(m)f.floor=m[1]+'階';}
  m=txt.match(/物件番号[:：]?(\d{4,})/);if(m)f.propNo=m[1];
  m=txt.match(/情報公開日[:：]?([\d.\/]+)/);if(m)f.pubDate=m[1];
  if(/B[・.]?T別|バス・?トイレ別|浴室トイレ別|BT別/.test(txt))f.btSep='あり';
  if(/洗面所独立|独立洗面/.test(txt))f.washStand='あり';
+ if(/ペット(相談|可|飼育)/.test(txt))f.petOk='あり';
+ if(/敷金(?:[:：])?(?:なし|無し|無|0円|０円|ゼロ|0ヶ月)/.test(txt)||(f.deposit&&/^(なし|無し|無|0円|０円|0ヶ月)/.test(f.deposit)))f.dep0='あり';
+ if(/礼金(?:[:：])?(?:なし|無し|無|0円|０円|ゼロ|0ヶ月)/.test(txt)||(f.keyMoney&&/^(なし|無し|無|0円|０円|0ヶ月)/.test(f.keyMoney)))f.key0='あり';
+ if(/オートロック/.test(txt))f.autoLock='あり';
+ if(/宅配(?:ボックス|BOX|ロッカー)/i.test(txt))f.delivBox='あり';
+ if(/(?:2|２|二)口(?:コンロ|ガス|IH|ガスコンロ)|コンロ(?:2|２|二)口/.test(txt))f.twoBurner='あり';
  if(zoneStn&&f.madori)f.waku=autoWaku(zoneStn,f.madori,String(totFromParts(f.rent,f.mgmtFee)||'0'));
  var reasons=[];
  if(manualStn||!zoneStn)reasons.push('駅');
@@ -499,7 +508,7 @@ function renderPend(){
   +'<div class="qlabel">物件状況メモ（申込状況・客付け状況など）</div><textarea oninput="PEND['+i+'].pendMemo=this.value" placeholder="例：先行申込1番手あり、2番手で打診可">'+esc(p.pendMemo)+'</textarea>'
   +'<button class="btn-sm" style="margin-top:8px" onclick="this.parentNode.querySelector(\'.det\').classList.toggle(\'show\')">物件情報の詳細・編集 ▾</button>'
   +'<div class="det">'
-  +'<div class="fg"><div><label>物件名</label><input value="'+esc(p.name)+'" oninput="PEND['+i+'].name=this.value"></div><div><label>間取り</label><input value="'+esc(p.madori)+'" oninput="PEND['+i+'].madori=this.value"></div></div>'
+  +'<div class="fg"><div><label>物件名</label><input value="'+esc(p.name)+'" oninput="PEND['+i+'].name=this.value"></div><div><label>部屋番号</label><input value="'+esc(p.room||'')+'" oninput="PEND['+i+'].room=this.value"></div><div><label>間取り</label><input value="'+esc(p.madori)+'" oninput="PEND['+i+'].madori=this.value"></div></div>'
   +'<div class="fg"><div><label>沿線</label><input value="'+esc(p.line)+'" oninput="PEND['+i+'].line=this.value"></div><div><label>駅（主要＝ランキング駅）</label><input value="'+esc(p.station)+'" oninput="PEND['+i+'].station=this.value"></div></div>'
   +'<div class="fg"><div><label>徒歩</label><input value="'+esc(p.walkMin)+'" oninput="PEND['+i+'].walkMin=this.value"></div><div><label>家賃(万)</label><input value="'+esc(p.rent)+'" oninput="PEND['+i+'].rent=this.value"></div><div><label>管理費・共益費(円)</label><input value="'+esc(p.mgmtFee)+'" oninput="PEND['+i+'].mgmtFee=this.value"></div></div>'
   +(p.nearby?'<div class="note" style="margin:2px 0 6px">他駅: '+esc(p.nearby)+'</div>':'')
@@ -509,6 +518,12 @@ function renderPend(){
   +'<div class="fg"><div><label>階数</label><input value="'+esc(p.floor||'')+'" oninput="PEND['+i+'].floor=this.value"></div><div><label>掲載納期</label><input type="date" value="'+p.deadline+'" onchange="PEND['+i+'].deadline=this.value"></div></div>'
   +'<div class="ck"><input type="checkbox" '+(p.btSep?'checked':'')+' onchange="PEND['+i+'].btSep=this.checked?\'あり\':\'\'"><label>バス・トイレ別</label></div>'
   +'<div class="ck"><input type="checkbox" '+(p.washStand?'checked':'')+' onchange="PEND['+i+'].washStand=this.checked?\'あり\':\'\'"><label>独立洗面台</label></div>'
+  +'<div class="ck"><input type="checkbox" '+(p.petOk?'checked':'')+' onchange="PEND['+i+'].petOk=this.checked?\'あり\':\'\'"><label>ペット相談可</label></div>'
+  +'<div class="ck"><input type="checkbox" '+(p.dep0?'checked':'')+' onchange="PEND['+i+'].dep0=this.checked?\'あり\':\'\'"><label>敷金0</label></div>'
+  +'<div class="ck"><input type="checkbox" '+(p.key0?'checked':'')+' onchange="PEND['+i+'].key0=this.checked?\'あり\':\'\'"><label>礼金0</label></div>'
+  +'<div class="ck"><input type="checkbox" '+(p.autoLock?'checked':'')+' onchange="PEND['+i+'].autoLock=this.checked?\'あり\':\'\'"><label>オートロック</label></div>'
+  +'<div class="ck"><input type="checkbox" '+(p.delivBox?'checked':'')+' onchange="PEND['+i+'].delivBox=this.checked?\'あり\':\'\'"><label>宅配ボックス</label></div>'
+  +'<div class="ck"><input type="checkbox" '+(p.twoBurner?'checked':'')+' onchange="PEND['+i+'].twoBurner=this.checked?\'あり\':\'\'"><label>2口コンロ</label></div>'
   +'<label>紹介コメント(A)</label><textarea oninput="PEND['+i+'].commentA=this.value">'+esc(p.commentA)+'</textarea>'
   +'<label>紹介コメント(B)</label><textarea oninput="PEND['+i+'].commentB=this.value">'+esc(p.commentB)+'</textarea>'
   +'</div></div>';}).join('');
@@ -521,7 +536,7 @@ async function savePend(){
   PROPS.push({id:id,status:'要入稿',confirmed:false,bjRef:null,bjOkAt:'',waku:p.waku||'Insight',suumoCode:'',
    pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),
    structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,phone:p.phone,holiday:p.holiday,
-   propNo:p.propNo,pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',
+   propNo:p.propNo,pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',
    uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,
    statusLog:log,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
    csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
@@ -576,7 +591,7 @@ function infoCard(p,agg){
  return '<div class="infocard">'
   +'<div class="ig"><div class="ih">物件概要</div><div class="fl">'+g('物件名',p.name)+g('間取り',p.madori)+g('構造',p.structure)+g('築年数',p.age)+g('面積',p.area)+g('階数',p.floor)+'</div></div>'
   +'<div class="ig"><div class="ih">立地</div><div class="fl">'+g('住所',p.address)+g('沿線',p.line)+g('駅',p.station)+g('徒歩',p.walkMin)+g('備考',p.nearby)+'</div></div>'
-  +'<div class="ig"><div class="ih">条件</div><div class="fl">'+g('賃料(総額)',p.rent?fmtRent(totalRent(p))+'万円':'')+g('敷金',p.deposit)+g('礼金',p.keyMoney)+g('BT別',p.btSep)+g('独立洗面台',p.washStand)+'</div></div>'
+  +'<div class="ig"><div class="ih">条件</div><div class="fl">'+g('賃料(総額)',p.rent?fmtRent(totalRent(p))+'万円':'')+g('敷金',p.deposit)+g('礼金',p.keyMoney)+g('BT別',p.btSep)+g('独立洗面台',p.washStand)+'</div></div>'+'<div class="ig"><div class="ih">設備</div><div class="fl">'+g('ペット相談',p.petOk)+g('敷金0',p.dep0)+g('礼金0',p.key0)+g('オートロック',p.autoLock)+g('宅配ボックス',p.delivBox)+g('2口コンロ',p.twoBurner)+'</div></div>'
   +'<div class="ig"><div class="ih">管理</div><div class="fl">'+g('管理会社',p.mgmtCo)+g('TEL',p.phone)+g('家賃',p.rent?p.rent+'万':'')+g('管理費・共益費',p.mgmt?p.mgmt+'円':'')+g('定休日',p.holiday)+'</div></div>'
   +'<div class="ig"><div class="ih">オプション</div><div class="fl">'+g('店ピク(+4)',p.storePick?'○ 付与':'×')+g('得エリ(+2)',p.specArea?'○ 付与':'×')+g('CM(+2)',p.video?'○ 付与':'×')+(p.optAppliedAt?g('付与日',p.optAppliedAt):'')+'</div></div>'
   +evalg
@@ -638,7 +653,7 @@ function rvFields(p){
  var f=function(field,label,typ){return '<div class="rvf"><label>'+label+'</label>'+inEd(p.id,field,p[field],'',typ)+'</div>';};
  var statusSel='<div class="rvf"><label>状態</label>'+inSel(p.id,'status',p.status,['掲載中','要入稿','落とし済み'])+'</div>';
  var wakuSel='<div class="rvf"><label>枠</label>'+inSel(p.id,'waku',p.waku,['Demand','Opportunity','Insight','High-Hold','未分類'])+'</div>';
- return '<div class="rvgrid">'+f('name','物件名')+f('room','部屋')+f('station','駅')+f('line','沿線')+f('walkMin','徒歩')+f('madori','間取り')+f('rent','家賃(万)')+f('mgmt','管理費・共益費(円)')+f('area','面積')+f('structure','構造')+f('age','築年数')+f('suumoListStart','掲載開始日')+f('propNo','物件番号')+f('suumoCode','SUUMOコード')+statusSel+wakuSel+'</div>';
+ return '<div class="rvgrid">'+f('name','物件名')+f('room','部屋')+f('station','駅')+f('line','沿線')+f('walkMin','徒歩')+f('madori','間取り')+f('rent','家賃(万)')+f('mgmt','管理費・共益費(円)')+f('area','面積')+f('structure','構造')+f('age','築年数')+f('propNo','物件番号')+statusSel+wakuSel+'</div>';
 }
 function renderReview(){
  var un=PROPS.filter(function(p){return p.confirmed===false;});
@@ -965,7 +980,7 @@ function renderStaff(){
 }
 function updF(id){const sc=+(document.getElementById('sc_'+id).value)||0;const sp=document.getElementById('sp_'+id).checked;const sa=document.getElementById('sa_'+id).checked;const vd=document.getElementById('vd_'+id).checked;const fs=sc+(sp?4:0)+(sa?2:0)+(vd?2:0);document.getElementById('fs_'+id).textContent=fs+' ('+kijun(fs)+')';}
 async function postListing(id){const p=PROPS.find(x=>x.id===id);if(!p)return;
- p.listDate=document.getElementById('ld_'+id).value;p.photoCount=document.getElementById('ph_'+id).value;
+ p.listDate=document.getElementById('ld_'+id).value||today();p.photoCount=document.getElementById('ph_'+id).value;
  p.belowCount=document.getElementById('b0_'+id).value;p.t1Count=document.getElementById('b1_'+id).value;
  p.t2Count=document.getElementById('b2_'+id).value;p.t3Count=document.getElementById('b3_'+id).value;
  p.scorePre=+(document.getElementById('sc_'+id).value)||0;
