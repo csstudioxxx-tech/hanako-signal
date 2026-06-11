@@ -536,10 +536,11 @@ function renderPend(){
   +'<label>紹介コメント(B)</label><textarea oninput="PEND['+i+'].commentB=this.value">'+esc(p.commentB)+'</textarea>'
   +'</div></div>';}).join('');
 }
+async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var body=JSON.stringify({action:'savePdf',name:((prop.name||prop.pdfName||'maisoku')+'').replace(/[\\/:*?"<>|]/g,'_').slice(0,80)+'.pdf',date:(prop.uploadDate||today()),data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
 function pendDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
 async function savePend(){
  const doSave=async()=>{
- var skipped=[];
+ var skipped=[];var _uploads=[];
  PEND.forEach(p=>{
   if(pendDup(p)){skipped.push(p.name||p.pdfName);return;}
   const id='PR'+Date.now()+Math.random().toString(36).slice(2,5);
@@ -551,8 +552,9 @@ async function savePend(){
    uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,
    statusLog:log,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
    csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
-  if(p.pdfData)gset('pdf_'+id,p.pdfData).catch(()=>{});});
-  await save();var _added=PEND.length-skipped.length;PEND=[];renderPend();toast(skipped.length?(_added+'件登録（重複'+skipped.length+'件はスキップ）'):'登録しました（'+_added+'件）');tab('dash');
+  if(p.pdfData)_uploads.push({id:id,b64:p.pdfData});});
+  var _dn=0;for(var _u=0;_u<_uploads.length;_u++){var _pp=PROPS.find(function(x){return x.id===_uploads[_u].id;});var _ok=false;if(_pp){_ok=await uploadPdfToDrive(_pp,_uploads[_u].b64);}if(_ok)_dn++;else{try{await gset('pdf_'+_uploads[_u].id,_uploads[_u].b64);}catch(e){}}}
+  await save();var _added=PEND.length-skipped.length;PEND=[];renderPend();toast(_added+'件登録'+(skipped.length?'（重複'+skipped.length+'件スキップ）':'')+(_uploads.length?'／PDFドライブ保存 '+_dn+'/'+_uploads.length:''));tab('dash');
  };
  const noMemo=PEND.filter(p=>!p.pendMemo||!p.pendMemo.trim()).length;
  if(noMemo>0)uiConfirm('メモ未入力の物件が'+noMemo+'件あります。このまま登録しますか？（あとから「物件一覧」で追加できます）',doSave);
@@ -639,7 +641,7 @@ async function addStatus(id){
  if(cur==='list')renderList();else if(cur==='staff')renderStaff();else if(cur==='dash')renderDash();
 }
 async function pickPdf(id){var inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,.pdf';inp.onchange=function(){if(inp.files&&inp.files[0])attachPdf(id,inp.files[0]);};inp.click();}
-async function attachPdf(id,f){if(!/pdf/i.test(f.type)&&!/\.pdf$/i.test(f.name)){toast('PDFファイルを選んでください');return;}try{var ab=await f.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);await gset('pdf_'+id,btoa(bs));toast('PDFを保存しました（この端末に保存）');}catch(e){toast('PDFの保存に失敗しました');}}
+async function attachPdf(id,f){if(!/pdf/i.test(f.type)&&!/\.pdf$/i.test(f.name)){toast('PDFファイルを選んでください');return;}try{var ab=await f.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);var _b=btoa(bs);var _p=PROPS.find(function(x){return x.id===id;});var _ok=false;if(_p){_ok=await uploadPdfToDrive(_p,_b);}if(_ok){await save();toast('PDFをドライブに保存しました（全PCで表示可）');}else{await gset('pdf_'+id,_b);toast('PDFをこの端末に保存しました（ドライブ未設定/失敗）');}}catch(e){toast('PDFの保存に失敗しました');}}
 async function viewPdf(id){var _pp=PROPS.find(function(x){return x.id===id;});if(_pp&&_pp.driveUrl){window.open(_pp.driveUrl,'_blank');return;}try{var d=await gget('pdf_'+id,null);if(d&&typeof d==='string'&&d.length>100){var bin=atob(d);var u8=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));var w=window.open(url,'_blank');if(!w){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}setTimeout(function(){URL.revokeObjectURL(url);},60000);return;}}catch(e){}toast('この端末にPDFが見つかりません（別の端末でアップロードした、または保存できていない可能性があります）');}
 
 // ---------- 確認待ち（未確認 + ビジコンズレ）+ インライン編集 ----------
