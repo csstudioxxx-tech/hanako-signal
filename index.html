@@ -56,7 +56,7 @@ header .sub{font-size:11px;color:var(--text3);margin-top:2px}
 .info{font-size:12px;color:var(--text2);margin-top:7px}
 /* pills */
 .pill{font-size:10.5px;font-weight:650;padding:2.5px 9px;border-radius:7px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
-.p-dm{background:var(--accent-soft);color:var(--accent2)}.p-op{background:var(--purple-bg);color:var(--purple)}.p-is{background:var(--green-bg);color:var(--green)}.p-hh{background:var(--amber-bg);color:var(--amber)}.p-uc{background:var(--bg2);color:var(--text2)}
+.p-dm{background:var(--accent-soft);color:var(--accent2)}.p-op{background:var(--purple-bg);color:var(--purple)}.p-is{background:var(--green-bg);color:var(--green)}.p-hh{background:var(--amber-bg);color:var(--amber)}.p-uc{background:var(--bg2);color:var(--text2)}.p-ot{background:#e6f7f4;color:#0d9488}
 .p-pre{background:var(--amber-bg);color:var(--amber)}.p-act{background:var(--green-bg);color:var(--green)}.p-done{background:var(--gray-bg);color:var(--gray-tx)}
 .p-st{background:var(--blue-bg);color:var(--blue)}
 /* forms */
@@ -150,6 +150,7 @@ textarea{resize:vertical;min-height:54px}
 .tlab{display:inline-block;font-size:9px;font-weight:800;line-height:1.45;padding:0 5px;border-radius:6px;margin-right:5px;vertical-align:1.5px;letter-spacing:.02em}.tlab-up{background:#e6f0ff;color:#2563eb}.tlab-nyu{background:#fff1e0;color:#c2700a}.tlab-beta{background:#eceef1;color:#9aa0a6}
 .pdfst{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px}.pdfst.dl{background:#e7f6ec;color:#1a7f37}.pdfst.local{background:#fff4e5;color:#c2700a}.pdfst.none{background:#eee;color:#999}.pdfst.pend{background:#eef2f7;color:#7a8aa0}.pdfst .btn-sm{margin-left:6px}
 .hd2{display:flex;align-items:center;gap:8px}.nmcopy{font-weight:700;font-size:14px;cursor:pointer;line-height:1.25}.nmcopy:hover{color:var(--accent)}.nocopy{font-size:11px;color:var(--text3);cursor:pointer;margin-top:1px}.nocopy:hover{color:var(--accent)}.ckrow{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:3px}.inck{display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;color:var(--text2)}.inck input{margin:0;width:15px;height:15px}
+.gbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 2px 10px;padding:8px;background:var(--bg2);border-radius:10px}.gbtn{font-size:12px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid #e2e6ea;background:#fff;color:var(--text2);cursor:pointer}.gbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}.gtot{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--text2)}
 </style></head><body>
 <header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span></h1><div class="sub">運を、構造化する。</div></header>
 <div class="tabs">
@@ -169,6 +170,7 @@ textarea{resize:vertical;min-height:54px}
 <button id="tb-report" onclick="tab('report')"><span class="tlab tlab-beta">β</span>現状レポート</button>
 </div>
 <div class="wrap">
+<div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
  <div id="drop" class="drop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>マイソクPDFをドロップ</div><div class="ds">複数可 ／ タップして選択 → 自動読み取り</div></div>
@@ -205,14 +207,15 @@ const STN=["千葉ニュータウン中央", "流山セントラルパーク", "
 const ZONES={"三軒茶屋|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10, 11], "o": [3, 4, 5, 6, 7, 8]}, "高円寺|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 6, 7]}, "北千住|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5, 6]}, "池袋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 7]}, "中野|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 5, 7, 8]}, "大井町|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7]}, "新小岩|シングル": {"d": [3, 4, 5, 6], "o": [3, 6]}, "葛西|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 3, 4]}, "笹塚|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "門前仲町|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "大森|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "荻窪|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "学芸大学|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "東中野|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5, 6]}, "高田馬場|シングル": {"d": [3, 4, 5, 6, 7, 9], "o": [3, 4, 5, 6, 7]}, "恵比寿|シングル": {"d": [6, 8, 9, 10, 11, 12, 13], "o": [6, 8, 9, 10]}, "三鷹|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 5]}, "吉祥寺|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 5]}, "両国|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 7, 8]}, "駒沢大学|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "押上|シングル": {"d": [3, 5, 6, 7, 8, 9, 10], "o": [3, 5, 6, 7]}, "亀戸|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7]}, "小岩|シングル": {"d": [2, 3, 4, 5, 6], "o": [2, 3]}, "祐天寺|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 10]}, "清澄白河|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "中野坂上|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10], "o": [3, 5, 6, 7, 10]}, "錦糸町|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7]}, "町屋|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 6]}, "森下|シングル": {"d": [5, 6, 7, 8, 9, 10, 11], "o": [5, 6, 7, 8]}, "武蔵小山|シングル": {"d": [3, 4, 5, 6, 7, 8, 10, 11], "o": [3, 4, 5, 6, 7]}, "大塚|シングル": {"d": [2, 4, 5, 6, 7, 8, 10], "o": [2, 4, 5, 8]}, "中目黒|シングル": {"d": [5, 6, 7, 8, 9, 10, 11, 12], "o": [5, 6, 7, 8, 9, 10, 11]}, "幡ヶ谷|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 8]}, "西荻窪|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 5]}, "目黒|シングル": {"d": [5, 6, 7, 8, 9, 10, 11, 12, 13], "o": [5, 6, 7, 9]}, "町田|シングル": {"d": [1, 2, 3, 4, 5, 6, 7], "o": [1, 4]}, "綾瀬|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5]}, "練馬|シングル": {"d": [1, 2, 3, 4, 5, 6, 7, 8], "o": [1, 2, 3, 4, 6]}, "初台|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 8]}, "阿佐ケ谷|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 5, 6]}, "下北沢|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10], "o": [3, 4, 6, 7]}, "千歳烏山|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 3, 4, 5]}, "駒込|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 5, 6, 7]}, "田端|シングル": {"d": [2, 4, 5, 6, 7], "o": [2, 4, 5, 6, 7]}, "代田橋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7, 8]}, "不動前|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11, 12], "o": [4, 5, 6, 7]}, "池尻大橋|シングル": {"d": [4, 5, 6, 8, 9, 10, 11, 12], "o": [4, 5, 6, 8, 9]}, "東高円寺|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "新中野|シングル": {"d": [2, 3, 4, 5, 6, 7, 8, 9], "o": [2, 3, 4, 8]}, "北綾瀬|シングル": {"d": [2, 3, 4, 5, 6], "o": [2, 3, 4]}, "方南町|シングル": {"d": [2, 3, 4, 5, 6, 7, 8, 9], "o": [2, 3, 4, 5, 6, 7]}, "西小山|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7]}, "明大前|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 6, 7]}, "千歳船橋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5]}, "住吉|シングル": {"d": [5, 6, 7, 8, 9], "o": [5, 6, 7, 8]}, "中野新橋|シングル": {"d": [4, 5, 6, 7, 8, 9], "o": [4, 5, 6, 8]}, "経堂|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 5, 7]}, "五反田|シングル": {"d": [4, 5, 6, 7, 8, 9], "o": [4, 5, 6, 7, 8]}, "都立大学|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 7, 10]}, "蔵前|シングル": {"d": [5, 6, 8, 9, 10, 11], "o": [5, 6, 8]}, "麻布十番|シングル": {"d": [4, 6, 7, 9, 10, 11, 12, 13], "o": [4, 6, 7, 9, 10]}, "西日暮里|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "平井|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4]}, "新高円寺|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [3, 6]}, "調布|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [4]}, "中井|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "用賀|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "大久保|シングル": {"d": [3, 4, 5, 6, 7, 9], "o": [3, 4, 5, 7]}, "浅草橋|シングル": {"d": [5, 7, 8, 9, 10, 11, 12], "o": [5, 7, 8, 9]}, "田町|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7, 9]}, "新小岩|カップル": {"d": [4, 5, 6, 7, 8, 9, 11], "o": [4, 5, 7, 8]}, "葛西|カップル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7, 8]}, "三鷹|カップル": {"d": [5, 6, 7, 8, 9, 10, 11, 12], "o": [5, 6, 7, 8, 9, 10, 11]}, "大森|カップル": {"d": [6, 9, 10, 11, 12, 13, 14, 15, 16], "o": [6, 9, 10, 11, 12]}, "三軒茶屋|カップル": {"d": [5, 11, 13, 14, 15, 16, 18], "o": [5, 11, 13, 14]}, "大井町|カップル": {"d": [8, 11, 12, 13, 14, 15, 16, 18], "o": [8, 11, 12, 13, 16]}, "荻窪|カップル": {"d": [6, 8, 9, 10, 11, 12, 13, 14], "o": [6, 8, 9, 10, 12, 13]}, "目黒|カップル": {"d": [11, 12, 14, 15, 16, 17, 18, 19], "o": [11, 12, 14, 15, 16, 17]}, "中野|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 14, 15], "o": [7, 8, 9, 10, 11, 12, 13, 14]}, "小岩|カップル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 9, 10]}, "武蔵小山|カップル": {"d": [10, 11, 12, 14, 15, 16, 18], "o": [10, 11, 12]}, "学芸大学|カップル": {"d": [10, 11, 12, 13, 14, 16, 17, 18], "o": [10, 11, 12, 13, 14]}, "北千住|カップル": {"d": [5, 7, 9, 10, 11, 12], "o": [5, 7, 9]}, "池袋|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 18], "o": [7, 8, 9, 10, 11]}, "高円寺|カップル": {"d": [6, 7, 8, 10, 11, 12, 13], "o": [6, 7, 8, 10, 11, 12, 13]}, "笹塚|カップル": {"d": [7, 10, 11, 12, 13, 14, 17], "o": [7, 10, 11, 12, 13, 17]}, "両国|カップル": {"d": [6, 8, 10, 11, 12, 13, 14, 15, 16], "o": [6, 8, 10, 11, 12, 13, 14]}, "恵比寿|カップル": {"d": [11, 14, 16, 17, 18, 19, 20], "o": [11, 14, 16, 17]}, "錦糸町|カップル": {"d": [6, 7, 8, 9, 12, 14, 15, 16], "o": [6, 7, 8, 9, 12, 14]}, "都立大学|カップル": {"d": [10, 11, 12, 13, 14, 15, 16, 17], "o": [10, 11, 13, 14, 16]}, "町田|カップル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 6, 8]}, "千歳烏山|カップル": {"d": [6, 7, 8, 9, 10, 11, 12], "o": [6, 7, 10, 11]}, "用賀|カップル": {"d": [5, 9, 10, 11, 12, 13, 14, 17, 18], "o": [5, 9, 10, 11, 17]}, "駒込|カップル": {"d": [7, 10, 11, 12, 13, 15], "o": [7, 10, 11, 12, 13]}, "押上|カップル": {"d": [7, 8, 11, 12, 13, 14, 16], "o": [7, 8, 11, 12, 13]}, "勝どき|カップル": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 17]}, "門前仲町|カップル": {"d": [5, 7, 9, 10, 11, 12, 14, 16], "o": [5, 7, 9, 10, 11, 12, 14]}, "西荻窪|カップル": {"d": [5, 7, 10, 11, 12, 13], "o": [5, 7, 10]}, "吉祥寺|カップル": {"d": [5, 6, 7, 8, 9, 10, 11, 12, 13], "o": [5, 6, 7, 8, 9, 11, 13]}, "麻布十番|カップル": {"d": [12, 14, 15, 16, 17, 18, 19, 20], "o": [12, 14, 15, 16, 17, 18]}, "東中野|カップル": {"d": [6, 9, 10, 11, 12, 13, 14, 18], "o": [6, 9, 10, 11, 12, 13, 14]}, "綾瀬|カップル": {"d": [4, 5, 6, 7, 8, 9, 10, 11, 12], "o": [4, 5, 6, 7, 8, 9, 10, 12]}, "駒沢大学|カップル": {"d": [10, 11, 12, 13, 14, 15, 17], "o": [10, 11, 12, 13]}, "祐天寺|カップル": {"d": [10, 11, 13, 14, 15, 16, 17, 18], "o": [10, 11, 13, 16]}, "西小山|カップル": {"d": [10, 11, 12, 13, 14, 15], "o": [10, 11, 12]}, "経堂|カップル": {"d": [8, 9, 11, 12, 13, 14, 15], "o": [8, 15]}, "池尻大橋|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18, 19], "o": [11, 12, 13, 14, 15, 16]}, "中目黒|カップル": {"d": [9, 13, 15, 16, 17, 18, 19], "o": [9, 13, 15, 16, 17]}, "田端|カップル": {"d": [6, 10, 11, 12], "o": [6, 10, 11]}, "方南町|カップル": {"d": [7, 8, 9, 10, 12, 13, 14, 15, 16], "o": [7, 8, 9, 10, 12, 13]}, "中野坂上|カップル": {"d": [9, 10, 11, 12, 13, 14, 15, 18], "o": [9, 10, 11, 12]}, "蔵前|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18], "o": [11, 12, 14]}, "住吉|カップル": {"d": [3, 8, 9, 10, 11, 12, 13, 15], "o": [3, 8, 9, 10, 11, 12]}, "練馬|カップル": {"d": [6, 7, 8, 9, 10, 11, 14], "o": [6, 7, 8, 9, 10]}, "下北沢|カップル": {"d": [7, 10, 11, 12, 13, 14], "o": [7, 10, 11, 12, 13]}, "森下|カップル": {"d": [9, 10, 11, 12, 13, 14], "o": [9, 10, 11, 12, 13, 14]}, "不動前|カップル": {"d": [11, 12, 13, 14, 15, 17, 18, 19], "o": [11, 12, 13, 15, 17]}, "幡ヶ谷|カップル": {"d": [9, 10, 11, 12, 13, 14, 15], "o": [9, 10, 11, 12, 14]}, "北綾瀬|カップル": {"d": [3, 4, 5, 6, 9, 10], "o": [3, 4, 5, 6, 9]}, "西葛西|カップル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 7, 8]}, "桜新町|カップル": {"d": [7, 8, 10, 11, 12, 13, 14, 15, 16], "o": [7, 8, 10, 11, 12, 14, 15]}, "西日暮里|カップル": {"d": [6, 8, 9, 10, 11, 12, 13], "o": [6, 8, 9, 11]}, "大塚|カップル": {"d": [6, 7, 8, 9, 10, 11, 12], "o": [6, 7, 8, 9, 10, 11, 12]}, "阿佐ケ谷|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 14], "o": [7, 8, 10, 11, 12]}, "亀戸|カップル": {"d": [6, 8, 9, 10, 12, 13, 14], "o": [6, 8, 9, 12]}, "大崎|カップル": {"d": [9, 12, 14, 15, 16, 17, 18, 19], "o": [9, 12, 18]}, "町屋|カップル": {"d": [4, 6, 7, 9, 10, 11, 12], "o": [4, 6, 7, 9, 10, 11]}, "代田橋|カップル": {"d": [6, 9, 11, 12, 13], "o": [6, 9, 11, 13]}, "自由が丘|カップル": {"d": [6, 11, 12, 13, 14, 15, 17], "o": [6, 11, 12, 15, 17]}, "調布|カップル": {"d": [5, 6, 7, 8, 9, 10, 11], "o": [5, 6, 7, 8]}, "清澄白河|カップル": {"d": [4, 9, 11, 13, 15], "o": [4, 9, 11, 13, 15]}, "浅草橋|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18], "o": [11, 12, 13, 14, 15]}, "千歳船橋|カップル": {"d": [6, 8, 9, 10, 11, 12, 13, 14], "o": [6, 8, 9, 10, 14]}, "高田馬場|カップル": {"d": [6, 9, 10, 11, 12, 13, 14], "o": [6, 9, 10, 11, 12]}, "西馬込|カップル": {"d": [6, 8, 9, 10, 12, 13], "o": [6, 8, 9, 10, 12]}, "中野新橋|カップル": {"d": [6, 7, 8, 10, 11, 12, 13, 14, 15, 17], "o": [6, 7, 8, 10, 12, 13, 14, 15]}, "新中野|カップル": {"d": [7, 8, 10, 11, 13, 14], "o": [7, 8, 10, 11]}, "初台|カップル": {"d": [7, 10, 11, 12, 13, 14, 15, 16, 18], "o": [7, 10, 11, 12, 14]}, "代々木上原|カップル": {"d": [11, 12, 13, 15, 16, 18, 19], "o": [11, 12, 13, 15, 16]}, "四谷三丁目|カップル": {"d": [10, 11, 12, 14, 15, 17, 18, 19], "o": [10, 11, 12, 14]}, "葛西|ファミリー": {"d": [9, 10, 11, 12, 13, 18], "o": [9, 10, 11, 12, 13]}, "勝どき|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "三鷹|ファミリー": {"d": [11, 12, 13, 15, 16, 17, 18, 19, 20], "o": [11, 16]}, "町田|ファミリー": {"d": [4, 5, 6, 7, 11, 12, 13, 14, 15, 18], "o": [4, 5, 6, 7]}, "大泉学園|ファミリー": {"d": [7, 8, 9, 10, 11, 12, 13, 17, 18], "o": [7, 10]}, "用賀|ファミリー": {"d": [10, 14, 15, 16, 17, 18, 19, 20], "o": [10, 14, 15, 17]}, "新小岩|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 15], "o": [9, 12, 13]}, "大森|ファミリー": {"d": [11, 13, 14, 15, 16, 17, 18, 19], "o": [11, 13, 14, 15, 16]}, "荻窪|ファミリー": {"d": [12, 13, 15, 17, 18, 19], "o": [12, 13, 15, 17]}, "学芸大学|ファミリー": {"d": [13, 18, 19, 20], "o": [13, 18]}, "千歳烏山|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 18], "o": [9, 10, 11, 12, 13]}, "小岩|ファミリー": {"d": [7, 8, 9, 10, 11, 12, 14, 18], "o": [7, 8, 9, 11, 12, 18]}, "都立大学|ファミリー": {"d": [13, 14, 17, 18, 19, 20], "o": [13, 14, 17]}, "豊洲|ファミリー": {"d": [14, 17, 18, 19, 20], "o": [14, 17]}, "吉祥寺|ファミリー": {"d": [11, 12, 13, 14, 18, 19, 20], "o": [13, 14]}, "目黒|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "大井町|ファミリー": {"d": [13, 14, 15, 16, 18, 19, 20], "o": [13, 14, 15, 16, 18]}, "西馬込|ファミリー": {"d": [12, 13, 14, 15, 16, 17, 18], "o": [12, 13, 17]}, "大崎|ファミリー": {"d": [17, 18, 19, 20], "o": [17, 18]}, "西葛西|ファミリー": {"d": [8, 9, 10, 11, 12, 13, 14, 16, 17], "o": [8, 9, 10, 11, 12, 13, 14, 16]}, "桜新町|ファミリー": {"d": [13, 15, 17, 18, 19, 20], "o": [13, 15, 17, 19]}, "駒沢大学|ファミリー": {"d": [15, 17, 18, 19, 20], "o": [15, 20]}, "千歳船橋|ファミリー": {"d": [11, 12, 14, 15, 16, 17, 18, 19, 20], "o": [11, 12, 14, 15, 16, 17]}, "武蔵小山|ファミリー": {"d": [18, 19, 20], "o": [20]}, "二子玉川|ファミリー": {"d": [12, 14, 16, 17, 18, 19, 20], "o": [12, 14, 16, 17]}, "両国|ファミリー": {"d": [15, 16, 17, 18, 19], "o": [15, 16, 17]}, "田町|ファミリー": {"d": [15, 18, 19, 20], "o": [15, 18]}, "中野|ファミリー": {"d": [14, 15, 16, 17, 18, 19, 20], "o": [14, 15, 16, 17, 18]}, "三軒茶屋|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 18]}, "西荻窪|ファミリー": {"d": [8, 10, 13, 16, 18, 19, 20], "o": [8, 10, 13, 16, 18]}, "調布|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 16, 18], "o": [10, 13, 14]}, "北千住|ファミリー": {"d": [10, 12, 14, 15, 18, 20], "o": [10, 12, 14, 15]}, "経堂|ファミリー": {"d": [12, 14, 15, 16, 17, 18, 19, 20], "o": [12, 14, 15, 16, 17]}, "成城学園前|ファミリー": {"d": [11, 13, 14, 15, 16, 18, 20], "o": [11, 13, 14, 15, 16]}, "恵比寿|ファミリー": {"d": [15, 16, 18, 19, 20], "o": [15, 16, 18]}, "鶴川|ファミリー": {"d": [3, 4, 5, 6, 7, 8, 9, 10, 11], "o": [3, 4, 7, 10]}, "品川|ファミリー": {"d": [16, 19, 20], "o": [16, 19]}, "祐天寺|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "麻布十番|ファミリー": {"d": [14, 16, 18, 19, 20], "o": [14, 16, 18, 19]}, "綾瀬|ファミリー": {"d": [6, 7, 8, 9, 11, 12, 13, 14, 18], "o": [6, 7, 8, 9, 11, 12, 13, 14]}, "錦糸町|ファミリー": {"d": [10, 14, 15, 16, 18, 19], "o": [10, 14, 15, 16]}, "仙川|ファミリー": {"d": [9, 11, 13, 14, 17, 18, 19], "o": [9, 11]}, "町屋|ファミリー": {"d": [10, 11, 12, 13, 14, 16, 18], "o": [10, 11, 12, 13, 14, 16]}, "練馬|ファミリー": {"d": [8, 10, 11, 12, 13, 14, 15, 16, 18, 19], "o": [8, 10, 11, 12, 15, 16]}, "代々木上原|ファミリー": {"d": [17, 18, 19, 20], "o": [17, 18]}, "中目黒|ファミリー": {"d": [14, 15, 18, 19, 20], "o": [14, 15, 18, 19]}, "駒込|ファミリー": {"d": [11, 13, 16, 18, 19, 20], "o": [11, 13, 20]}, "清澄白河|ファミリー": {"d": [16, 17, 18, 19, 20], "o": [16, 17, 18]}, "つつじヶ丘|ファミリー": {"d": [8, 9, 10, 11, 12, 13, 18], "o": [8, 9, 13]}, "東中野|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 17]}, "押上|ファミリー": {"d": [11, 12, 13, 15, 18, 19], "o": [11, 12, 13, 15]}, "笹塚|ファミリー": {"d": [13, 14, 15, 16, 18, 19, 20], "o": [13, 14, 15, 16, 18]}, "北綾瀬|ファミリー": {"d": [6, 9, 10, 11, 12, 13, 14, 15, 16, 18], "o": [6, 9, 10, 13, 14]}, "春日|ファミリー": {"d": [13, 14, 18, 19, 20], "o": [13, 14]}, "自由が丘|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 17]}, "池袋|ファミリー": {"d": [10, 11, 18, 19, 20], "o": [10, 11]}, "光が丘|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 15, 18], "o": [12, 14, 15, 18]}, "門前仲町|ファミリー": {"d": [11, 14, 15, 18, 19, 20], "o": [11, 14, 15]}, "茗荷谷|ファミリー": {"d": [15, 17, 18, 19, 20], "o": [15, 17, 19]}, "田端|ファミリー": {"d": [12, 14, 15, 17, 18, 19], "o": [12, 14, 15]}};
 const RANK={};Object.keys(ZONES).forEach(k=>{RANK[k.split('|')[0]]=1;});
 const SK='ibt_props_v1',HK='ibt_hist_v1',EK='ibt_events_v1';
-const TARGETS={dm:80,op:50,is:50,hh:20,do_inq:100,is_inq:200,total:300};
-const WK_MAP={Demand:'dm',Opportunity:'op',Insight:'is','High-Hold':'hh','未分類':'uc'};
-const WK_PILL={dm:'p-dm',op:'p-op',is:'p-is',hh:'p-hh',uc:'p-uc'};
+const TARGETS={dm:20,op:120,is:30,hh:20,ot:10,do_inq:100,is_inq:200,total:300};
+const WK_MAP={Demand:'dm',Opportunity:'op',Insight:'is','High-Hold':'hh','その他':'ot','未分類':'uc'};
+const WK_PILL={dm:'p-dm',op:'p-op',is:'p-is',hh:'p-hh',ot:'p-ot',uc:'p-uc'};
 const STATUSES=['先行申込あり','2番手','3番手以降','空き(申込なし)','申込予定','審査中','成約/入居中','募集終了'];
 let PROPS=[],PEND=[],HIST={},EVENTS={};
 let viewYM='';
 let CURTAB='dash';
 let bijikonPending=null;
+let GROUP='ALL';
 
 // ---------- helpers ----------
 function esc(s){return(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -263,7 +266,7 @@ async function load(){
  else{PROPS=await gget(SK,[]);HIST=await gget(HK,{});EVENTS=await gget(EK,{});}
  PROPS.forEach(p=>{
   if(!p.statusLog)p.statusLog=[];
-  if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
+  if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';if(p.stations==null)p.stations=[];['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
   if(p.csvPV==null)p.csvPV=0;if(p.csvInq==null)p.csvInq=0;if(p.csvInqB==null)p.csvInqB=0;
   if(p.csvAsOf==null)p.csvAsOf='';
   if(p.optReviewed==null)p.optReviewed=false;if(p.compDataAt==null)p.compDataAt='';if(p.optAppliedAt==null)p.optAppliedAt='';
@@ -424,7 +427,7 @@ function extractFields(raw,fname){
 
 // ---------- tabs ----------
 function tab(t){CURTAB=t;['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review')renderReview();if(t==='report')renderReport();updateBadges();}
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review')renderReview();if(t==='report')renderReport();var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}updateBadges();}
 
 // ---------- DASHBOARD ----------
 function monthOptions(){
@@ -433,7 +436,7 @@ function monthOptions(){
 }
 function renderDash(){
  recompute();
- const ct={dm:0,op:0,is:0,hh:0},iq={dm:0,op:0,is:0,hh:0};
+ const ct={dm:0,op:0,is:0,hh:0,ot:0,uc:0},iq={dm:0,op:0,is:0,hh:0,ot:0,uc:0};
  PROPS.forEach(p=>{const w=WK_MAP[p.waku]||'is';ct[w]++;iq[w]+=+(p.csvInq||0);});
  const doInq=iq.dm+iq.op,isInq=iq.is,total=doInq+isInq+iq.hh;
  const opts=monthOptions().map(m=>'<option'+(m===viewYM?' selected':'')+'>'+m+'</option>').join('');
@@ -441,17 +444,17 @@ function renderDash(){
  h+='<div class="spread" style="margin-bottom:10px"><div class="muted" style="font-size:12px">対象月</div><select style="width:auto;padding:7px 10px" onchange="viewYM=this.value;renderDash()">'+opts+'</select></div>';
  h+='<div class="hero fade"><div class="t">'+viewYM+' 反響目標</div><div class="n">'+total+' <small>/ '+TARGETS.total+'</small></div>'
   +'<div class="bar" style="height:6px;margin-top:9px"><div class="fill" style="width:'+Math.min(total/TARGETS.total*100,100)+'%;background:var(--accent)"></div></div>'
-  +'<div class="s">D+O '+doInq+'/'+TARGETS.do_inq+' ・ Insight '+isInq+'/'+TARGETS.is_inq+' ・ High-Hold '+iq.hh+'</div></div>';
+  +'<div class="s">D+O '+doInq+'/'+TARGETS.do_inq+' ・ Insight(YOKOYAMA) '+isInq+'/'+TARGETS.is_inq+' ・ High-Hold '+iq.hh+'</div></div>';
  h+='<div class="stat-grid fade">';
  [['dm','Demand','反響ランキング','var(--accent)'],['op','Opportunity','オポゾーン','var(--purple)'],['is','Insight','経験・知見','var(--green)'],['hh','High-Hold','高額キープ','var(--amber)']].forEach(a=>{
   h+='<div class="stat '+a[0]+'"><div class="t">'+a[1]+'</div><div class="n">'+ct[a[0]]+'<small>/'+TARGETS[a[0]]+'</small></div><div class="s">'+a[2]+'</div><div class="bar"><div class="fill" style="width:'+Math.min(ct[a[0]]/TARGETS[a[0]]*100,100)+'%;background:'+a[3]+'"></div></div></div>';});
  h+='</div>';
  h+='<div class="stat-grid" style="grid-template-columns:1fr 1fr">';
  h+='<div class="hero" style="margin:0"><div class="t">D+O 合算反響</div><div class="n">'+doInq+' <small>/ '+TARGETS.do_inq+'</small></div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.min(doInq/TARGETS.do_inq*100,100)+'%;background:var(--accent)"></div></div></div>';
- h+='<div class="hero" style="margin:0"><div class="t">Insight 反響</div><div class="n">'+isInq+' <small>/ '+TARGETS.is_inq+'</small></div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.min(isInq/TARGETS.is_inq*100,100)+'%;background:var(--green)"></div></div></div>';
+ h+='<div class="hero" style="margin:0"><div class="t">Insight(YOKOYAMA) 反響</div><div class="n">'+isInq+' <small>/ '+TARGETS.is_inq+'</small></div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.min(isInq/TARGETS.is_inq*100,100)+'%;background:var(--green)"></div></div></div>';
  h+='</div>';
  // performance table
- var allP=PROPS.filter(p=>p.status==='掲載中');
+ var allP=liveG();
  var sk=window._perfSort||'csvInq';
  allP.sort((a,b)=>{
   if(sk==='csvInq')return(+(b.csvInq||0))-(+(a.csvInq||0));
@@ -501,7 +504,7 @@ async function extractInto(file,rec){
 function addBlank(){const r=mkRec();r.pdfName='手動入力';r.auto='手動';PEND.push(r);renderPend();tab('add');}
 function statusChips(idx){return STATUSES.map(s=>'<button type="button" class="chip" onclick="pendStat('+idx+',\''+s+'\',this)">'+s+'</button>').join('');}
 function pendStat(i,s,el){PEND[i].pendStatus=(PEND[i].pendStatus===s?'':s);[...el.parentNode.children].forEach(c=>c.classList.remove('on'));if(PEND[i].pendStatus)el.classList.add('on');}
-function wakuChips(i){const opts=['Demand','Opportunity','Insight','High-Hold','未分類'];return '<div class="chips">'+opts.map(w=>'<button type="button" class="chip'+(PEND[i].waku===w?' on':'')+'" onclick="setPendWaku('+i+',\''+w+'\')">'+w+'</button>').join('')+'</div>';}
+function wakuChips(i){const opts=['Demand','Opportunity','Insight','High-Hold','その他','未分類'];return '<div class="chips">'+opts.map(w=>'<button type="button" class="chip'+(PEND[i].waku===w?' on':'')+'" onclick="setPendWaku('+i+',\''+w+'\')">'+w+'</button>').join('')+'</div>';}
 function setPendWaku(i,w){PEND[i].waku=w;renderPend();}
 function autoPill(a){const c=(a.indexOf('読取不可')>=0||a.indexOf('要手動')>=0)?'p-pre':(a==='手動'?'p-st':'p-act');return '<span class="pill '+c+'">'+esc(a)+'</span>';}
 function renderPend(){
@@ -566,6 +569,7 @@ async function savePend(){
 }
 
 // ---------- info card + status block ----------
+function otherStHtml(p){if(!p.stations||p.stations.length<2)return '';var rest=p.stations.filter(function(x){return x.sta&&x.sta!==p.station;});if(!rest.length)return '';return '<div class="fi"><b>他の駅</b>'+rest.map(function(x){return esc((x.line||'')+' '+(x.sta||'')+' '+(x.walk||''))+(RANK[x.sta]?'（ランク）':'');}).join(' ／ ')+'</div>';}
 function infoCard(p,agg){
  agg=agg||anaAgg();
  var g=(l,v)=>v?'<div class="fi"><b>'+l+'</b>'+esc(String(v))+'</div>':'';
@@ -607,9 +611,9 @@ function infoCard(p,agg){
   +'</div><div class="note" style="margin-top:6px"><b>物件状況メモ：</b>'+(stz?esc(stz.memo||'')+' <span class="muted">／ '+relTime(stz.ts)+'</span>':'未記録')+' <span class="lk" style="font-size:11px" onclick="event.stopPropagation();openMemo(\''+p.id+'\')">編集</span></div></div>';
  return '<div class="infocard">'
   +'<div class="ig"><div class="ih">物件概要</div><div class="fl">'+g('物件名',p.name)+g('間取り',p.madori)+g('構造',p.structure)+g('築年数',p.age)+g('面積',p.area)+g('階数',p.floor)+'</div></div>'
-  +'<div class="ig"><div class="ih">立地</div><div class="fl">'+g('住所',p.address)+g('沿線',p.line)+g('駅',p.station)+g('徒歩',p.walkMin)+g('備考',p.nearby)+'</div></div>'
-  +'<div class="ig"><div class="ih">条件</div><div class="fl">'+g('賃料(総額)',p.rent?fmtRent(totalRent(p))+'万円':'')+g('敷金',p.deposit)+g('礼金',p.keyMoney)+g('BT別',p.btSep)+g('独立洗面台',p.washStand)+'</div></div>'+'<div class="ig"><div class="ih">設備</div><div class="fl">'+g('ペット相談',p.petOk)+g('敷金0',p.dep0)+g('礼金0',p.key0)+g('オートロック',p.autoLock)+g('宅配ボックス',p.delivBox)+g('2口コンロ',p.twoBurner)+'</div></div>'
-  +'<div class="ig"><div class="ih">管理</div><div class="fl">'+g('管理会社名',p.mgmtCo)+g('管理会社TEL',p.phone)+g('管理会社FAX',p.fax)+g('家賃',p.rent?p.rent+'万':'')+g('管理費・共益費',p.mgmt?p.mgmt+'円':'')+g('定休日',p.holiday)+'</div></div>'
+  +'<div class="ig"><div class="ih">立地</div><div class="fl">'+g('住所',p.address)+g('沿線',p.line)+g('駅',p.station)+g('徒歩',p.walkMin)+otherStHtml(p)+g('備考',p.nearby)+'</div></div>'
+  +'<div class="ig"><div class="ih">条件</div><div class="fl">'+g('賃料(総額)',(p.rent!=null&&p.rent!=='')?totalRent(p).toFixed(1)+'万円':'')+g('敷金',p.deposit)+g('礼金',p.keyMoney)+g('BT別',p.btSep)+g('独立洗面台',p.washStand)+'</div></div>'+'<div class="ig"><div class="ih">設備</div><div class="fl">'+g('ペット相談',p.petOk)+g('敷金0',p.dep0)+g('礼金0',p.key0)+g('オートロック',p.autoLock)+g('宅配ボックス',p.delivBox)+g('2口コンロ',p.twoBurner)+'</div></div>'
+  +'<div class="ig"><div class="ih">管理</div><div class="fl">'+g('管理会社名',p.mgmtCo)+g('管理会社TEL',p.phone)+g('管理会社FAX',p.fax)+g('家賃',(p.rent!=null&&p.rent!=='')?Number(p.rent).toFixed(1)+'万円':'')+g('管理費・共益費',(p.mgmt!=null&&p.mgmt!=='')?(Number(p.mgmt)||0)+'円':'')+g('定休日',p.holiday)+'</div></div>'
   +'<div class="ig"><div class="ih">オプション</div><div class="fl">'+g('店ピク(+4)',p.storePick?'○ 付与':'×')+g('得エリ(+2)',p.specArea?'○ 付与':'×')+g('CM(+2)',p.video?'○ 付与':'×')+(p.optAppliedAt?g('付与日',p.optAppliedAt):'')+'</div></div>'
   +evalg
   +perf
@@ -669,7 +673,7 @@ function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===
 function rvFields(p){
  var f=function(field,label,typ){return '<div class="rvf"><label>'+label+'</label>'+inEd(p.id,field,p[field],'',typ)+'</div>';};
  var statusSel='<div class="rvf"><label>状態</label>'+inSel(p.id,'status',p.status,['掲載中','要入稿','落とし済み'])+'</div>';
- var wakuSel='<div class="rvf"><label>枠</label>'+inSel(p.id,'waku',p.waku,['Demand','Opportunity','Insight','High-Hold','未分類'])+'</div>';
+ var wakuSel='<div class="rvf"><label>枠</label>'+wakuSelEl(p.id,p.waku)+'</div>';
  var amHtml='<div class="rvf" style="grid-column:1/-1"><label>設備</label><div class="ckrow">'+inChk(p.id,'btSep',p.btSep,'バストイレ別')+inChk(p.id,'washStand',p.washStand,'独立洗面台')+inChk(p.id,'petOk',p.petOk,'ペット相談可')+inChk(p.id,'dep0',p.dep0,'敷金0')+inChk(p.id,'key0',p.key0,'礼金0')+inChk(p.id,'autoLock',p.autoLock,'オートロック')+inChk(p.id,'delivBox',p.delivBox,'宅配ボックス')+inChk(p.id,'twoBurner',p.twoBurner,'2口コンロ')+'</div></div>';return '<div class="rvgrid">'+f('name','物件名')+f('room','部屋')+f('station','駅')+f('line','沿線')+f('walkMin','徒歩')+f('madori','間取り')+f('rent','家賃(万)')+f('mgmt','管理費・共益費(円)')+f('area','面積')+f('structure','構造')+f('age','築年数')+f('propNo','物件番号')+f('mgmtCo','管理会社名')+f('phone','管理会社TEL')+f('fax','管理会社FAX')+f('address','住所')+f('deposit','敷金')+f('keyMoney','礼金')+statusSel+wakuSel+amHtml+'</div>';
 }
 function pdfStatusHtml(p){
@@ -708,7 +712,13 @@ async function markPosted(id){
 function inChk(id,field,val,label){return '<label class="inck"><input type="checkbox" '+(val?'checked':'')+' onchange="editProp(\''+id+'\',\''+field+'\',this.checked?\'あり\':\'\')">'+esc(label)+'</label>';}
 function copyText(txt,label){try{navigator.clipboard.writeText(txt);}catch(e){var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e2){}ta.remove();}toast((label||'テキスト')+'：'+txt);}
 function copyEl(el){var t=(el&&el.getAttribute)?(el.getAttribute('data-copy')||''):'';copyText(t,'コピー');}
-function reviewInfo(p){var tr=totalRent(p);return '<div style="margin-top:8px;font-size:12px;color:var(--text2)">賃料総額 '+(!isNaN(tr)?tr.toFixed(1)+'万':'—')+' ／ '+pdfStatusHtml(p)+'</div>';}
+function reviewInfo(p){var tr=totalRent(p);return '<div style="margin-top:8px;font-size:12px;color:var(--text2)">賃料総額 '+(!isNaN(tr)?tr.toFixed(1)+'万円':'—')+' ／ '+pdfStatusHtml(p)+'</div>';}
+function wkLabel(w){return w==='Insight'?'Insight(YOKOYAMA)':(w==='その他'?'その他(仮説検証群)':w);}
+function wakuSelEl(id,val){var opts=['Demand','Opportunity','Insight','High-Hold','その他','未分類'];return '<select class="ined" onchange="editProp(\''+id+'\',\'waku\',this.value)">'+opts.map(function(o){return '<option value="'+o+'"'+(String(val)===o?' selected':'')+'>'+wkLabel(o)+'</option>';}).join('')+'</select>';}
+function inGroup(p){if(GROUP==='ALL')return true;if(GROUP==='DO')return p.waku==='Demand'||p.waku==='Opportunity';return p.waku===GROUP;}
+function liveG(){return PROPS.filter(function(p){return p.status==='掲載中'&&inGroup(p);});}
+function groupBar(){var opts=[['ALL','ALL（全体）'],['Demand','Demand'],['Opportunity','Opportunity'],['DO','Demand＋Opportunity'],['High-Hold','High-Hold'],['Insight','Insight(YOKOYAMA)'],['その他','その他(仮説検証群)']];var tot=0;PROPS.forEach(function(p){if(p.status==='掲載中')tot+=(+(p.csvInq||0)||0);});return '<div class="gbar">'+opts.map(function(o){return '<button class="gbtn'+(GROUP===o[0]?' on':'')+'" onclick="setGroup(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'<span class="gtot">全体の反響合計 '+tot+'</span></div>';}
+function setGroup(g){GROUP=g;tab(CURTAB);}
 function renderReview(){
  var un=PROPS.filter(function(p){return p.confirmed===false;});
  var mm=PROPS.filter(bjMismatch);
@@ -1096,7 +1106,7 @@ function setDropFilt(){dropOnlyData=!dropOnlyData;renderDrop();}
 function setDropSort(v){dropSort=v;renderDrop();}
 function renderDrop(){
  const a=anaAgg();
- let L=PROPS.filter(p=>p.status==='掲載中').map(p=>({p:p,ss:pstat(p,a),ds:daysSince(p.listDate)}));
+ let L=liveG().map(p=>({p:p,ss:pstat(p,a),ds:daysSince(p.listDate)}));
  L.forEach(r=>{r.score=dropScore(r.p,r.ss);});
  if(dropOnlyData)L=L.filter(r=>r.ss.hasData);
  if(dropSort==='days')L.sort((x,y)=>((y.ds==null?-1:y.ds)-(x.ds==null?-1:x.ds))||(x.score-y.score));else L.sort((x,y)=>x.score-y.score); // 既定: -100が上（最も落とすべき）
@@ -1130,7 +1140,7 @@ async function dropProp(id){const p=PROPS.find(x=>x.id===id);if(!p)return;uiConf
 function renderOpt(){
  const _a=anaAgg();
  const TOKU=['世田谷区','渋谷区','杉並区','中野区','目黒区'];
- let active=PROPS.filter(p=>p.status==='掲載中'&&p.scorePre);
+ let active=PROPS.filter(p=>p.status==='掲載中'&&inGroup(p)&&p.scorePre);
  if(!active.length){document.getElementById('obody').innerHTML='<div class="empty">掲載中でスコアが入力された物件がありません。<br>要入稿タブでスコアを入力してください。</div>';return;}
  if(optReviewFilt==='要検討')active=active.filter(p=>!p.optReviewed);
  else if(optReviewFilt==='検討済み')active=active.filter(p=>p.optReviewed);
@@ -1234,7 +1244,7 @@ async function processHankyo(file){
  const col=(name)=>{let i=H.indexOf(norm(name));if(i<0)i=H.findIndex(h=>h.indexOf(norm(name))>=0);return i;};
  const I={name:col('物件名'),room:col('部屋番号'),mad:col('間取'),rent:col('現在賃料(万円)'),mgmt:col('管理費'),line:col('沿線'),station:H.indexOf('駅'),walk:col('交通'),
    code:col('物件コード'),score:col('住戸名寄点数'),comp:col('競合物件数（合計）'),first:col('初回掲載日'),
-   sa:col('得意なエリア'),sp:col('店舗案内ピックアップ'),cm:col('動画・ＣＭ')};
+   sa:col('得意なエリア'),sp:col('店舗案内ピックアップ'),cm:col('動画・ＣＭ'),line2:col('沿線2'),st2:col('駅2'),wk2:col('交通2'),line3:col('沿線3'),st3:col('駅3'),wk3:col('交通3')};
  if(I.rent<0)I.rent=col('現在賃料');
  const secRow=M[hr-1]?M[hr-1].map(norm):[];
  let dstart=-1;for(let c=0;c<secRow.length;c++){if(/\d{2}年\d{2}月\d{2}日～\d{2}年\d{2}月\d{2}日/.test(secRow[c])){dstart=c;break;}}
@@ -1251,6 +1261,8 @@ async function processHankyo(file){
   const station=String(I.station>=0?row[I.station]:'').trim();
   const line=String(I.line>=0?row[I.line]:'').trim();
   const wm=((String(I.walk>=0?row[I.walk]:'').match(/(\d+)\s*分/)||[])[1])||'';
+  const _sts=[[I.line,I.station,I.walk],[I.line2,I.st2,I.wk2],[I.line3,I.st3,I.wk3]].map(function(t){var sa=String(t[1]>=0?row[t[1]]:'').trim();if(!sa)return null;var wt=String(t[2]>=0?row[t[2]]:'').trim();return {line:String(t[0]>=0?row[t[0]]:'').trim(),sta:sa,walk:wt,walkMin:((wt.match(/(\d+)\s*分/)||[])[1])||''};}).filter(Boolean);
+  let _mi=_sts.findIndex(function(x){return RANK[x.sta];});if(_mi<0)_mi=0;const _main=_sts[_mi]||null;
   const sp=String(I.sp>=0?row[I.sp]:'').indexOf('◆')>=0,sa=String(I.sa>=0?row[I.sa]:'').indexOf('◆')>=0,cm=String(I.cm>=0?row[I.cm]:'').indexOf('◆')>=0;
   const score=I.score>=0?(parseInt(String(row[I.score]||'').replace(/[^0-9]/g,''))):NaN;
   const comp=I.comp>=0?String(row[I.comp]||'').trim():'';
@@ -1268,8 +1280,9 @@ async function processHankyo(file){
      storePick:sp,specArea:sa,video:cm,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',
      needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',analysisMemo:'',
      csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:first||'',compTotal:comp};
+   p.stations=_sts;if(_main){p.station=_main.sta;p.line=_main.line;p.walkMin=_main.walkMin;p.waku=autoWakuImport(_main.sta,mad,String(totFromParts(rent,mgmtV)||'0'));}
    PROPS.push(p);created++;
-  }else{matched++;if(code&&!p.suumoCode)p.suumoCode=code;}
+  }else{matched++;if(code&&!p.suumoCode)p.suumoCode=code;p.stations=_sts;if(p.waku!=='Insight'&&p.waku!=='High-Hold'&&p.waku!=='その他'&&_main){p.station=_main.sta;p.line=_main.line;p.walkMin=_main.walkMin;p.waku=autoWakuImport(_main.sta,mad,String(totFromParts(rent,mgmtV)||p.rent||'0'));}}
   if(first){if(!p.suumoListStart)p.suumoListStart=first;if(!p.listDate)p.listDate=first;}
   if(!HIST[repDate])HIST[repDate]={};
   HIST[repDate][p.id]=Object.assign(HIST[repDate][p.id]||{},{inqB:inq,score:p.csvScore||'',b0:p.belowCount||'',b1:p.t1Count||'',b2:p.t2Count||'',b3:p.t3Count||'',comp:(p.compTotal||''),photo:p.photoCount||'',sp:!!p.storePick,sa:!!p.specArea,vd:!!p.video,status:p.status||'',rent:p.rent||'',mgmt:p.mgmt||''}); // pv(PCのみ)は取り込まない。PVはビジコンから
@@ -1432,8 +1445,8 @@ function anaAgg(){
 function mgmtYen(p){if(!p)return 0;var n=parseFloat(String(p.mgmt!=null?p.mgmt:'').replace(/[^0-9.]/g,''));return isNaN(n)?0:n;}
 function totalRent(p){var r=parseFloat(p&&p.rent);if(isNaN(r))r=0;return r+mgmtYen(p)/10000;}
 function fmtRent(v){return ''+(Math.round(v*100)/100);}
-function rentMan(p){return (p&&p.rent!=null&&p.rent!=='')?fmtRent(totalRent(p))+'万':'';}
-function rentDash(p){return totalRent(p)>0?fmtRent(totalRent(p))+'万':'-';}
+function rentMan(p){return (p&&p.rent!=null&&p.rent!=='')?totalRent(p).toFixed(1)+'万円':'';}
+function rentDash(p){return (p&&p.rent!=null&&p.rent!=='')?totalRent(p).toFixed(1)+'万円':'-';}
 function totFromParts(rm,mg){var r=parseFloat(rm);if(isNaN(r))r=0;var m=parseFloat(String(mg==null?'':mg).replace(/[^0-9.]/g,''));if(isNaN(m))m=0;return r+m/10000;}
 function pstat(p,a){const pv=a.pv[p.id]||0,d=a.days[p.id]||0,iq=a.inq[p.id]||0,lv=(a.lv&&a.lv[p.id])||0;return{p:p,pv:pv,d:d,avg:d>0?pv/d:0,lv:lv,lvAvg:d>0?lv/d:0,inq:iq,rate:pv>0?iq/pv:0,walk:parseInt(p.walkMin)||null,rent:totalRent(p),bt:!!p.btSep,wash:!!p.washStand,pet:!!p.petOk,dep0:!!p.dep0,key0:!!p.key0,alock:!!p.autoLock,dbox:!!p.delivBox,burner:!!p.twoBurner,hasData:d>0};}
 // 落としSCORE: 1（残す）〜 -100（最も落とすべき）
@@ -1480,7 +1493,7 @@ function segTable(title,groups){
 }
 function renderAna(){
  const a=anaAgg();
- const all=PROPS.filter(p=>p.status==='掲載中').map(p=>pstat(p,a));
+ const all=liveG().map(p=>pstat(p,a));
  let h='';
  h+='<div class="qlabel">枠で絞り込み</div>'+anaChips('w',anaWaku,['全','デマンド','オポ','ハイ','その他']);
  h+='<div class="qlabel">間取りで絞り込み</div>'+anaChips('m',anaMad,['全','シングル','カップル','ファミリー']);
@@ -1576,7 +1589,7 @@ function cxReset(){cxBT=[];cxWash=[];cxPet=[];cxDep0=[];cxKey0=[];cxAlock=[];cxD
 function cxChips(kind,arr,opts){return '<div class="chips">'+opts.map(o=>'<button type="button" class="chip'+(arr.indexOf(o[0])>=0?' on':'')+'" onclick="cxToggle(\''+kind+'\',\''+o[0]+'\')">'+o[1]+'</button>').join('')+'</div>';}
 function renderCross(){
  const a=anaAgg();
- const base=PROPS.filter(p=>p.status==='掲載中').map(p=>pstat(p,a));
+ const base=liveG().map(p=>pstat(p,a));
  const wmin=parseFloat(cxWalkMin),wmax=parseFloat(cxWalkMax),rlo=parseFloat(cxRentLo),rhi=parseFloat(cxRentHi);
  const L=base.filter(s=>{
   if(cxBT.length){if(cxBT.indexOf(s.bt?'y':'n')<0)return false;}
