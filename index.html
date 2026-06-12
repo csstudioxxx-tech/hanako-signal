@@ -168,6 +168,7 @@ textarea{resize:vertical;min-height:54px}
 <button id="tb-otrend" onclick="tab('otrend')"><span class="tlab tlab-beta">β</span>オプション遷移</button>
 <button id="tb-ana" onclick="tab('ana')"><span class="tlab tlab-beta">β</span>反響分析</button>
 <button id="tb-report" onclick="tab('report')"><span class="tlab tlab-beta">β</span>現状レポート</button>
+<button id="tb-cost" onclick="tab('cost')"><span class="tlab tlab-up">¥</span>初期費用</button>
 </div>
 <div class="wrap">
 <div id="groupbar" style="display:none"></div>
@@ -187,6 +188,7 @@ textarea{resize:vertical;min-height:54px}
 <div id="v-drop" style="display:none"><div id="dropbody"></div></div>
 <div id="v-review" style="display:none"><div id="reviewbody"></div></div>
 <div id="v-report" style="display:none"><div id="reportbody"></div></div>
+<div id="v-cost" style="display:none"><div id="costbody"></div></div>
 <div id="v-csv" style="display:none">
  <div class="drop" id="csvdrop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M4 20V10M10 20V4M16 20v-7M20 20H3"/></svg>CSV / Excelをドロップ</div><div class="ds">ビジコン＝PV（アプリ・スマホ込）／ 反響報告書(Excel)＝反響・オプション ／ JDS＝反響</div></div>
  <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-sec" onclick="bijikonDriveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからビジコン取込</button><button class="btn btn-sec" onclick="testDrive()">ドライブ保存テスト</button></div>
@@ -426,8 +428,8 @@ function extractFields(raw,fname){
 
 
 // ---------- tabs ----------
-function tab(t){CURTAB=t;['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review')renderReview();if(t==='report')renderReport();var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}updateBadges();}
+function tab(t){CURTAB=t;['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review')renderReview();if(t==='report')renderReport();if(t==='cost')renderCost();var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}updateBadges();}
 
 // ---------- DASHBOARD ----------
 function monthOptions(){
@@ -489,16 +491,45 @@ function setupDrop(){const dz=document.getElementById('drop'),inp=document.getEl
 function mkRec(){return{fid:'P'+Date.now()+Math.random().toString(36).slice(2,5),pdfName:'',auto:'',name:'',madori:'',line:'',station:'',walkMin:'',structure:'',age:'',area:'',address:'',mgmtCo:'',fax:'',phone:'',holiday:'',propNo:'',pubDate:'',nearby:'',rent:'',btSep:'',washStand:'',floor:'',deposit:'',keyMoney:'',uploadDate:today(),deadline:nextSun(),commentA:'',commentB:'',analysisMemo:'',prospect:'',waku:'Demand',pendStatus:'',pendMemo:'',rawText:'',pdfData:null};}
 function handleFiles(files){[...files].forEach(f=>{if(!/pdf/i.test(f.type)&&!/\.pdf$/i.test(f.name))return;
  const rec=mkRec();rec.pdfName=f.name;rec.auto='読取中…';PEND.push(rec);renderPend();extractInto(f,rec);});if(PEND.length)tab('add');}
+function _needPng(j){return !j||!j.bukken_mei||j.chinryo==null;}
+async function geminiExtract(b64,mime){try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'extractPdf',data:b64,mime:mime})});var d=await r.json();return (d&&d.ok&&d.data)?d.data:null;}catch(e){return null;}}
+async function pdfToPng(file){try{const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;const pg=await pdf.getPage(1);const vp=pg.getViewport({scale:2.5});const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;return cv.toDataURL('image/png').split(',')[1];}catch(e){return null;}}
+function _feeFmt(o){if(!o||o.value==null||o.value==='')return '';return o.unit==='months'?(o.value+'ヶ月'):(((Number(o.value)||0)/10000).toFixed(1)+'万円');}
+function mapGemini(j,rec){if(!j)return;
+ if(j.bukken_mei)rec.name=String(j.bukken_mei);
+ if(j.chinryo!=null)rec.rent=String(j.chinryo/10000);
+ if(j.kanrihi!=null)rec.mgmtFee=String(j.kanrihi);
+ if(j.madori)rec.madori=String(j.madori);
+ if(j.senyu_menseki!=null)rec.area=String(j.senyu_menseki);
+ if(j.chikunengetsu)rec.age=String(j.chikunengetsu);
+ if(j.kouzou)rec.structure=String(j.kouzou);
+ if(j.shozai_kai)rec.floor=String(j.shozai_kai);
+ if(j.shozaichi)rec.address=String(j.shozaichi);
+ if(j.motozuke_kaisha)rec.mgmtCo=String(j.motozuke_kaisha);
+ if(j.motozuke_tel)rec.phone=String(j.motozuke_tel);
+ if(j.bukken_bango)rec.propNo=String(j.bukken_bango);
+ rec.deposit=_feeFmt(j.shikikin);rec.keyMoney=_feeFmt(j.reikin);
+ var ks=(j.kotsu||[]).filter(function(k){return k&&k.eki;}).map(function(k){return {line:k.ensen||'',sta:k.eki||'',walk:(k.toho_fun!=null?k.toho_fun+'分':''),walkMin:(k.toho_fun!=null?String(k.toho_fun):'')};});
+ if(ks.length){rec.stations=ks;var mi=ks.findIndex(function(x){return RANK[x.sta];});if(mi<0)mi=0;rec.station=ks[mi].sta;rec.line=ks[mi].line;rec.walkMin=ks[mi].walkMin;}
+ rec.nearby=[(j.torihiki_taiyo?'取引: '+j.torihiki_taiyo:''),(j.ad?'AD: '+j.ad:''),(j.biko||'')].filter(Boolean).join(' / ');
+ rec.needsReview=!!j.needs_review;rec.reviewReason=(Array.isArray(j.review_reason)?j.review_reason.join('、'):(j.review_reason||''));
+ if(rec.station&&rec.madori)rec.waku=autoWaku(rec.station,rec.madori,String(totFromParts(rec.rent,rec.mgmtFee)||'0'));
+ rec.auto=rec.needsReview?('要確認：'+(rec.reviewReason||'')):'Gemini自動読取';}
 async function extractInto(file,rec){
+ try{const ab2=await file.arrayBuffer();if(file.size<30000000){const u8=new Uint8Array(ab2);let bs='';for(let j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);rec.pdfData=btoa(bs);}}catch(ee){}
+ if(API&&rec.pdfData){try{
+  var gj=await geminiExtract(rec.pdfData,'application/pdf');
+  if(_needPng(gj)){var png=await pdfToPng(file);if(png){var gj2=await geminiExtract(png,'image/png');if(gj2&&gj2.bukken_mei)gj=gj2;}}
+  if(gj&&gj.bukken_mei){mapGemini(gj,rec);if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');renderPend();return;}
+ }catch(e){}}
  try{const raw=await pdfText(file);const f=extractFields(raw,file.name);
   const okread=f._readable,manual=f._manual,mr=f._manualReason||'';
   delete f._readable;delete f._manual;delete f._manualReason;
   Object.keys(f).forEach(k=>{if(f[k]!=null&&f[k]!=='')rec[k]=String(f[k]);});
   if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');
-  rec.auto=!okread?'読取不可（手入力）':(manual?('要手動対応'+(mr?'：'+mr:'')):'自動読取');
+  rec.auto=!okread?'読取不可（手入力）':(manual?('要手動対応'+(mr?'：'+mr:'')):'自動読取(簡易)');
   if(rec.station&&rec.madori)rec.waku=autoWaku(rec.station,rec.madori,String(totFromParts(rec.rent,rec.mgmtFee)||'0'));
   rec.rawText=raw.normalize('NFKC').replace(/\u2ec4/g,'\u897f').slice(0,2000);
-  try{const ab2=await file.arrayBuffer();if(file.size<30000000){const u8=new Uint8Array(ab2);let bs='';for(let j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);rec.pdfData=btoa(bs);}}catch(ee){}
  }catch(e){rec.auto='読取不可（手入力）';}
  renderPend();}
 function addBlank(){const r=mkRec();r.pdfName='手動入力';r.auto='手動';PEND.push(r);renderPend();tab('add');}
@@ -555,7 +586,7 @@ async function savePend(){
   PROPS.push({id:id,status:'要入稿',confirmed:false,bjRef:null,bjOkAt:'',waku:p.waku||'Insight',suumoCode:'',
    pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),
    structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,
-   propNo:p.propNo,pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',
+   propNo:p.propNo,pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',
    uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,
    statusLog:log,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
    csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
@@ -613,7 +644,7 @@ function infoCard(p,agg){
   +'<div class="ig"><div class="ih">物件概要</div><div class="fl">'+g('物件名',p.name)+g('間取り',p.madori)+g('構造',p.structure)+g('築年数',p.age)+g('面積',p.area)+g('階数',p.floor)+'</div></div>'
   +'<div class="ig"><div class="ih">立地</div><div class="fl">'+g('住所',p.address)+g('沿線',p.line)+g('駅',p.station)+g('徒歩',p.walkMin)+otherStHtml(p)+g('備考',p.nearby)+'</div></div>'
   +'<div class="ig"><div class="ih">条件</div><div class="fl">'+g('賃料(総額)',(p.rent!=null&&p.rent!=='')?totalRent(p).toFixed(1)+'万円':'')+g('敷金',p.deposit)+g('礼金',p.keyMoney)+g('BT別',p.btSep)+g('独立洗面台',p.washStand)+'</div></div>'+'<div class="ig"><div class="ih">設備</div><div class="fl">'+g('ペット相談',p.petOk)+g('敷金0',p.dep0)+g('礼金0',p.key0)+g('オートロック',p.autoLock)+g('宅配ボックス',p.delivBox)+g('2口コンロ',p.twoBurner)+'</div></div>'
-  +'<div class="ig"><div class="ih">管理</div><div class="fl">'+g('管理会社名',p.mgmtCo)+g('管理会社TEL',p.phone)+g('管理会社FAX',p.fax)+g('家賃',(p.rent!=null&&p.rent!=='')?Number(p.rent).toFixed(1)+'万円':'')+g('管理費・共益費',(p.mgmt!=null&&p.mgmt!=='')?(Number(p.mgmt)||0)+'円':'')+g('定休日',p.holiday)+'</div></div>'
+  +'<div class="ig"><div class="ih">管理</div><div class="fl">'+g('管理会社名',p.mgmtCo)+g('管理会社TEL',p.phone)+g('管理会社FAX',p.fax)+g('家賃',(p.rent!=null&&p.rent!=='')?Number(p.rent).toFixed(1)+'万円':'')+g('管理費・共益費',(p.mgmt!=null&&p.mgmt!=='')?(((Number(p.mgmt)||0)/10000).toFixed(1)+'万円'):'')+g('定休日',p.holiday)+'</div></div>'
   +'<div class="ig"><div class="ih">オプション</div><div class="fl">'+g('店ピク(+4)',p.storePick?'○ 付与':'×')+g('得エリ(+2)',p.specArea?'○ 付与':'×')+g('CM(+2)',p.video?'○ 付与':'×')+(p.optAppliedAt?g('付与日',p.optAppliedAt):'')+'</div></div>'
   +evalg
   +perf
@@ -727,6 +758,7 @@ function renderReview(){
  if(!un.length)h+='<div class="empty">未確認の物件はありません</div>';
  un.forEach(function(p){
   h+='<div class="rvcard"><div class="row" style="justify-content:space-between;align-items:center"><b>'+esc(p.name||'(名称未設定)')+'</b><span class="pill p-st">'+esc(p.pdfName||'取込')+'</span></div>';
+  h+=(p.reviewReason?'<div class="note" style="margin:6px 2px;color:#c2700a;font-weight:600">要確認：'+esc(p.reviewReason)+'</div>':'');
   h+=rvFields(p);
   h+=reviewInfo(p);
   h+='<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap"><button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">'+ic('doc')+'PDFを見る</button><button class="pdfbtn" onclick="pickPdf(\''+p.id+'\')">'+ic('clip')+'PDF追加/差替</button><button class="btn btn-pri" onclick="confirmReview(\''+p.id+'\')">'+ic('check')+'確認済みにする</button></div></div>';
@@ -1797,4 +1829,124 @@ async function importJ(ev){const f=ev.target.files[0];if(!f)return;try{const o=J
  await load();setupDrop();setupCSV();renderDash();updateBadges();})();
 let _lastRefresh=Date.now();
 document.addEventListener('visibilitychange',()=>{if(API&&document.visibilityState==='visible'&&!_pushing&&Date.now()-_lastRefresh>4000){_lastRefresh=Date.now();refreshData();}});
+
+/* ===== 初期費用タブ（保存なし） ===== */
+let COST={name:'',room:'',rent:0,mgmt:0,shiki:0,rei:0,hoshouPct:50,kasai:20000,kasaiChk:true,kagi:20000,kagiChk:true,sonotaOne:[],sonotaMon:[]};
+function fy(n){n=Math.round(Number(n)||0);return '\u00a5'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function splitNameRoom(full){full=(full||'').trim();var m=full.match(/^(.*?)[\s\u3000]+([0-9\uff10-\uff19]{1,4}\u53f7?\u5ba4?|[A-Za-z]?[0-9\uff10-\uff19]{2,4})$/);if(m)return {name:m[1].trim(),room:m[2].trim()};return {name:full,room:''};}
+function _feeYen(o,rentYen){if(!o)return 0;if(o.value==null||o.value===''||Number(o.value)===0)return 0;if(o.unit==='months')return Math.round((Number(o.value)||0)*(Number(rentYen)||0));return Math.round(Number(o.value)||0);}
+function mapCost(j){
+ var sp=splitNameRoom(j.bukken_mei||'');COST.name=sp.name;COST.room=sp.room;
+ COST.rent=Math.round(Number(j.chinryo)||0);COST.mgmt=Math.round(Number(j.kanrihi)||0);
+ COST.shiki=_feeYen(j.shikikin,COST.rent);COST.rei=_feeYen(j.reikin,COST.rent);
+ COST.hoshouPct=(j.hoshou_pct!=null&&j.hoshou_pct!=='')?Number(j.hoshou_pct):50;
+ var kk=j.kasai_hoken||{},kv=null;
+ if(kk.value!=null&&kk.value!=='')kv=Number(kk.value);
+ else if(kk.min!=null&&kk.max!=null){var mid=(Number(kk.min)+Number(kk.max))/2;kv=Math.floor(mid/1000)*1000;}
+ if(kv!=null&&!isNaN(kv)&&kv>0){COST.kasai=kv;COST.kasaiChk=false;}else{COST.kasai=20000;COST.kasaiChk=true;}
+ if(j.kagi_koukan!=null&&j.kagi_koukan!==''&&Number(j.kagi_koukan)>0){COST.kagi=Math.round(Number(j.kagi_koukan));COST.kagiChk=false;}else{COST.kagi=20000;COST.kagiChk=true;}
+ COST.sonotaOne=[];COST.sonotaMon=[];
+ (j.sonota||[]).forEach(function(o){if(!o||!o.name)return;var t=o.timing||'',amt=Math.round(Number(o.amount)||0);
+  if(t==='monthly')COST.sonotaMon.push({name:String(o.name),amt:amt});
+  else if(t==='one_time')COST.sonotaOne.push({name:String(o.name),amt:amt});});
+}
+async function costPdf(file){
+ var box=document.getElementById('coststat');if(box)box.textContent='\u8aad\u307f\u53d6\u308a\u4e2d\u2026';
+ try{
+  var ab=await file.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var i=0;i<u8.length;i++)bs+=String.fromCharCode(u8[i]);var b64=btoa(bs);
+  var j=null;
+  if(API){j=await geminiExtract(b64,'application/pdf');if(_needPng(j)){var png=await pdfToPng(file);if(png){var j2=await geminiExtract(png,'image/png');if(j2&&j2.bukken_mei)j=j2;}}}
+  if(j&&j.bukken_mei){mapCost(j);if(box)box.textContent='\u8aad\u307f\u53d6\u308a\u5b8c\u4e86\uff1a\u5185\u5bb9\u3092\u78ba\u8a8d\u30fb\u4fee\u6b63\u3057\u3066\u304b\u3089\u30c6\u30ad\u30b9\u30c8\u751f\u6210\u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
+  else{if(box)box.textContent='\u81ea\u52d5\u8aad\u53d6\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u4e0b\u8a18\u30d5\u30a9\u30fc\u30e0\u306b\u624b\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
+ }catch(e){if(box)box.textContent='\u8aad\u53d6\u30a8\u30e9\u30fc\uff1a\u624b\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
+ renderCost();
+}
+function _ci(id,val){return '<input id="'+id+'" value="'+String(val==null?'':val).replace(/"/g,'&quot;')+'" style="width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--border);border-radius:8px;font-size:13px">';}
+function renderCost(){
+ var h='';
+ h+='<div class="card" style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:4px">\u521d\u671f\u8cbb\u7528 \u6982\u7b97\uff08LINE\u9001\u4ed8\u7528\uff09</div><div class="note">\u30de\u30a4\u30bd\u30afPDF\u304b\u3089\u521d\u671f\u8cbb\u7528\u306e\u6982\u7b97\u3092\u8a08\u7b97\u3057\u3001\u9001\u4ed8\u7528\u30c6\u30ad\u30b9\u30c8\u3092\u4f5c\u6210\u3057\u307e\u3059\u3002\u30c7\u30fc\u30bf\u306f\u4fdd\u5b58\u3055\u308c\u307e\u305b\u3093\u3002</div></div>';
+ h+='<div class="drop" id="costdrop" style="margin-bottom:6px"><div class="di">PDF\u3092\u30c9\u30e9\u30c3\u30b0\uff06\u30c9\u30ed\u30c3\u30d7\u3001\u307e\u305f\u306f\u30bf\u30c3\u30d7\u3057\u3066\u9078\u629e</div><input type="file" id="costfile" accept="application/pdf" style="display:none"></div>';
+ h+='<div id="coststat" class="note" style="margin:0 2px 12px">PDF\u672a\u9078\u629e\uff08\u624b\u5165\u529b\u3067\u3082\u53ef\uff09</div>';
+ function row(lbl,inner){return '<div style="margin-bottom:9px"><div style="font-size:11px;color:var(--muted);margin-bottom:3px">'+lbl+'</div>'+inner+'</div>';}
+ h+='<div class="card" style="margin-bottom:12px">';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+ h+=row('\u7269\u4ef6\u540d',_ci('c_name',COST.name));
+ h+=row('\u90e8\u5c4b\u53f7\u5ba4',_ci('c_room',COST.room));
+ h+=row('\u5bb6\u8cc3(\u5186)',_ci('c_rent',COST.rent));
+ h+=row('\u7ba1\u7406\u8cbb\u30fb\u5171\u76ca\u8cbb(\u5186)',_ci('c_mgmt',COST.mgmt));
+ h+=row('\u6577\u91d1(\u5186)',_ci('c_shiki',COST.shiki));
+ h+=row('\u793c\u91d1(\u5186)',_ci('c_rei',COST.rei));
+ h+=row('\u4fdd\u8a3c\u4f1a\u793e\u521d\u56de (%)',_ci('c_pct',COST.hoshouPct));
+ h+=row('\u706b\u707d\u4fdd\u967a(\u5186)',_ci('c_kasai',COST.kasai)+'<label class="note" style="display:flex;align-items:center;gap:5px;margin-top:4px"><input type="checkbox" id="c_kasaichk" '+(COST.kasaiChk?'checked':'')+'>\u203b\u8981\u78ba\u8a8d</label>');
+ h+=row('\u9375\u4ea4\u63db\u4ee3\u7b49(\u5186)',_ci('c_kagi',COST.kagi)+'<label class="note" style="display:flex;align-items:center;gap:5px;margin-top:4px"><input type="checkbox" id="c_kagichk" '+(COST.kagiChk?'checked':'')+'>\u203b\u8981\u78ba\u8a8d</label>');
+ h+='</div>';
+ h+='<div style="margin-top:10px;font-size:11px;color:var(--muted)">\u305d\u306e\u4ed6\uff08\u521d\u671f\u8cbb\u7528\u30fb\u4e00\u56de\u6255\u3044\uff09</div><div id="c_one">';
+ COST.sonotaOne.forEach(function(o,i){h+='<div style="display:flex;gap:6px;margin-top:5px"><input value="'+String(o.name).replace(/"/g,'&quot;')+'" oninput="COST.sonotaOne['+i+'].name=this.value" placeholder="\u9805\u76ee\u540d" style="flex:2;padding:6px 8px;border:1px solid var(--border);border-radius:8px;font-size:13px"><input value="'+o.amt+'" oninput="COST.sonotaOne['+i+'].amt=Number(this.value)||0" placeholder="\u91d1\u984d" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:8px;font-size:13px"><button onclick="COST.sonotaOne.splice('+i+',1);renderCost()" class="btn-sm btn-danger">\u00d7</button></div>';});
+ h+='</div><button onclick="COST.sonotaOne.push({name:\'\',amt:0});renderCost()" class="btn-sm btn-sec" style="margin-top:6px">\uff0b\u4e00\u56de\u6255\u3044\u9805\u76ee\u3092\u8ffd\u52a0</button>';
+ h+='<div style="margin-top:12px;font-size:11px;color:var(--muted)">\u305d\u306e\u4ed6\u6708\u984d\u8cbb\u7528</div><div id="c_mon">';
+ COST.sonotaMon.forEach(function(o,i){h+='<div style="display:flex;gap:6px;margin-top:5px"><input value="'+String(o.name).replace(/"/g,'&quot;')+'" oninput="COST.sonotaMon['+i+'].name=this.value" placeholder="\u9805\u76ee\u540d" style="flex:2;padding:6px 8px;border:1px solid var(--border);border-radius:8px;font-size:13px"><input value="'+o.amt+'" oninput="COST.sonotaMon['+i+'].amt=Number(this.value)||0" placeholder="\u91d1\u984d" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:8px;font-size:13px"><button onclick="COST.sonotaMon.splice('+i+',1);renderCost()" class="btn-sm btn-danger">\u00d7</button></div>';});
+ h+='</div><button onclick="COST.sonotaMon.push({name:\'\',amt:0});renderCost()" class="btn-sm btn-sec" style="margin-top:6px">\uff0b\u6708\u984d\u9805\u76ee\u3092\u8ffd\u52a0</button>';
+ h+='<div style="margin-top:14px"><button onclick="genCostText()" class="btn btn-pri" style="width:100%">\u30c6\u30ad\u30b9\u30c8\u751f\u6210</button></div>';
+ h+='</div>';
+ h+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="font-weight:700">\u9001\u4ed8\u7528\u30c6\u30ad\u30b9\u30c8</div><button onclick="copyText(document.getElementById(\'c_out\').value,\'\u30b3\u30d4\u30fc\')" class="btn-sm btn-sec">\u30b3\u30d4\u30fc</button></div><textarea id="c_out" style="width:100%;box-sizing:border-box;height:360px;font-family:ui-monospace,monospace;font-size:12px;line-height:1.55;padding:10px;border:1px solid var(--border);border-radius:10px" placeholder="\u300c\u30c6\u30ad\u30b9\u30c8\u751f\u6210\u300d\u3092\u62bc\u3059\u3068\u3053\u3053\u306b\u8868\u793a\u3055\u308c\u307e\u3059"></textarea></div>';
+ document.getElementById('costbody').innerHTML=h;
+ var bind=function(id,key,num){var el=document.getElementById(id);if(el)el.oninput=function(){COST[key]=num?(Number(this.value)||0):this.value;};};
+ bind('c_name','name');bind('c_room','room');bind('c_rent','rent',1);bind('c_mgmt','mgmt',1);bind('c_shiki','shiki',1);bind('c_rei','rei',1);bind('c_pct','hoshouPct',1);bind('c_kasai','kasai',1);bind('c_kagi','kagi',1);
+ var kc=document.getElementById('c_kasaichk');if(kc)kc.onchange=function(){COST.kasaiChk=this.checked;};
+ var gc=document.getElementById('c_kagichk');if(gc)gc.onchange=function(){COST.kagiChk=this.checked;};
+ var df=document.getElementById('costfile'),dz=document.getElementById('costdrop');
+ if(dz&&df){dz.onclick=function(){df.click();};df.onchange=function(){if(df.files&&df.files[0])costPdf(df.files[0]);};
+  dz.ondragover=function(e){e.preventDefault();dz.classList.add('over');};dz.ondragleave=function(){dz.classList.remove('over');};
+  dz.ondrop=function(e){e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files&&e.dataTransfer.files[0])costPdf(e.dataTransfer.files[0]);};}
+}
+function genCostText(){
+ var rent=Number(COST.rent)||0,mgmt=Number(COST.mgmt)||0,shiki=Number(COST.shiki)||0,rei=Number(COST.rei)||0;
+ var chuukai=Math.round(rent*1.1);
+ var pct=(COST.hoshouPct==null||COST.hoshouPct==='')?50:Number(COST.hoshouPct);
+ var hoshou=Math.round((rent+mgmt)*pct/100);
+ var kasai=Number(COST.kasai)||0,kagi=Number(COST.kagi)||0;
+ var oneItems=(COST.sonotaOne||[]).filter(function(o){return o&&((o.name&&o.name.trim())||o.amt);});
+ var sonotaTotal=oneItems.reduce(function(a,o){return a+(Number(o.amt)||0);},0);
+ var init1=shiki+rei+chuukai+hoshou+kasai+kagi+sonotaTotal;
+ var nextRent=rent+mgmt,pay2=nextRent,grand=init1+pay2;
+ var L=[];
+ L.push('\u7269\u4ef6\u540d : '+(COST.name||''));
+ L.push('\u90e8\u5c4b\u53f7\u5ba4\uff1a'+(COST.room||''));
+ L.push('\u5bb6\u8cc3 : '+fy(rent));
+ L.push('\u7ba1\u7406\u8cbb : '+fy(mgmt));
+ var monItems=(COST.sonotaMon||[]).filter(function(o){return o&&((o.name&&o.name.trim())||o.amt);});
+ if(monItems.length){L.push('\u305d\u306e\u4ed6\u6708\u984d\u8cbb\u7528');L.push(monItems.map(function(o){return (o.name||'')+' : '+fy(o.amt);}).join(' / '));}
+ L.push('');
+ L.push('\u25fe\ufe0f\u521d\u671f\u8cbb\u7528');
+ L.push('----------');
+ L.push('\u6577\u91d1 : '+fy(shiki));
+ L.push('\u793c\u91d1 : '+fy(rei));
+ L.push('\u4ef2\u4ecb\u624b\u6570\u6599 : '+fy(chuukai));
+ L.push('\u4fdd\u8a3c\u4f1a\u793e\u521d\u56de\u5229\u7528\u6599 '+fy(hoshou)+' \u203b\u5be9\u67fb\u7d50\u679c\u306b\u3088\u308b');
+ L.push('\u706b\u707d\u4fdd\u967a : '+fy(kasai)+(COST.kasaiChk?' \u203b\u8981\u78ba\u8a8d':''));
+ L.push('\u9375\u4ea4\u63db\u4ee3\u7b49 : '+fy(kagi)+(COST.kagiChk?' \u203b\u8981\u78ba\u8a8d':''));
+ if(oneItems.length){
+  L.push('\u305d\u306e\u4ed6 : '+fy(sonotaTotal));
+  var br=oneItems.map(function(o){var sname=(o.name||''),seg=sname+' : '+fy(o.amt);if(shiki===0&&/\u30af\u30ea\u30fc\u30cb\u30f3\u30b0/.test(sname))seg+='\uff08\u5165\u5c45\u6642\u306b\u652f\u6255\u3046\u53ef\u80fd\u6027\u3042\u308a\u203b\u8981\u78ba\u8a8d\uff09';return seg;}).join(' / ');
+  L.push('\u305d\u306e\u4ed6\u5185\u8a33 '+br);
+ }
+ L.push('----------');
+ L.push('\u521d\u671f\u8cbb\u7528\u5408\u8a08 : '+fy(init1)+'...\u2460');
+ L.push('');
+ L.push('\u25fe\ufe0f\u524d\u5bb6\u8cc3');
+ L.push('----------');
+ L.push('\u7fcc\u6708\u5bb6\u8cc3 : '+fy(nextRent));
+ L.push('\u65e5\u5272\u308a\u5bb6\u8cc3 : \u5165\u5c45\u65e5\u306b\u3088\u308b');
+ L.push('----------');
+ L.push('\u5408\u8a08 : '+fy(pay2)+'\uff0b\u65e5\u5272\u308a\u5bb6\u8cc3...\u2461');
+ L.push('');
+ L.push('\u25fe\ufe0f\u5408\u8a08\u304a\u652f\u6255\u984d(\u2460+\u2461)');
+ L.push('----------');
+ L.push('\u27a1'+fy(grand)+'+\u65e5\u5272\u308a\u5bb6\u8cc3');
+ L.push('----------');
+ L.push('');
+ L.push('\u203b\u6982\u7b97\u3067\u3059\u306e\u3067\u3001\u5be9\u67fb\u306e\u7d50\u679c\u7b49\u306b\u3088\u3063\u3066\u591a\u5c11\u524d\u5f8c\u3059\u308b\u53ef\u80fd\u6027\u304c\u3054\u3056\u3044\u307e\u3059\u3002\u3054\u4e86\u627f\u304f\u3060\u3055\u3044\u307e\u305b\u3002');
+ var out=document.getElementById('c_out');if(out)out.value=L.join('\n');
+}
+
 </script></body></html>
