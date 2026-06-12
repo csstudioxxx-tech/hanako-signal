@@ -154,6 +154,92 @@ textarea{resize:vertical;min-height:54px}
 .pdfst{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px}.pdfst.dl{background:#e7f6ec;color:#1a7f37}.pdfst.local{background:#fff4e5;color:#c2700a}.pdfst.none{background:#eee;color:#999}.pdfst.pend{background:#eef2f7;color:#7a8aa0}.pdfst .btn-sm{margin-left:6px}
 .hd2{display:flex;align-items:center;gap:8px}.nmcopy{font-weight:700;font-size:14px;cursor:pointer;line-height:1.25}.nmcopy:hover{color:var(--accent)}.nocopy{font-size:11px;color:var(--text3);cursor:pointer;margin-top:1px}.nocopy:hover{color:var(--accent)}.ckrow{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:3px}.inck{display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;color:var(--text2)}.inck input{margin:0;width:15px;height:15px}
 .gbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 2px 10px;padding:8px;background:var(--bg2);border-radius:10px}.gbtn{font-size:12px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid #e2e6ea;background:#fff;color:var(--text2);cursor:pointer}.gbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}.gtot{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--text2)}
+
+/* ===== 要データ確認 新UI ===== */
+.rvtop{display:flex;align-items:center;gap:10px;margin:0 2px 10px}
+.rvtop .reg{margin-left:auto;border:none;background:#0d9488;color:#fff;font-weight:700;font-size:12.5px;padding:8px 15px;border-radius:9px;cursor:pointer}
+.rvtop .reg:disabled{background:#cbd3df;cursor:not-allowed}
+.rvtop .rc{font-size:11.5px;color:var(--text3)}
+.rvwrap{display:flex;gap:12px;align-items:stretch}
+.rvlist{width:228px;flex:none;border:1px solid var(--border2);border-radius:12px;background:#fff;display:flex;flex-direction:column;overflow:hidden;transition:width .15s}
+.rvwrap.lc .rvlist{width:42px}
+.rvlhd{display:flex;align-items:center;gap:6px;padding:9px 10px;border-bottom:1px solid var(--border2)}
+.rvlhd .t{font-weight:700;font-size:12.5px;flex:1;white-space:nowrap;overflow:hidden}
+.rvlhd button{border:1px solid var(--border2);background:#fff;width:24px;height:24px;border-radius:6px;cursor:pointer;color:var(--text3)}
+.rvcounts{padding:9px 10px;border-bottom:1px solid var(--border2);display:flex;flex-direction:column;gap:4px;background:#fafbfc}
+.rvc{display:flex;align-items:center;gap:7px;font-size:12px}
+.rvc .d{width:8px;height:8px;border-radius:50%}
+.rvc .n{margin-left:auto;font-weight:700}
+.rvc.un .d{background:#d8a200}.rvc.mg .d{background:#7c3aed}.rvc.ok .d{background:#0d9488}.rvc.tot .d{background:#1a2942}
+.rvc.tot{border-top:1px dashed var(--border2);padding-top:5px;margin-top:1px;font-weight:700}
+.rvitems{overflow:auto;flex:1;max-height:70vh}
+.rvit{padding:9px 10px;border-bottom:1px solid var(--border2);cursor:pointer;border-left:3px solid transparent}
+.rvit:hover{background:#f7f9fc}
+.rvit.cur{background:#fff8e6;border-left-color:#d8a200}
+.rvit.s-ok{border-left-color:#0d9488}.rvit.s-ok .nm{color:#0d9488}
+.rvit.s-mg{border-left-color:#7c3aed}.rvit.s-mg .nm{color:#7c3aed}
+.rvit .nm{font-weight:700;font-size:12px;display:flex;align-items:center}
+.rvit .mt{font-size:10.5px;color:var(--text3);margin-top:1px}
+.rvit .tg{font-size:9px;font-weight:700;padding:0 6px;border-radius:5px;margin-left:auto}
+.rvit.s-ok .tg{background:#e3f5f1;color:#0d9488}.rvit.s-mg .tg{background:#f1e8fd;color:#7c3aed}
+.rvit .lt{font-size:9.5px;font-weight:700;color:#c2410c;margin-top:3px}
+.rvwrap.lc .rvlhd .t,.rvwrap.lc .rvcounts,.rvwrap.lc .rvitems{display:none}
+.rvwork{flex:1;display:grid;grid-template-columns:minmax(0,52fr) minmax(0,48fr);gap:12px;min-width:0}
+.rvpdfcard{border:1px solid var(--border2);border-radius:12px;background:#fff;display:flex;flex-direction:column;overflow:hidden;min-height:560px}
+.rvpdfhd{padding:7px 11px;border-bottom:1px solid var(--border2);font-weight:700;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.rvpdfwrap{flex:1;background:#525659;min-height:0;position:relative}
+.rvpdfframe{width:100%;height:100%;border:0;display:block}
+.rvpdfnone{color:#fff;opacity:.85;font-size:12px;display:flex;align-items:center;justify-content:center;height:100%;text-align:center;padding:20px}
+.rvrcol{display:flex;flex-direction:column;gap:10px;min-width:0}
+.rvcp{background:#fff8e6;border:1px solid #efe1b6;border-radius:10px;padding:10px 12px}
+.rvcp .t{font-size:11.5px;font-weight:700;color:#a07700;margin-bottom:7px}
+.rvchips{display:flex;flex-wrap:wrap;gap:6px}
+.rvchip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;background:#fff;border:1px solid #ecdfb8;border-radius:99px;padding:3px 10px;cursor:pointer}
+.rvchip .d{width:7px;height:7px;border-radius:50%;background:#c2410c}
+.rvchip.w .d{background:#d8a200}
+.rvchip.info{cursor:default}.rvchip.info .d{background:#d8a200}
+.rvchip.done{background:#effaf7;border-color:#bfe3dd;color:#0d9488}
+.rvchip.done .d{background:#0d9488}
+.rvform{border:1px solid var(--border2);border-radius:12px;background:#fff;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.rvfhd{padding:9px 14px;border-bottom:1px solid var(--border2);font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.rvfhd .rvst{margin-left:auto;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px}
+.rvst.un{background:#fff8e6;color:#a07700}.rvst.ok{background:#e3f5f1;color:#0d9488}.rvst.mg{background:#f1e8fd;color:#7c3aed}
+.rvfbody{padding:12px 14px;overflow:auto;display:flex;flex-direction:column;gap:11px;max-height:62vh}
+.rvsec{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--text3);border-bottom:1px solid var(--border2);padding-bottom:4px}
+.rvmediarow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rvmtag{font-size:11px;font-weight:700;padding:3px 11px;border-radius:99px;border:1px solid var(--border2);color:var(--text3)}
+.rvmtag.on{background:#1a3d6b;color:#fff;border-color:#1a3d6b}
+.rvmnote{font-size:10.5px;color:var(--text3)}
+.rvstrow{display:flex;gap:7px;flex-wrap:wrap}
+.rvsta{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid var(--border2);border-radius:9px;font-size:11.5px;background:#fbfcfe}
+.rvsta .tg{font-size:9px;font-weight:700;padding:1px 7px;border-radius:5px}
+.rvsta.main{border-color:#bfe3dd;background:#f0faf7}.rvsta.main .tg{background:#0d9488;color:#fff}
+.rvsta.out .tg{background:#eef0f4;color:#9aa3b2}
+.rvfg{display:grid;grid-template-columns:repeat(3,1fr);gap:9px 10px}
+.rvfld label{display:block;font-size:10px;color:var(--text3);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rvfld input{width:100%;font-size:12.5px;padding:7px 9px;border:1px solid var(--border2);border-radius:8px;background:#fbfcfe;font-family:inherit}
+.rvfld input:focus{outline:none;border-color:#d8a200;box-shadow:0 0 0 3px rgba(216,162,0,.13);background:#fff}
+.rvfld.flagempty input{border-color:#f3b4a0;background:#fff5f0}
+.rvfld.done input{border-color:#bfe3dd;background:#f0faf7}
+.rvflag{font-size:9px;font-weight:700;margin-left:5px;padding:1px 6px;border-radius:5px;background:#fff5f0;color:#c2410c}
+.rvfld.done .rvflag{display:none}
+.rvckrow{display:flex;flex-wrap:wrap;gap:6px 14px}
+.rvck{display:inline-flex;align-items:center;gap:5px;font-size:12px}
+.rv_gate{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;padding:8px 12px;border:1px solid #f0c896;background:#fff8ee;border-radius:9px;cursor:pointer}
+.rv_gate.done{border-color:#bfe3dd;background:#f0faf7;color:#0d9488}
+.rvmgmemo{border:1px solid #d9c4f5;background:#faf6ff;border-radius:9px;padding:9px 11px}
+.rvmgmemo .t{font-size:10.5px;font-weight:700;color:#7c3aed;margin-bottom:5px}
+.rvmgmemo textarea{width:100%;min-height:50px;border:1px solid #e0d3f3;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12px;box-sizing:border-box}
+.rvbtns{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--border2);background:#fbfcfe}
+.rvbtns .b{border:none;font-family:inherit;font-weight:700;font-size:12.5px;padding:9px 14px;border-radius:9px;cursor:pointer}
+.rvbtns .b.ok{background:#0d9488;color:#fff;flex:1}
+.rvbtns .b.mg{background:#fff;border:1px solid #d9c4f5;color:#7c3aed}
+.rvbtns .b.gho{background:#fff;border:1px solid var(--border2);color:var(--text2)}
+.rvbtns .b.del{background:#fff;border:1px solid #f0c2b0;color:#c2410c}
+.rvempty{padding:40px;text-align:center;color:var(--text3)}
+@media(max-width:1500px){.rvfg{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1100px){.rvwrap{flex-direction:column}.rvwork{grid-template-columns:1fr}.rvpdfcard{min-height:60vh}}
+
 </style></head><body>
 <header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span></h1><div class="sub">運を、構造化する。</div></header>
 <div class="tabs">
@@ -271,7 +357,7 @@ async function load(){
  else{PROPS=await gget(SK,[]);HIST=await gget(HK,{});EVENTS=await gget(EK,{});}
  PROPS.forEach(p=>{
   if(!p.statusLog)p.statusLog=[];
-  if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';if(p.stations==null)p.stations=[];if(p.waku==='未分類')p.waku='その他';if(p.media==null)p.media='';if(p.mediaOther==null)p.mediaOther='';if(p.rtMedia==null)p.rtMedia='-';if(p.rtUrl==null)p.rtUrl='';if(p.vacancyLog==null)p.vacancyLog=[];['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
+  if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';if(p.stations==null)p.stations=[];if(p.waku==='未分類')p.waku='その他';if(p.media==null)p.media='';if(p.mediaOther==null)p.mediaOther='';if(p.rtMedia==null)p.rtMedia='-';if(p.rtUrl==null)p.rtUrl='';if(p.vacancyLog==null)p.vacancyLog=[];if(p.revStatus==null)p.revStatus='un';if(p.mgMemo==null)p.mgMemo='';if(p.equipOk==null)p.equipOk=false;['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
   if(p.csvPV==null)p.csvPV=0;if(p.csvInq==null)p.csvInq=0;if(p.csvInqB==null)p.csvInqB=0;
   if(p.csvAsOf==null)p.csvAsOf='';
   if(p.optReviewed==null)p.optReviewed=false;if(p.compDataAt==null)p.compDataAt='';if(p.optAppliedAt==null)p.optAppliedAt='';
@@ -543,11 +629,13 @@ function wakuChips(i){const opts=['Demand','Opportunity','Insight','High-Hold','
 function setPendWaku(i,w){PEND[i].waku=w;renderPend();}
 function autoPill(a){const c=(a.indexOf('読取不可')>=0||a.indexOf('要手動')>=0)?'p-pre':(a==='手動'?'p-st':'p-act');return '<span class="pill '+c+'">'+esc(a)+'</span>';}
 function pendMedia(i,v){PEND[i].media=v;if(v!=='その他')PEND[i].mediaOther='';renderPend();}
+function pendMediaAll(v){var name='';if(v==='その他'){name=(prompt('媒体名を入力（全件に適用）','')||'その他');}PEND.forEach(function(p){p.media=v;p.mediaOther=(v==='その他')?name:'';});renderPend();toast('全'+PEND.length+'件の掲載媒体を「'+(v==='その他'?name:v)+'」に設定');}
 function pendVacAdd(i){if(!PEND[i].vacancyLog)PEND[i].vacancyLog=[];PEND[i].vacancyLog.push({date:new Date().toISOString().slice(0,10),text:''});renderPend();}
 function renderPend(){
  const el=document.getElementById('pend');document.getElementById('addbar').style.display=PEND.length?'block':'none';
  document.getElementById('pcnt').textContent='（'+PEND.length+'件）';
- el.innerHTML=PEND.map((p,i)=>{
+ var _bulk=PEND.length?'<div class="card" style="padding:10px 12px;margin-bottom:8px"><div class="qlabel" style="margin-top:0">今回の掲載媒体を一括指定（個別でも変更可）</div><div class="row" style="gap:6px;flex-wrap:wrap">'+['atbb','REINS','itandi','その他'].map(function(m){return '<button class="btn-sm" onclick="pendMediaAll(\''+m+'\')">'+m+'</button>';}).join('')+'</div></div>':'';
+ el.innerHTML=_bulk+PEND.map((p,i)=>{
   const fix=(p.auto&&(p.auto.indexOf('要手動')>=0||p.auto.indexOf('読取不可')>=0));
   const dup=pendDup(p);
   return '<div class="card'+(fix?' needfix':'')+'">'
@@ -599,7 +687,7 @@ async function savePend(){
   if(pendDup(p)){skipped.push(p.name||p.pdfName);return;}
   const id='PR'+Date.now()+Math.random().toString(36).slice(2,5);
   const log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});
-  PROPS.push({id:id,status:'要入稿',confirmed:false,bjRef:null,bjOkAt:'',waku:p.waku||'その他',suumoCode:'',
+  PROPS.push({id:id,status:'要入稿',confirmed:false,bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:false,waku:p.waku||'その他',suumoCode:'',
    pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),
    structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,
    propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',
@@ -764,37 +852,78 @@ function inGroup(p){if(GROUP==='ALL')return true;if(GROUP==='DO')return p.waku==
 function liveG(){return PROPS.filter(function(p){return p.status==='掲載中'&&inGroup(p);});}
 function groupBar(){var opts=[['ALL','ALL（全体）'],['Demand','Demand'],['Opportunity','Opportunity'],['DO','Demand＋Opportunity'],['High-Hold','High-Hold'],['Insight','Insight(YOKOYAMA)'],['その他','その他(仮説検証群)']];var tot=0;PROPS.forEach(function(p){if(p.status==='掲載中')tot+=(+(p.csvInq||0)||0);});return '<div class="gbar">'+opts.map(function(o){return '<button class="gbtn'+(GROUP===o[0]?' on':'')+'" onclick="setGroup(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'<span class="gtot">全体の反響合計 '+tot+'</span></div>';}
 function setGroup(g){GROUP=g;tab(CURTAB);}
+let CURREV=null,RVLISTOPEN=true;
+var RVF=[['name','物件名'],['room','部屋番号'],['madori','間取り'],['rent','家賃(万)'],['mgmt','管理費(円)'],['area','面積'],['deposit','敷金'],['keyMoney','礼金'],['age','築年'],['structure','構造'],['floor','階'],['address','住所'],['mgmtCo','管理会社名'],['phone','管理会社TEL'],['fax','管理会社FAX'],['propNo','物件番号'],['rtMedia','R.T.確認媒体']];
+function revItems(){return PROPS.filter(function(p){return p.confirmed===false;});}
+function revCounts(){var it=revItems(),c={un:0,ok:0,mg:0,total:it.length};it.forEach(function(p){var st=p.revStatus||'un';if(st==='ok')c.ok++;else if(st==='mg')c.mg++;else c.un++;});return c;}
+function rvToggleList(){RVLISTOPEN=!RVLISTOPEN;renderReview();}
+function revSelect(id){CURREV=id;renderReview();}
+function revMarkOk(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(!p.equipOk){toast('設備の確認にチェックを入れてください');var g=document.getElementById('rv_gate');if(g)g.scrollIntoView({block:'center'});return;}p.revStatus='ok';save();updateBadges();var it=revItems();var nx=it.find(function(x){return x.id!==id&&(x.revStatus||'un')!=='ok';});CURREV=nx?nx.id:id;renderReview();toast('「'+(p.name||'物件')+'」を確認済みにしました');}
+function revToggleMg(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.revStatus=(p.revStatus==='mg')?'un':'mg';save();renderReview();updateBadges();if(p.revStatus==='mg'){var t=document.getElementById('rv_mgmemo');if(t)t.focus();toast('マネージャー要確認にしました（このページに残ります）');}}
+function revMgMemo(id,v){var p=PROPS.find(function(x){return x.id===id;});if(p){p.mgMemo=v;save();}}
+function revEquip(id,ck){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.equipOk=ck;save();var g=document.getElementById('rv_gate');if(g)g.classList.toggle('done',ck);document.querySelectorAll('[data-chipkey="__equip"]').forEach(function(c){c.classList.toggle('done',ck);});}
+function revRegister(){var ok=revItems().filter(function(p){return (p.revStatus||'un')==='ok';});if(!ok.length){toast('確認済みの物件がありません');return;}ok.forEach(function(p){p.confirmed=true;p.revStatus='un';});recompute();save();updateBadges();CURREV=null;renderReview();toast(ok.length+'件を入稿ページへ登録しました（確認済みのみ移動）');}
+function revLive(el){var key=el.getAttribute('data-key'),field=el.getAttribute('data-field');editProp(CURREV,field,el.value);var done=el.value&&el.value.trim()!=='';document.querySelectorAll('[data-chipkey="'+key+'"]').forEach(function(c){c.classList.toggle('done',!!done);});var fl=el.closest('.rvfld');if(fl)fl.classList.toggle('done',!!done);}
+function revFocus(key){var el=document.querySelector('[data-fldkey="'+key+'"]');if(el){el.scrollIntoView({block:'center'});var i=el.querySelector('input,textarea');if(i)i.focus();}}
+function loadReviewPdf(p,host){
+ if(!host)return;
+ if(p.driveId){host.innerHTML='<iframe class="rvpdfframe" src="https://drive.google.com/file/d/'+p.driveId+'/preview"></iframe>';return;}
+ host.innerHTML='<div class="rvpdfnone">PDFを読み込み中…</div>';
+ (async function(){try{var d=await gget('pdf_'+p.id,null);if(d&&typeof d==='string'&&d.length>100){var bin=atob(d);var u8=new Uint8Array(bin.length);for(var k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));host.innerHTML='<iframe class="rvpdfframe" src="'+url+'#zoom=page-width"></iframe>';return;}}catch(e){}host.innerHTML='<div class="rvpdfnone">PDFが見つかりません（物件登録でPDFを添付するとここに表示されます）</div>';})();
+}
+function rvMediaLabel(p){return p.media==='その他'?(p.mediaOther||'その他'):(p.media||'未指定');}
+function rvCellHTML(p,field,label){
+ var v=p[field]==null?'':String(p[field]);var empty=v.trim()==='';
+ return '<div class="rvfld'+(empty?' flagempty':'')+'" data-fldkey="'+field+'"><label>'+label+(empty?'<span class="rvflag">空欄</span>':'')+'</label><input value="'+esc(v)+'" data-key="'+field+'" data-field="'+field+'" oninput="revLive(this)" placeholder="'+(empty?'未入力 — 要確認':'')+'"></div>';
+}
+function rvStations(p){
+ var arr=(p.stations&&p.stations.length)?p.stations:[{sta:p.station,line:p.line,walk:p.walkMin?('徒歩'+p.walkMin+'分'):''}];
+ var html=arr.map(function(s){var isMain=s.sta===p.station;var ranked=RANK[s.sta];var cls=isMain?'main':(ranked?'':'out');var tg=isMain?'メイン':(ranked?'ランク内':'ランク外');return '<span class="rvsta '+cls+'"><span class="tg">'+tg+'</span><b>'+esc(s.sta||'-')+'</b> '+esc((s.line||'')+' '+(s.walk||''))+'</span>';}).join('');
+ return '<div class="rvstrow">'+html+'</div>';
+}
+function rvConfirmPoints(p){
+ var pts=[];
+ RVF.forEach(function(fl){var v=p[fl[0]]==null?'':String(p[fl[0]]);if(v.trim()==='')pts.push({key:fl[0],label:fl[1],type:'e',done:false});});
+ var chips=pts.map(function(pt){return '<span class="rvchip'+(pt.done?' done':'')+'" data-chipkey="'+pt.key+'" onclick="revFocus(\''+pt.key+'\')"><span class="d"></span>'+pt.label+' 空欄</span>';}).join('');
+ chips+='<span class="rvchip'+(p.equipOk?' done':'')+'" data-chipkey="__equip" onclick="revFocus(\'__equip\')"><span class="d"></span>設備の最終確認</span>';
+ if(p.reviewReason)chips+='<span class="rvchip w info"><span class="d"></span>AI要確認: '+esc(p.reviewReason)+'</span>';
+ var n=pts.length+(p.equipOk?0:1);
+ return '<div class="rvcp"><div class="t">確認ポイント（空欄 '+pts.length+'／設備'+(p.equipOk?'確認済':'未確認')+'） — クリックで該当欄へ</div><div class="rvchips">'+chips+'</div></div>';
+}
+function rvAmenChk(p){
+ return '<div class="rvckrow">'+inChk(p.id,'btSep',p.btSep,'バス・トイレ別')+inChk(p.id,'washStand',p.washStand,'独立洗面台')+inChk(p.id,'petOk',p.petOk,'ペット相談可')+inChk(p.id,'autoLock',p.autoLock,'オートロック')+inChk(p.id,'delivBox',p.delivBox,'宅配BOX')+inChk(p.id,'twoBurner',p.twoBurner,'2口コンロ')+inChk(p.id,'dep0',p.dep0,'敷金0')+inChk(p.id,'key0',p.key0,'礼金0')+'</div>';
+}
 function renderReview(){
- var un=PROPS.filter(function(p){return p.confirmed===false;});
- var mm=PROPS.filter(bjMismatch);
- var h='<div class="note" style="margin:0 2px 10px">取込・読み取り直後の物件はまずここに入ります。クリックせずそのまま編集でき、「確認済み」を押すと反映されます。</div>';
- h+='<h3 class="rvh">未確認の物件（'+un.length+'件）</h3>';
- if(!un.length)h+='<div class="empty">未確認の物件はありません</div>';
- un.forEach(function(p){
-  h+='<div class="rvcard"><div class="row" style="justify-content:space-between;align-items:center"><b>'+esc(p.name||'(名称未設定)')+'</b><span class="pill p-st">'+esc(p.pdfName||'取込')+'</span></div>';
-  h+=(p.reviewReason?'<div class="note" style="margin:6px 2px;color:#c2700a;font-weight:600">要確認：'+esc(p.reviewReason)+'</div>':'');
-  h+=rvFields(p);
-  h+=reviewInfo(p);
-  h+='<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap"><button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">'+ic('doc')+'PDFを見る</button><button class="pdfbtn" onclick="pickPdf(\''+p.id+'\')">'+ic('clip')+'PDF追加/差替</button><button class="btn btn-pri" onclick="confirmReview(\''+p.id+'\')">'+ic('check')+'確認済みにする</button><button class="btn-sm btn-danger" style="margin-left:auto" onclick="deleteReviewProp(\''+p.id+'\')">物件削除</button></div></div>';
- });
- h+='<h3 class="rvh" style="margin-top:18px">ビジコンとズレあり（'+mm.length+'件）</h3>';
- h+='<div class="note" style="margin:0 2px 10px">ビジコンのCSVが正です。<span class="curval">赤＝アプリの現在値</span> → <span class="bjval">緑＝ビジコン値</span>。直したら「修正済み」を押してください。</div>';
- if(!mm.length)h+='<div class="empty">ズレのある物件はありません</div>';
- mm.forEach(function(p){
-  var ds=bjDiff(p);
-  h+='<div class="rvcard"><div class="row" style="justify-content:space-between;align-items:center"><b>'+esc(p.name||'')+'</b><span class="muted" style="font-size:11px">ビジコン '+esc((p.bjRef&&p.bjRef.at)||'')+'</span></div>';
-  ds.forEach(function(d){
-   var isbool=(d.f==='storePick'||d.f==='specArea'||d.f==='video');
-   h+='<div class="diffrow diffbad"><div style="min-width:80px;font-size:12px;color:var(--text3)">'+d.label+'</div>';
-   if(!isbool)h+='<div class="rvf">'+inEd(p.id,d.f,p[d.f],'')+'</div>';
-   h+='<div style="font-size:12px">現在 <span class="curval">'+esc(String(d.cur))+'</span> → ビジコン <span class="bjval">'+esc(String(d.bj))+'</span></div>';
-   h+='<button class="btn btn-sec" onclick="bjApply(\''+p.id+'\',\''+d.f+'\',\''+esc(String(d.bj))+'\')">ビジコンに合わせる</button></div>';
-  });
-  h+='<div class="row" style="margin-top:6px"><button class="btn btn-pri" onclick="bjResolve(\''+p.id+'\')">'+ic('check')+'修正済み</button></div></div>';
- });
+ var items=revItems();
+ if(!CURREV||!items.some(function(p){return p.id===CURREV;}))CURREV=items.length?items[0].id:null;
+ var c=revCounts();
+ var h='<div class="rvtop"><span class="rc">確認済み '+c.ok+' 件を登録</span><button class="reg" '+(c.ok?'':'disabled')+' onclick="revRegister()">確認済みを入稿ページへ登録</button></div>';
+ if(!items.length){h+='<div class="rvempty">未確認の物件はありません。物件登録でPDFを取り込むとここに表示されます。</div>';document.getElementById('reviewbody').innerHTML=h;updateBadges();return;}
+ h+='<div class="rvwrap'+(RVLISTOPEN?'':' lc')+'">';
+ // list
+ h+='<aside class="rvlist"><div class="rvlhd"><span class="t">未確認リスト</span><button onclick="rvToggleList()">'+(RVLISTOPEN?'‹':'›')+'</button></div>';
+ h+='<div class="rvcounts"><div class="rvc un"><span class="d"></span>未確認<span class="n">'+c.un+'</span></div><div class="rvc mg"><span class="d"></span>マネージャー要確認<span class="n">'+c.mg+'</span></div><div class="rvc ok"><span class="d"></span>確認済み<span class="n">'+c.ok+'</span></div><div class="rvc tot"><span class="d"></span>合計<span class="n">'+c.total+'</span></div></div>';
+ h+='<div class="rvitems">'+items.map(function(p){var st=p.revStatus||'un';var icon=st==='ok'?'<span class="tg">済</span>':st==='mg'?'<span class="tg">要確認</span>':'';var tail=st==='un'?'<div class="lt">確認待ち</div>':'';return '<div class="rvit s-'+st+(p.id===CURREV?' cur':'')+'" onclick="revSelect(\''+p.id+'\')"><div class="nm">'+esc(p.name||'(名称未設定)')+icon+'</div><div class="mt">'+esc((p.station||'')+' '+(p.madori||''))+'</div>'+tail+'</div>';}).join('')+'</div></aside>';
+ // work
+ var p=PROPS.find(function(x){return x.id===CURREV;});
+ var st=p.revStatus||'un';var stLab=st==='ok'?'確認済み':st==='mg'?'マネージャー要確認':'未確認';
+ h+='<div class="rvwork">';
+ h+='<div class="rvpdfcard"><div class="rvpdfhd"><span>'+esc(p.name||'物件')+'</span><span>PDF</span></div><div class="rvpdfwrap" id="rv_pdf"></div></div>';
+ h+='<div class="rvrcol">';
+ h+=rvConfirmPoints(p);
+ h+='<div class="rvform"><div class="rvfhd">物件情報<span class="rvst '+st+'">'+stLab+'</span></div><div class="rvfbody">';
+ h+='<div class="rvsec">掲載媒体 / 物件番号</div><div class="rvmediarow">'+['atbb','REINS','itandi','その他'].map(function(m){return '<span class="rvmtag'+(p.media===m?' on':'')+'">'+m+(m==='その他'&&p.media==='その他'&&p.mediaOther?'：'+esc(p.mediaOther):'')+'</span>';}).join('')+'<span class="rvmnote">物件番号 '+(p.propNo?esc(p.propNo):'（空欄）')+(p.media==='atbb'?'（atbb：記載必須）':'')+'</span></div>';
+ h+='<div class="rvsec">駅（ランキング照合・自動判定）</div>'+rvStations(p);
+ h+='<div class="rvsec">基本情報（その場で修正可・自動保存）</div><div class="rvfg">'+RVF.map(function(fl){return rvCellHTML(p,fl[0],fl[1]);}).join('')+'</div>';
+ h+='<div class="rvsec">設備（Geminiで漏れやすいので必ず確認）</div>'+rvAmenChk(p);
+ h+='<label class="rv_gate'+(p.equipOk?' done':'')+'" id="rv_gate" data-fldkey="__equip"><input type="checkbox" '+(p.equipOk?'checked':'')+' onchange="revEquip(\''+p.id+'\',this.checked)"> 設備を確認した（確認済みにするには必須）</label>';
+ if(st==='mg')h+='<div class="rvmgmemo"><div class="t">マネージャーへの確認内容</div><textarea id="rv_mgmemo" oninput="revMgMemo(\''+p.id+'\',this.value)" placeholder="確認してほしい点を記載…">'+esc(p.mgMemo||'')+'</textarea></div>';
+ h+='</div>';
+ h+='<div class="rvbtns"><button class="b ok" onclick="revMarkOk(\''+p.id+'\')">データ確認済み → 次へ</button><button class="b mg" onclick="revToggleMg(\''+p.id+'\')">'+(st==='mg'?'マネージャー要確認を解除':'マネージャーへ要確認')+'</button><button class="b gho" onclick="viewPdf(\''+p.id+'\')">別窓で開く</button><button class="b del" onclick="deleteReviewProp(\''+p.id+'\')">物件削除</button></div>';
+ h+='</div></div></div>';
  document.getElementById('reviewbody').innerHTML=h;
+ loadReviewPdf(p,document.getElementById('rv_pdf'));
  updateBadges();
- refreshPdfStatuses();
 }
 
 async function driveImport(){
