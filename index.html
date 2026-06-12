@@ -492,7 +492,8 @@ function mkRec(){return{fid:'P'+Date.now()+Math.random().toString(36).slice(2,5)
 function handleFiles(files){[...files].forEach(f=>{if(!/pdf/i.test(f.type)&&!/\.pdf$/i.test(f.name))return;
  const rec=mkRec();rec.pdfName=f.name;rec.auto='読取中…';PEND.push(rec);renderPend();extractInto(f,rec);});if(PEND.length)tab('add');}
 function _needPng(j){return !j||!j.bukken_mei||j.chinryo==null;}
-async function geminiExtract(b64,mime){try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'extractPdf',data:b64,mime:mime})});var d=await r.json();return (d&&d.ok&&d.data)?d.data:null;}catch(e){return null;}}
+let GEMERR='';
+async function geminiExtract(b64,mime){try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'extractPdf',data:b64,mime:mime})});var tx=await r.text();var d=null;try{d=JSON.parse(tx);}catch(pe){GEMERR='GAS\u5fdc\u7b54\u304cJSON\u3067\u306f\u3042\u308a\u307e\u305b\u3093\uff08\u518d\u30c7\u30d7\u30ed\u30a4\u672a\u5b9f\u65bd\u304b\u516c\u958b\u8a2d\u5b9a\u306e\u53ef\u80fd\u6027\uff09';return null;}if(d&&d.ok&&d.data){GEMERR='';return d.data;}GEMERR=(d&&d.error)?String(d.error):'GAS\u304c extractPdf \u3092\u51e6\u7406\u3057\u3066\u3044\u307e\u305b\u3093\uff08\u65b0\u30d0\u30fc\u30b8\u30e7\u30f3\u3067\u306e\u518d\u30c7\u30d7\u30ed\u30a4\u304c\u5fc5\u8981\uff09';return null;}catch(e){GEMERR='\u901a\u4fe1\u30a8\u30e9\u30fc: '+e.message;return null;}}
 async function pdfToPng(file){try{const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;const pg=await pdf.getPage(1);const vp=pg.getViewport({scale:2.5});const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;return cv.toDataURL('image/png').split(',')[1];}catch(e){return null;}}
 function _feeFmt(o){if(!o||o.value==null||o.value==='')return '';return o.unit==='months'?(o.value+'ヶ月'):(((Number(o.value)||0)/10000).toFixed(1)+'万円');}
 function mapGemini(j,rec){if(!j)return;
@@ -574,7 +575,7 @@ function renderPend(){
   +'</div></div>';}).join('');
 }
 async function testDrive(){if(!API){alert('共有設定（GASのURL）が未設定です。物件追加→共有設定で設定してください。');return;}toast('ドライブ保存をテスト中…');try{var body=JSON.stringify({action:'savePdf',name:'_接続テスト_'+Date.now()+'.pdf',date:today(),data:btoa('%PDF-1.4\n% hanako test\n')});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var t=await r.text();var ok=false,url='';try{var d=JSON.parse(t);ok=d&&d.ok;url=d&&d.url||'';}catch(e){}alert((ok?'成功：ドライブに保存できました。\n日付フォルダ（'+today()+'）の中を確認してください。\n'+url:'失敗：GASからの応答↓\n'+t.slice(0,600))+'\n\n（成功なのにDBが消えた場合はdoPostの分岐位置を確認）');}catch(e){alert('通信エラー：'+e.message+'\n→ GASを「新バージョン」で再デプロイしたか、URLが正しいか、Drive権限を承認したかを確認してください。');}}
-async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var body=JSON.stringify({action:'savePdf',name:((prop.name||prop.pdfName||'maisoku')+'').replace(/[\\/:*?"<>|]/g,'_').slice(0,80)+'.pdf',date:(prop.uploadDate||today()),data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
+async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var body=JSON.stringify({action:'savePdf',name:((prop.name?((prop.name+'')+(prop.room?('-'+prop.room):'')):(prop.pdfName||'maisoku'))+'').replace(/\.pdf$/i,'').replace(/[\\/:*?"<>|]/g,'_').slice(0,80)+'.pdf',date:(prop.uploadDate||today()),data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
 function pendDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
 async function savePend(){
  const doSave=async()=>{
@@ -761,7 +762,7 @@ function renderReview(){
   h+=(p.reviewReason?'<div class="note" style="margin:6px 2px;color:#c2700a;font-weight:600">要確認：'+esc(p.reviewReason)+'</div>':'');
   h+=rvFields(p);
   h+=reviewInfo(p);
-  h+='<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap"><button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">'+ic('doc')+'PDFを見る</button><button class="pdfbtn" onclick="pickPdf(\''+p.id+'\')">'+ic('clip')+'PDF追加/差替</button><button class="btn btn-pri" onclick="confirmReview(\''+p.id+'\')">'+ic('check')+'確認済みにする</button></div></div>';
+  h+='<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap"><button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">'+ic('doc')+'PDFを見る</button><button class="pdfbtn" onclick="pickPdf(\''+p.id+'\')">'+ic('clip')+'PDF追加/差替</button><button class="btn btn-pri" onclick="confirmReview(\''+p.id+'\')">'+ic('check')+'確認済みにする</button><button class="btn-sm btn-danger" style="margin-left:auto" onclick="deleteReviewProp(\''+p.id+'\')">物件削除</button></div></div>';
  });
  h+='<h3 class="rvh" style="margin-top:18px">ビジコンとズレあり（'+mm.length+'件）</h3>';
  h+='<div class="note" style="margin:0 2px 10px">ビジコンのCSVが正です。<span class="curval">赤＝アプリの現在値</span> → <span class="bjval">緑＝ビジコン値</span>。直したら「修正済み」を押してください。</div>';
@@ -1055,6 +1056,15 @@ function renderList(){
 async function chgStatus(id,st){const p=PROPS.find(x=>x.id===id);if(!p)return;p.status=st;await save();const cur=document.querySelector('.tabs button.on').id.replace('tb-','');if(cur==='list')renderList();else if(cur==='dash')renderDash();}
 async function delProp(id){if(!confirm('削除しますか？'))return;PROPS=PROPS.filter(p=>p.id!==id);await save();renderList();}
 
+async function drivePdfDelete(fileId){if(!API||!fileId)return {ok:false,error:'no api/fileId'};try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'deletePdf',fileId:fileId})});var d=await r.json();return d||{ok:false,error:'no response'};}catch(e){return {ok:false,error:e.message};}}
+async function deleteReviewProp(id){
+ var p=PROPS.find(function(x){return x.id===id;});if(!p)return;
+ if(!confirm('「'+(p.name||p.pdfName||'物件')+(p.room?(' '+p.room):'')+'」を削除しますか？\nドライブ上のPDFも削除されます。'))return;
+ if(p.driveId){toast('ドライブのPDFを削除中…');var d=await drivePdfDelete(p.driveId);if(!(d&&d.ok)){toast('ドライブ側の削除に失敗：'+((d&&d.error)||'GAS未更新の可能性')+'（物件は削除します）');}}
+ try{await idbSet('pdf_'+id,null);}catch(e){}try{localStorage.removeItem('pdf_'+id);}catch(e){}
+ PROPS=PROPS.filter(function(x){return x.id!==id;});
+ await save();renderReview();updateBadges();toast('物件を削除しました');
+}
 // ---------- STAFF ----------
 function renderStaff(){
  const _a=anaAgg();
@@ -1857,8 +1867,8 @@ async function costPdf(file){
   var j=null;
   if(API){j=await geminiExtract(b64,'application/pdf');if(_needPng(j)){var png=await pdfToPng(file);if(png){var j2=await geminiExtract(png,'image/png');if(j2&&j2.bukken_mei)j=j2;}}}
   if(j&&j.bukken_mei){mapCost(j);if(box)box.textContent='\u8aad\u307f\u53d6\u308a\u5b8c\u4e86\uff1a\u5185\u5bb9\u3092\u78ba\u8a8d\u30fb\u4fee\u6b63\u3057\u3066\u304b\u3089\u30c6\u30ad\u30b9\u30c8\u751f\u6210\u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
-  else{if(box)box.textContent='\u81ea\u52d5\u8aad\u53d6\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u4e0b\u8a18\u30d5\u30a9\u30fc\u30e0\u306b\u624b\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
- }catch(e){if(box)box.textContent='\u8aad\u53d6\u30a8\u30e9\u30fc\uff1a\u624b\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
+  else{if(box)box.textContent='\u81ea\u52d5\u8aad\u53d6\u306b\u5931\u6557\uff1a'+(GEMERR||'PDF\u304b\u3089\u60c5\u5831\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f')+'\u3000\u2192 \u4e0b\u306e\u30d5\u30a9\u30fc\u30e0\u306b\u624b\u5165\u529b\u3067\u304d\u307e\u3059\u3002';}
+ }catch(e){if(box)box.textContent='\u8aad\u53d6\u30a8\u30e9\u30fc\uff1a'+e.message+'\u3000\u2192 \u624b\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002';}
  renderCost();
 }
 function _ci(id,val){return '<input id="'+id+'" value="'+String(val==null?'':val).replace(/"/g,'&quot;')+'" style="width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--border);border-radius:8px;font-size:13px">';}
