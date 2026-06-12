@@ -240,7 +240,7 @@ textarea{resize:vertical;min-height:54px}
 @media(max-width:1500px){.rvfg{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:1100px){.rvwrap{flex-direction:column}.rvwork{grid-template-columns:1fr}.rvpdfcard{min-height:60vh}}
 
-</style></head><body>
+.bkcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;margin-bottom:12px}.bkq{width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r2);margin-bottom:12px;font-family:inherit}.bkq:focus{outline:none;border-color:var(--accent)}.bkgrid{display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start}.bklist{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:auto;max-height:64vh}.bkitem{padding:11px 13px;border-bottom:1px solid var(--border2);cursor:pointer;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.bkitem:last-child{border-bottom:none}.bkitem:hover{background:var(--hover)}.bkitem.on{background:var(--amber-bg)}.bkitem b{font-size:13.5px}.bksub{font-size:11px;color:var(--text2);font-family:ui-monospace,monospace}.bkedit{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}.bkedit input,.bkedit textarea{width:100%;font-size:13.5px;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r2);font-family:inherit;background:var(--bg)}.bkedit input:focus,.bkedit textarea:focus{outline:none;border-color:var(--accent);background:#fff}.bkedit textarea{min-height:54px;resize:vertical}.bksel{width:100%;font-size:13.5px;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r2);font-family:inherit;background:var(--bg)}.bkempty{padding:18px;color:var(--text3);font-size:13px;text-align:center}.bkfg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.kindtag{font-size:10.5px;font-weight:700;padding:1px 8px;border-radius:99px}.kindtag.k-shin{background:var(--blue-bg);color:var(--blue)}.kindtag.k-cre{background:var(--green-bg);color:var(--green)}.kindtag.k-ind{background:var(--amber-bg);color:var(--amber)}.kindtag.k-unk{background:var(--gray-bg);color:var(--gray-tx)}.bkhi{background:var(--amber-bg);border:1px solid #ecdca8;border-radius:var(--r2);padding:10px 12px;margin-top:12px}.bkhihd{font-size:11.5px;font-weight:700;color:var(--amber);margin-bottom:8px;letter-spacing:.04em}.navirow{display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap}.navirow input{flex:1;min-width:80px;background:#fff}.navirow .navinum{flex:none;width:64px;text-align:center}.navirow .rank{flex:none;font-size:11px;font-weight:700;color:var(--amber);width:30px}.navirow span{font-size:12px;color:var(--text2)}@media(max-width:1100px){.bkgrid{grid-template-columns:1fr}.bklist{max-height:40vh}.bkfg2{grid-template-columns:1fr}}</style></head><body>
 <header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span></h1><div class="sub">運を、構造化する。</div></header>
 <div class="tabs">
 <button id="tb-dash" class="on" onclick="tab('dash')">ダッシュボード</button>
@@ -258,6 +258,8 @@ textarea{resize:vertical;min-height:54px}
 <button id="tb-otrend" onclick="tab('otrend')"><span class="tlab tlab-beta">β</span>オプション遷移</button>
 <button id="tb-ana" onclick="tab('ana')"><span class="tlab tlab-beta">β</span>反響分析</button>
 <button id="tb-report" onclick="tab('report')"><span class="tlab tlab-beta">β</span>現状レポート</button>
+<button id="tb-mbank" onclick="tab('mbank')">管理会社DB</button>
+<button id="tb-gbank" onclick="tab('gbank')">保証会社DB</button>
 </div>
 <div class="wrap">
 <div id="groupbar" style="display:none"></div>
@@ -277,6 +279,8 @@ textarea{resize:vertical;min-height:54px}
 <div id="v-drop" style="display:none"><div id="dropbody"></div></div>
 <div id="v-review" style="display:none"><div id="reviewbody"></div></div>
 <div id="v-report" style="display:none"><div id="reportbody"></div></div>
+<div id="v-mbank" style="display:none"><div id="mbankbody"></div></div>
+<div id="v-gbank" style="display:none"><div id="gbankbody"></div></div>
 <div id="v-cost" style="display:none"><div id="costbody"></div></div>
 <div id="v-csv" style="display:none">
  <div class="drop" id="csvdrop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M4 20V10M10 20V4M16 20v-7M20 20H3"/></svg>CSV / Excelをドロップ</div><div class="ds">ビジコン＝PV（アプリ・スマホ込）／ 反響報告書(Excel)＝反響・オプション ／ JDS＝反響</div></div>
@@ -297,12 +301,13 @@ textarea{resize:vertical;min-height:54px}
 const STN=["千葉ニュータウン中央", "流山セントラルパーク", "柏の葉キャンパス", "流山おおたかの森", "伊勢佐木長者町", "たまプラーザ", "元町・中華街", "八千代緑が丘", "小田急相模原", "祖師ヶ谷大蔵", "西新宿五丁目", "読売ランド前", "つつじヶ丘", "ひばりヶ丘", "センター北", "センター南", "三ツ沢上町", "三ツ沢下町", "京成大久保", "京成大和田", "京成津田沼", "京成酒々井", "京王稲田堤", "代々木上原", "八千代中央", "向ヶ丘遊園", "四谷三丁目", "地下鉄成増", "成城学園前", "新百合ヶ丘", "東海大学前", "武蔵小金井", "石神井公園", "船橋日大前", "鎌ヶ谷大仏", "あざみ野", "かしわ台", "さがみ野", "みつわ台", "みどり台", "みのり台", "三軒茶屋", "上石神井", "下総中山", "中央林間", "中野坂上", "中野新橋", "二子新地", "二子玉川", "井土ヶ谷", "京急川崎", "京急蒲田", "京急鶴見", "京成佐倉", "京成成田", "京成稲毛", "京成臼井", "京成船橋", "保土ケ谷", "八千代台", "公津の杜", "北習志野", "千歳烏山", "千歳船橋", "千葉中央", "原木中山", "大泉学園", "大神宮下", "学芸大学", "小竹向原", "川崎大師", "市川大野", "幕張本郷", "愛甲石田", "新検見川", "新鎌ケ谷", "新高円寺", "東久留米", "東小金井", "東神奈川", "東高円寺", "松戸新田", "板橋本町", "柏たなか", "武蔵中原", "武蔵小山", "武蔵小杉", "武蔵新城", "江戸川台", "江戸川橋", "池尻大橋", "海浜幕張", "清澄白河", "港南中央", "白金高輪", "百合ヶ丘", "相模大塚", "相模大野", "相武台前", "稲毛海岸", "自由が丘", "船橋法典", "花小金井", "西八王子", "西日暮里", "都立大学", "金沢八景", "金沢文庫", "門前仲町", "阿佐ケ谷", "駒沢大学", "高根公団", "高田馬場", "鶴見市場", "麻布十番", "一之江", "三ツ境", "三ノ輪", "上大岡", "上星川", "上本郷", "上板橋", "上永谷", "下北沢", "不動前", "中目黒", "中野島", "二俣川", "五反田", "代田橋", "仲町台", "伊勢原", "元住吉", "光が丘", "八丁堀", "八丁畷", "八幡宿", "八王子", "勝どき", "勝田台", "北千住", "北国分", "北小金", "北山田", "北松戸", "北綾瀬", "千葉寺", "南千住", "南林間", "南流山", "南行徳", "吉祥寺", "吉野町", "和田町", "四街道", "国分寺", "国府台", "大久保", "大井町", "大倉山", "大森台", "大森町", "天王台", "天王町", "妙蓮寺", "姉ケ崎", "宮前平", "宮崎台", "宿河原", "小田原", "小田栄", "尾山台", "市が尾", "常盤平", "幡ヶ谷", "平和台", "平和島", "弘明寺", "恵比寿", "我孫子", "新中野", "新丸子", "新八柱", "新子安", "新小岩", "新川崎", "新松戸", "新横浜", "新浦安", "方南町", "早稲田", "明大前", "木更津", "本八幡", "本千葉", "本厚木", "本郷台", "東中山", "東中野", "東十条", "東千葉", "東戸塚", "東松戸", "東白楽", "東船橋", "東陽町", "桜新町", "桜木町", "梅屋敷", "梶が谷", "検見川", "武蔵境", "氷川台", "洋光台", "津田沼", "浅草橋", "海老名", "淵野辺", "港南台", "湘南台", "溝の口", "滝不動", "片倉町", "相模原", "石川町", "祐天寺", "稲田堤", "竹ノ塚", "等々力", "習志野", "茅ケ崎", "茗荷谷", "薬園台", "藤が丘", "袖ケ浦", "西千葉", "西大井", "西小山", "西新井", "西横浜", "西船橋", "西荻窪", "西葛西", "西馬込", "豊四季", "酒々井", "野田市", "錦糸町", "鎌ケ谷", "長津田", "阪東橋", "青葉台", "飯山満", "馬込沢", "高円寺", "鶴ケ峰", "鹿島田", "黄金町", "三咲", "三鷹", "両国", "中井", "中山", "中川", "中野", "久地", "亀戸", "亀有", "五井", "五香", "仙川", "住吉", "佐倉", "保谷", "入谷", "八街", "六実", "六町", "初台", "初石", "前原", "北柏", "千葉", "南柏", "反町", "古淵", "君津", "品川", "国立", "土気", "塚田", "増尾", "大口", "大和", "大塚", "大山", "大崎", "大森", "大網", "大船", "天台", "妙典", "子安", "実籾", "小岩", "小机", "尻手", "山手", "巌根", "川崎", "川間", "市川", "幕張", "平井", "平塚", "平間", "府中", "志津", "愛宕", "成増", "成田", "戸塚", "戸部", "押上", "新柏", "日吉", "星川", "春日", "木場", "東金", "松戸", "柿生", "根岸", "梅郷", "森下", "横浜", "橋本", "池袋", "浅草", "浜野", "浦安", "海神", "清瀬", "渋沢", "湖北", "瀬谷", "王子", "瑞江", "生田", "生麦", "用賀", "田町", "田端", "町屋", "町田", "登戸", "白楽", "目黒", "矢切", "矢向", "矢部", "秦野", "稲毛", "穴川", "立川", "笹塚", "篠崎", "経堂", "綱島", "綾瀬", "練馬", "舞浜", "船堀", "船橋", "茂原", "荻窪", "菊名", "菊川", "葛西", "蒔田", "蒲田", "蔵前", "藤沢", "蘇我", "行徳", "西谷", "要町", "誉田", "調布", "谷津", "豊洲", "赤羽", "辻堂", "追浜", "逆井", "逗子", "運河", "都賀", "金町", "鎌倉", "鎌取", "長後", "長浦", "関内", "馬橋", "馬込", "駒込", "高津", "高田", "鴨宮", "鴨居", "鶴川", "鶴見", "鶴間", "鷺沼", "柏"];
 const ZONES={"三軒茶屋|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10, 11], "o": [3, 4, 5, 6, 7, 8]}, "高円寺|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 6, 7]}, "北千住|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5, 6]}, "池袋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 7]}, "中野|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 5, 7, 8]}, "大井町|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7]}, "新小岩|シングル": {"d": [3, 4, 5, 6], "o": [3, 6]}, "葛西|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 3, 4]}, "笹塚|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "門前仲町|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "大森|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "荻窪|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "学芸大学|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "東中野|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5, 6]}, "高田馬場|シングル": {"d": [3, 4, 5, 6, 7, 9], "o": [3, 4, 5, 6, 7]}, "恵比寿|シングル": {"d": [6, 8, 9, 10, 11, 12, 13], "o": [6, 8, 9, 10]}, "三鷹|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 5]}, "吉祥寺|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 5]}, "両国|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 7, 8]}, "駒沢大学|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "押上|シングル": {"d": [3, 5, 6, 7, 8, 9, 10], "o": [3, 5, 6, 7]}, "亀戸|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7]}, "小岩|シングル": {"d": [2, 3, 4, 5, 6], "o": [2, 3]}, "祐天寺|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 10]}, "清澄白河|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7, 8, 9]}, "中野坂上|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10], "o": [3, 5, 6, 7, 10]}, "錦糸町|シングル": {"d": [5, 6, 7, 8, 9, 10], "o": [5, 6, 7]}, "町屋|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 6]}, "森下|シングル": {"d": [5, 6, 7, 8, 9, 10, 11], "o": [5, 6, 7, 8]}, "武蔵小山|シングル": {"d": [3, 4, 5, 6, 7, 8, 10, 11], "o": [3, 4, 5, 6, 7]}, "大塚|シングル": {"d": [2, 4, 5, 6, 7, 8, 10], "o": [2, 4, 5, 8]}, "中目黒|シングル": {"d": [5, 6, 7, 8, 9, 10, 11, 12], "o": [5, 6, 7, 8, 9, 10, 11]}, "幡ヶ谷|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 8]}, "西荻窪|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [2, 3, 4, 5]}, "目黒|シングル": {"d": [5, 6, 7, 8, 9, 10, 11, 12, 13], "o": [5, 6, 7, 9]}, "町田|シングル": {"d": [1, 2, 3, 4, 5, 6, 7], "o": [1, 4]}, "綾瀬|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4, 5]}, "練馬|シングル": {"d": [1, 2, 3, 4, 5, 6, 7, 8], "o": [1, 2, 3, 4, 6]}, "初台|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 8]}, "阿佐ケ谷|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 5, 6]}, "下北沢|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10], "o": [3, 4, 6, 7]}, "千歳烏山|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 3, 4, 5]}, "駒込|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 5, 6, 7]}, "田端|シングル": {"d": [2, 4, 5, 6, 7], "o": [2, 4, 5, 6, 7]}, "代田橋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7, 8]}, "不動前|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11, 12], "o": [4, 5, 6, 7]}, "池尻大橋|シングル": {"d": [4, 5, 6, 8, 9, 10, 11, 12], "o": [4, 5, 6, 8, 9]}, "東高円寺|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "新中野|シングル": {"d": [2, 3, 4, 5, 6, 7, 8, 9], "o": [2, 3, 4, 8]}, "北綾瀬|シングル": {"d": [2, 3, 4, 5, 6], "o": [2, 3, 4]}, "方南町|シングル": {"d": [2, 3, 4, 5, 6, 7, 8, 9], "o": [2, 3, 4, 5, 6, 7]}, "西小山|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6, 7]}, "明大前|シングル": {"d": [4, 5, 6, 7, 8], "o": [4, 6, 7]}, "千歳船橋|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5]}, "住吉|シングル": {"d": [5, 6, 7, 8, 9], "o": [5, 6, 7, 8]}, "中野新橋|シングル": {"d": [4, 5, 6, 7, 8, 9], "o": [4, 5, 6, 8]}, "経堂|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [2, 5, 7]}, "五反田|シングル": {"d": [4, 5, 6, 7, 8, 9], "o": [4, 5, 6, 7, 8]}, "都立大学|シングル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 7, 10]}, "蔵前|シングル": {"d": [5, 6, 8, 9, 10, 11], "o": [5, 6, 8]}, "麻布十番|シングル": {"d": [4, 6, 7, 9, 10, 11, 12, 13], "o": [4, 6, 7, 9, 10]}, "西日暮里|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "平井|シングル": {"d": [3, 4, 5, 6, 7], "o": [3, 4]}, "新高円寺|シングル": {"d": [2, 3, 4, 5, 6, 7, 8], "o": [3, 6]}, "調布|シングル": {"d": [2, 3, 4, 5, 6, 7], "o": [4]}, "中井|シングル": {"d": [3, 4, 5, 6, 7, 8], "o": [3, 4, 5, 6]}, "用賀|シングル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 4, 5, 6, 7]}, "大久保|シングル": {"d": [3, 4, 5, 6, 7, 9], "o": [3, 4, 5, 7]}, "浅草橋|シングル": {"d": [5, 7, 8, 9, 10, 11, 12], "o": [5, 7, 8, 9]}, "田町|シングル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7, 9]}, "新小岩|カップル": {"d": [4, 5, 6, 7, 8, 9, 11], "o": [4, 5, 7, 8]}, "葛西|カップル": {"d": [4, 5, 6, 7, 8, 9, 10, 11], "o": [4, 5, 6, 7, 8]}, "三鷹|カップル": {"d": [5, 6, 7, 8, 9, 10, 11, 12], "o": [5, 6, 7, 8, 9, 10, 11]}, "大森|カップル": {"d": [6, 9, 10, 11, 12, 13, 14, 15, 16], "o": [6, 9, 10, 11, 12]}, "三軒茶屋|カップル": {"d": [5, 11, 13, 14, 15, 16, 18], "o": [5, 11, 13, 14]}, "大井町|カップル": {"d": [8, 11, 12, 13, 14, 15, 16, 18], "o": [8, 11, 12, 13, 16]}, "荻窪|カップル": {"d": [6, 8, 9, 10, 11, 12, 13, 14], "o": [6, 8, 9, 10, 12, 13]}, "目黒|カップル": {"d": [11, 12, 14, 15, 16, 17, 18, 19], "o": [11, 12, 14, 15, 16, 17]}, "中野|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 14, 15], "o": [7, 8, 9, 10, 11, 12, 13, 14]}, "小岩|カップル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 6, 9, 10]}, "武蔵小山|カップル": {"d": [10, 11, 12, 14, 15, 16, 18], "o": [10, 11, 12]}, "学芸大学|カップル": {"d": [10, 11, 12, 13, 14, 16, 17, 18], "o": [10, 11, 12, 13, 14]}, "北千住|カップル": {"d": [5, 7, 9, 10, 11, 12], "o": [5, 7, 9]}, "池袋|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 18], "o": [7, 8, 9, 10, 11]}, "高円寺|カップル": {"d": [6, 7, 8, 10, 11, 12, 13], "o": [6, 7, 8, 10, 11, 12, 13]}, "笹塚|カップル": {"d": [7, 10, 11, 12, 13, 14, 17], "o": [7, 10, 11, 12, 13, 17]}, "両国|カップル": {"d": [6, 8, 10, 11, 12, 13, 14, 15, 16], "o": [6, 8, 10, 11, 12, 13, 14]}, "恵比寿|カップル": {"d": [11, 14, 16, 17, 18, 19, 20], "o": [11, 14, 16, 17]}, "錦糸町|カップル": {"d": [6, 7, 8, 9, 12, 14, 15, 16], "o": [6, 7, 8, 9, 12, 14]}, "都立大学|カップル": {"d": [10, 11, 12, 13, 14, 15, 16, 17], "o": [10, 11, 13, 14, 16]}, "町田|カップル": {"d": [3, 4, 5, 6, 7, 8, 9], "o": [3, 6, 8]}, "千歳烏山|カップル": {"d": [6, 7, 8, 9, 10, 11, 12], "o": [6, 7, 10, 11]}, "用賀|カップル": {"d": [5, 9, 10, 11, 12, 13, 14, 17, 18], "o": [5, 9, 10, 11, 17]}, "駒込|カップル": {"d": [7, 10, 11, 12, 13, 15], "o": [7, 10, 11, 12, 13]}, "押上|カップル": {"d": [7, 8, 11, 12, 13, 14, 16], "o": [7, 8, 11, 12, 13]}, "勝どき|カップル": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 17]}, "門前仲町|カップル": {"d": [5, 7, 9, 10, 11, 12, 14, 16], "o": [5, 7, 9, 10, 11, 12, 14]}, "西荻窪|カップル": {"d": [5, 7, 10, 11, 12, 13], "o": [5, 7, 10]}, "吉祥寺|カップル": {"d": [5, 6, 7, 8, 9, 10, 11, 12, 13], "o": [5, 6, 7, 8, 9, 11, 13]}, "麻布十番|カップル": {"d": [12, 14, 15, 16, 17, 18, 19, 20], "o": [12, 14, 15, 16, 17, 18]}, "東中野|カップル": {"d": [6, 9, 10, 11, 12, 13, 14, 18], "o": [6, 9, 10, 11, 12, 13, 14]}, "綾瀬|カップル": {"d": [4, 5, 6, 7, 8, 9, 10, 11, 12], "o": [4, 5, 6, 7, 8, 9, 10, 12]}, "駒沢大学|カップル": {"d": [10, 11, 12, 13, 14, 15, 17], "o": [10, 11, 12, 13]}, "祐天寺|カップル": {"d": [10, 11, 13, 14, 15, 16, 17, 18], "o": [10, 11, 13, 16]}, "西小山|カップル": {"d": [10, 11, 12, 13, 14, 15], "o": [10, 11, 12]}, "経堂|カップル": {"d": [8, 9, 11, 12, 13, 14, 15], "o": [8, 15]}, "池尻大橋|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18, 19], "o": [11, 12, 13, 14, 15, 16]}, "中目黒|カップル": {"d": [9, 13, 15, 16, 17, 18, 19], "o": [9, 13, 15, 16, 17]}, "田端|カップル": {"d": [6, 10, 11, 12], "o": [6, 10, 11]}, "方南町|カップル": {"d": [7, 8, 9, 10, 12, 13, 14, 15, 16], "o": [7, 8, 9, 10, 12, 13]}, "中野坂上|カップル": {"d": [9, 10, 11, 12, 13, 14, 15, 18], "o": [9, 10, 11, 12]}, "蔵前|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18], "o": [11, 12, 14]}, "住吉|カップル": {"d": [3, 8, 9, 10, 11, 12, 13, 15], "o": [3, 8, 9, 10, 11, 12]}, "練馬|カップル": {"d": [6, 7, 8, 9, 10, 11, 14], "o": [6, 7, 8, 9, 10]}, "下北沢|カップル": {"d": [7, 10, 11, 12, 13, 14], "o": [7, 10, 11, 12, 13]}, "森下|カップル": {"d": [9, 10, 11, 12, 13, 14], "o": [9, 10, 11, 12, 13, 14]}, "不動前|カップル": {"d": [11, 12, 13, 14, 15, 17, 18, 19], "o": [11, 12, 13, 15, 17]}, "幡ヶ谷|カップル": {"d": [9, 10, 11, 12, 13, 14, 15], "o": [9, 10, 11, 12, 14]}, "北綾瀬|カップル": {"d": [3, 4, 5, 6, 9, 10], "o": [3, 4, 5, 6, 9]}, "西葛西|カップル": {"d": [4, 5, 6, 7, 8, 9, 10], "o": [4, 5, 7, 8]}, "桜新町|カップル": {"d": [7, 8, 10, 11, 12, 13, 14, 15, 16], "o": [7, 8, 10, 11, 12, 14, 15]}, "西日暮里|カップル": {"d": [6, 8, 9, 10, 11, 12, 13], "o": [6, 8, 9, 11]}, "大塚|カップル": {"d": [6, 7, 8, 9, 10, 11, 12], "o": [6, 7, 8, 9, 10, 11, 12]}, "阿佐ケ谷|カップル": {"d": [7, 8, 9, 10, 11, 12, 13, 14], "o": [7, 8, 10, 11, 12]}, "亀戸|カップル": {"d": [6, 8, 9, 10, 12, 13, 14], "o": [6, 8, 9, 12]}, "大崎|カップル": {"d": [9, 12, 14, 15, 16, 17, 18, 19], "o": [9, 12, 18]}, "町屋|カップル": {"d": [4, 6, 7, 9, 10, 11, 12], "o": [4, 6, 7, 9, 10, 11]}, "代田橋|カップル": {"d": [6, 9, 11, 12, 13], "o": [6, 9, 11, 13]}, "自由が丘|カップル": {"d": [6, 11, 12, 13, 14, 15, 17], "o": [6, 11, 12, 15, 17]}, "調布|カップル": {"d": [5, 6, 7, 8, 9, 10, 11], "o": [5, 6, 7, 8]}, "清澄白河|カップル": {"d": [4, 9, 11, 13, 15], "o": [4, 9, 11, 13, 15]}, "浅草橋|カップル": {"d": [11, 12, 13, 14, 15, 16, 17, 18], "o": [11, 12, 13, 14, 15]}, "千歳船橋|カップル": {"d": [6, 8, 9, 10, 11, 12, 13, 14], "o": [6, 8, 9, 10, 14]}, "高田馬場|カップル": {"d": [6, 9, 10, 11, 12, 13, 14], "o": [6, 9, 10, 11, 12]}, "西馬込|カップル": {"d": [6, 8, 9, 10, 12, 13], "o": [6, 8, 9, 10, 12]}, "中野新橋|カップル": {"d": [6, 7, 8, 10, 11, 12, 13, 14, 15, 17], "o": [6, 7, 8, 10, 12, 13, 14, 15]}, "新中野|カップル": {"d": [7, 8, 10, 11, 13, 14], "o": [7, 8, 10, 11]}, "初台|カップル": {"d": [7, 10, 11, 12, 13, 14, 15, 16, 18], "o": [7, 10, 11, 12, 14]}, "代々木上原|カップル": {"d": [11, 12, 13, 15, 16, 18, 19], "o": [11, 12, 13, 15, 16]}, "四谷三丁目|カップル": {"d": [10, 11, 12, 14, 15, 17, 18, 19], "o": [10, 11, 12, 14]}, "葛西|ファミリー": {"d": [9, 10, 11, 12, 13, 18], "o": [9, 10, 11, 12, 13]}, "勝どき|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "三鷹|ファミリー": {"d": [11, 12, 13, 15, 16, 17, 18, 19, 20], "o": [11, 16]}, "町田|ファミリー": {"d": [4, 5, 6, 7, 11, 12, 13, 14, 15, 18], "o": [4, 5, 6, 7]}, "大泉学園|ファミリー": {"d": [7, 8, 9, 10, 11, 12, 13, 17, 18], "o": [7, 10]}, "用賀|ファミリー": {"d": [10, 14, 15, 16, 17, 18, 19, 20], "o": [10, 14, 15, 17]}, "新小岩|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 15], "o": [9, 12, 13]}, "大森|ファミリー": {"d": [11, 13, 14, 15, 16, 17, 18, 19], "o": [11, 13, 14, 15, 16]}, "荻窪|ファミリー": {"d": [12, 13, 15, 17, 18, 19], "o": [12, 13, 15, 17]}, "学芸大学|ファミリー": {"d": [13, 18, 19, 20], "o": [13, 18]}, "千歳烏山|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 18], "o": [9, 10, 11, 12, 13]}, "小岩|ファミリー": {"d": [7, 8, 9, 10, 11, 12, 14, 18], "o": [7, 8, 9, 11, 12, 18]}, "都立大学|ファミリー": {"d": [13, 14, 17, 18, 19, 20], "o": [13, 14, 17]}, "豊洲|ファミリー": {"d": [14, 17, 18, 19, 20], "o": [14, 17]}, "吉祥寺|ファミリー": {"d": [11, 12, 13, 14, 18, 19, 20], "o": [13, 14]}, "目黒|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "大井町|ファミリー": {"d": [13, 14, 15, 16, 18, 19, 20], "o": [13, 14, 15, 16, 18]}, "西馬込|ファミリー": {"d": [12, 13, 14, 15, 16, 17, 18], "o": [12, 13, 17]}, "大崎|ファミリー": {"d": [17, 18, 19, 20], "o": [17, 18]}, "西葛西|ファミリー": {"d": [8, 9, 10, 11, 12, 13, 14, 16, 17], "o": [8, 9, 10, 11, 12, 13, 14, 16]}, "桜新町|ファミリー": {"d": [13, 15, 17, 18, 19, 20], "o": [13, 15, 17, 19]}, "駒沢大学|ファミリー": {"d": [15, 17, 18, 19, 20], "o": [15, 20]}, "千歳船橋|ファミリー": {"d": [11, 12, 14, 15, 16, 17, 18, 19, 20], "o": [11, 12, 14, 15, 16, 17]}, "武蔵小山|ファミリー": {"d": [18, 19, 20], "o": [20]}, "二子玉川|ファミリー": {"d": [12, 14, 16, 17, 18, 19, 20], "o": [12, 14, 16, 17]}, "両国|ファミリー": {"d": [15, 16, 17, 18, 19], "o": [15, 16, 17]}, "田町|ファミリー": {"d": [15, 18, 19, 20], "o": [15, 18]}, "中野|ファミリー": {"d": [14, 15, 16, 17, 18, 19, 20], "o": [14, 15, 16, 17, 18]}, "三軒茶屋|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 18]}, "西荻窪|ファミリー": {"d": [8, 10, 13, 16, 18, 19, 20], "o": [8, 10, 13, 16, 18]}, "調布|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 16, 18], "o": [10, 13, 14]}, "北千住|ファミリー": {"d": [10, 12, 14, 15, 18, 20], "o": [10, 12, 14, 15]}, "経堂|ファミリー": {"d": [12, 14, 15, 16, 17, 18, 19, 20], "o": [12, 14, 15, 16, 17]}, "成城学園前|ファミリー": {"d": [11, 13, 14, 15, 16, 18, 20], "o": [11, 13, 14, 15, 16]}, "恵比寿|ファミリー": {"d": [15, 16, 18, 19, 20], "o": [15, 16, 18]}, "鶴川|ファミリー": {"d": [3, 4, 5, 6, 7, 8, 9, 10, 11], "o": [3, 4, 7, 10]}, "品川|ファミリー": {"d": [16, 19, 20], "o": [16, 19]}, "祐天寺|ファミリー": {"d": [16, 18, 19, 20], "o": [16, 18]}, "麻布十番|ファミリー": {"d": [14, 16, 18, 19, 20], "o": [14, 16, 18, 19]}, "綾瀬|ファミリー": {"d": [6, 7, 8, 9, 11, 12, 13, 14, 18], "o": [6, 7, 8, 9, 11, 12, 13, 14]}, "錦糸町|ファミリー": {"d": [10, 14, 15, 16, 18, 19], "o": [10, 14, 15, 16]}, "仙川|ファミリー": {"d": [9, 11, 13, 14, 17, 18, 19], "o": [9, 11]}, "町屋|ファミリー": {"d": [10, 11, 12, 13, 14, 16, 18], "o": [10, 11, 12, 13, 14, 16]}, "練馬|ファミリー": {"d": [8, 10, 11, 12, 13, 14, 15, 16, 18, 19], "o": [8, 10, 11, 12, 15, 16]}, "代々木上原|ファミリー": {"d": [17, 18, 19, 20], "o": [17, 18]}, "中目黒|ファミリー": {"d": [14, 15, 18, 19, 20], "o": [14, 15, 18, 19]}, "駒込|ファミリー": {"d": [11, 13, 16, 18, 19, 20], "o": [11, 13, 20]}, "清澄白河|ファミリー": {"d": [16, 17, 18, 19, 20], "o": [16, 17, 18]}, "つつじヶ丘|ファミリー": {"d": [8, 9, 10, 11, 12, 13, 18], "o": [8, 9, 13]}, "東中野|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 17]}, "押上|ファミリー": {"d": [11, 12, 13, 15, 18, 19], "o": [11, 12, 13, 15]}, "笹塚|ファミリー": {"d": [13, 14, 15, 16, 18, 19, 20], "o": [13, 14, 15, 16, 18]}, "北綾瀬|ファミリー": {"d": [6, 9, 10, 11, 12, 13, 14, 15, 16, 18], "o": [6, 9, 10, 13, 14]}, "春日|ファミリー": {"d": [13, 14, 18, 19, 20], "o": [13, 14]}, "自由が丘|ファミリー": {"d": [13, 15, 16, 17, 18, 19, 20], "o": [13, 15, 16, 17]}, "池袋|ファミリー": {"d": [10, 11, 18, 19, 20], "o": [10, 11]}, "光が丘|ファミリー": {"d": [9, 10, 11, 12, 13, 14, 15, 18], "o": [12, 14, 15, 18]}, "門前仲町|ファミリー": {"d": [11, 14, 15, 18, 19, 20], "o": [11, 14, 15]}, "茗荷谷|ファミリー": {"d": [15, 17, 18, 19, 20], "o": [15, 17, 19]}, "田端|ファミリー": {"d": [12, 14, 15, 17, 18, 19], "o": [12, 14, 15]}};
 const RANK={};Object.keys(ZONES).forEach(k=>{RANK[k.split('|')[0]]=1;});
-const SK='ibt_props_v1',HK='ibt_hist_v1',EK='ibt_events_v1';
+const SK='ibt_props_v1',HK='ibt_hist_v1',EK='ibt_events_v1',MK='ibt_mgmt_v1',GK='ibt_guar_v1';
 const TARGETS={dm:20,op:120,is:30,hh:20,ot:10,do_inq:100,is_inq:200,total:300};
 const WK_MAP={Demand:'dm',Opportunity:'op',Insight:'is','High-Hold':'hh','その他':'ot','未分類':'uc'};
 const WK_PILL={dm:'p-dm',op:'p-op',is:'p-is',hh:'p-hh',ot:'p-ot',uc:'p-uc'};
 const STATUSES=['先行申込あり','2番手','3番手以降','空き(申込なし)','申込予定','審査中','成約/入居中','募集終了'];
-let PROPS=[],PEND=[],HIST={},EVENTS={};
+let PROPS=[],PEND=[],HIST={},EVENTS={},MGMT=[],GUAR=[];
+let CURMB=null,CURGB=null,MBQ='',GBQ='';
 let viewYM='';
 let CURTAB='dash';
 let bijikonPending=null;
@@ -337,7 +342,7 @@ function setAPI(){const u=prompt('GoogleスプレッドシートのGAS Web App U
 async function apiGet(){const r=await fetch(API+(API.indexOf('?')>=0?'&':'?')+'action=all',{method:'GET'});return await r.json();}
 let _pushT=null,_pushing=false,_again=false;
 function schedulePush(){if(!API)return;clearTimeout(_pushT);_pushT=setTimeout(doPush,500);}
-async function doPush(){if(!API)return;if(_pushing){_again=true;return;}_pushing=true;try{await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({props:PROPS,hist:HIST,events:EVENTS})});}catch(e){}_pushing=false;if(_again){_again=false;schedulePush();}}
+async function doPush(){if(!API)return;if(_pushing){_again=true;return;}_pushing=true;try{await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({props:PROPS,hist:HIST,events:EVENTS,mgmt:MGMT,guar:GUAR})});}catch(e){}_pushing=false;if(_again){_again=false;schedulePush();}}
 
 var _IDBp=null;
 function idbOpen(){if(_IDBp)return _IDBp;_IDBp=new Promise(function(res,rej){try{var r=indexedDB.open('hanako_pdf',1);r.onupgradeneeded=function(){r.result.createObjectStore('pdfs');};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};}catch(e){rej(e);}});return _IDBp;}
@@ -353,8 +358,8 @@ async function gset(k,v){
  try{if(window.storage){await window.storage.set(k,JSON.stringify(v));return;}}catch(e){}
  try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 async function load(){
- if(API){try{const d=await apiGet();PROPS=d.props||[];HIST=d.hist||{};EVENTS=d.events||{};}catch(e){PROPS=[];HIST={};EVENTS={};toast('共有データの取得に失敗。共有設定のURLを確認してください');}}
- else{PROPS=await gget(SK,[]);HIST=await gget(HK,{});EVENTS=await gget(EK,{});}
+ if(API){try{const d=await apiGet();PROPS=d.props||[];HIST=d.hist||{};EVENTS=d.events||{};MGMT=d.mgmt||[];GUAR=d.guar||[];}catch(e){PROPS=[];HIST={};EVENTS={};toast('共有データの取得に失敗。共有設定のURLを確認してください');}}
+ else{PROPS=await gget(SK,[]);HIST=await gget(HK,{});EVENTS=await gget(EK,{});MGMT=await gget(MK,[]);GUAR=await gget(GK,[]);}
  PROPS.forEach(p=>{
   if(!p.statusLog)p.statusLog=[];
   if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';if(p.stations==null)p.stations=[];if(p.waku==='未分類')p.waku='その他';if(p.media==null)p.media='';if(p.mediaOther==null)p.mediaOther='';if(p.rtMedia==null)p.rtMedia='-';if(p.rtUrl==null)p.rtUrl='';if(p.vacancyLog==null)p.vacancyLog=[];if(p.revStatus==null)p.revStatus='un';if(p.mgMemo==null)p.mgMemo='';if(p.equipOk==null)p.equipOk=false;['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
@@ -516,9 +521,129 @@ function extractFields(raw,fname){
 }
 
 
+// ===================== データバンク（管理会社／保証会社） =====================
+function saveBank(){ if(API){schedulePush();} else { gset(MK,MGMT); gset(GK,GUAR); } }
+function kindCls(k){ return k==='信販系'?'k-shin':k==='信用系'?'k-cre':k==='独立系'?'k-ind':'k-unk'; }
+function kindSel(id,val,kind){
+ var opts=['信販系','信用系','独立系','不明'];
+ return '<select class="bksel" onchange="setGuar(\''+id+'\',\'kind\',this.value);renderGBank()">'+opts.map(function(o){return '<option'+((String(val||'不明'))===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select>';
+}
+// ---- 保証会社 ----
+function mergeGuar(d){
+ var nm=(d.name||'').trim(); if(!nm){toast('保証会社名が読み取れませんでした');return;}
+ var p=GUAR.find(function(x){return (x.name||'').trim().toLowerCase()===nm.toLowerCase();});
+ if(!p){p={id:'GB'+Date.now()+Math.random().toString(36).slice(2,5),name:nm,kind:'不明',passHistory:'',memo:''};GUAR.push(p);}
+ if(d.kind&&d.kind!=='不明')p.kind=d.kind;
+ if(d.passHistory&&d.passHistory.trim())p.passHistory=(p.passHistory?p.passHistory+' / ':'')+d.passHistory.trim();
+ if(d.memo&&d.memo.trim())p.memo=(p.memo?p.memo+' / ':'')+d.memo.trim();
+ CURGB=p.id;GBQ='';saveBank();renderGBank();toast('「'+nm+'」を登録／更新しました');
+}
+function setGuar(id,f,v){var p=GUAR.find(function(x){return x.id===id;});if(p){p[f]=v;saveBank();}}
+function delGuar(id){var p=GUAR.find(function(x){return x.id===id;});if(!p)return;uiConfirm('「'+(p.name||'')+'」を削除しますか？',function(){GUAR=GUAR.filter(function(x){return x.id!==id;});if(CURGB===id)CURGB=null;saveBank();renderGBank();toast('削除しました');});}
+function renderGBank(){
+ var q=(GBQ||'').trim().toLowerCase();
+ var list=GUAR.filter(function(x){return !q||(x.name||'').toLowerCase().indexOf(q)>=0;});
+ var h='<div class="bkcard"><div class="qlabel" style="margin-top:0">ゆる書きで追加・更新（保存時にGeminiが構造化）</div>';
+ h+='<textarea id="gb_in" placeholder="例：エポス 信販系 収入低めでも過去2件通過"></textarea>';
+ h+='<button class="btn btn-pri" id="gb_go" style="margin-top:8px" onclick="bankIngest(\'guar\')">Geminiで読み取って登録／更新</button></div>';
+ h+='<input class="bkq" id="gb_q" placeholder="保証会社名で検索" value="'+esc(GBQ)+'" oninput="GBQ=this.value;renderGBank()">';
+ h+='<div class="bkgrid">';
+ h+='<div class="bklist">';
+ if(!list.length)h+='<div class="bkempty">該当なし</div>';
+ list.forEach(function(x){h+='<div class="bkitem'+(x.id===CURGB?' on':'')+'" onclick="CURGB=\''+x.id+'\';renderGBank()"><b>'+esc(x.name)+'</b><span class="kindtag '+kindCls(x.kind)+'">'+esc(x.kind||'不明')+'</span></div>';});
+ h+='</div>';
+ var p=GUAR.find(function(x){return x.id===CURGB;});
+ h+='<div class="bkedit">';
+ if(!p){h+='<div class="bkempty">左で選択、または上のゆる書きで追加してください</div>';}
+ else{
+  h+='<div class="qlabel" style="margin-top:0">保証会社名</div><input value="'+esc(p.name)+'" oninput="setGuar(\''+p.id+'\',\'name\',this.value)">';
+  h+='<div class="qlabel">系統</div>'+kindSel(p.id,p.kind);
+  h+='<div class="qlabel">弊社 審査通過履歴</div><textarea oninput="setGuar(\''+p.id+'\',\'passHistory\',this.value)">'+esc(p.passHistory||'')+'</textarea>';
+  h+='<div class="qlabel">メモ</div><textarea oninput="setGuar(\''+p.id+'\',\'memo\',this.value)">'+esc(p.memo||'')+'</textarea>';
+  h+='<div class="row" style="margin-top:10px"><button class="btn btn-sec" onclick="delGuar(\''+p.id+'\')">削除</button></div>';
+ }
+ h+='</div></div>';
+ document.getElementById('gbankbody').innerHTML=h;
+}
+// ---- 管理会社 ----
+function mergeMgmt(d){
+ var nm=(d.name||'').trim(); if(!nm){toast('管理会社名が読み取れませんでした');return;}
+ var p=MGMT.find(function(x){return (x.name||'').trim().toLowerCase()===nm.toLowerCase();});
+ if(!p){p={id:'MB'+Date.now()+Math.random().toString(36).slice(2,5),name:nm,phone:'',navi:[],guarantors:[],confirmMethod:'',applyMethod:'',hours:'',holiday:'',dealHistory:'',image:'',memo:''};MGMT.push(p);}
+ if(d.phone&&d.phone.trim())p.phone=d.phone.trim();
+ if(d.navi&&d.navi.length)p.navi=d.navi.map(function(n){return {num:String(n.num||''),role:String(n.role||'')};});
+ if(d.guarantors&&d.guarantors.length)p.guarantors=d.guarantors.filter(Boolean);
+ ['confirmMethod','applyMethod','hours','holiday'].forEach(function(f){if(d[f]&&String(d[f]).trim())p[f]=String(d[f]).trim();});
+ if(d.dealHistory&&d.dealHistory.trim())p.dealHistory=(p.dealHistory?p.dealHistory+' / ':'')+d.dealHistory.trim();
+ if(d.image&&d.image.trim())p.image=(p.image?p.image+' / ':'')+d.image.trim();
+ if(d.memo&&d.memo.trim())p.memo=(p.memo?p.memo+' / ':'')+d.memo.trim();
+ CURMB=p.id;MBQ='';saveBank();renderMBank();toast('「'+nm+'」を登録／更新しました');
+}
+function setMgmt(id,f,v){var p=MGMT.find(function(x){return x.id===id;});if(p){p[f]=v;saveBank();}}
+function delMgmt(id){var p=MGMT.find(function(x){return x.id===id;});if(!p)return;uiConfirm('「'+(p.name||'')+'」を削除しますか？',function(){MGMT=MGMT.filter(function(x){return x.id!==id;});if(CURMB===id)CURMB=null;saveBank();renderMBank();toast('削除しました');});}
+function mbNaviAdd(id){var p=MGMT.find(function(x){return x.id===id;});if(!p)return;if(!p.navi)p.navi=[];p.navi.push({num:'',role:''});saveBank();renderMBank();}
+function mbNaviDel(id,i){var p=MGMT.find(function(x){return x.id===id;});if(!p)return;p.navi.splice(i,1);saveBank();renderMBank();}
+function setMbNavi(id,i,k,v){var p=MGMT.find(function(x){return x.id===id;});if(p&&p.navi[i]){p.navi[i][k]=v;saveBank();}}
+function mbGuarAdd(id){var p=MGMT.find(function(x){return x.id===id;});if(!p)return;if(!p.guarantors)p.guarantors=[];p.guarantors.push('');saveBank();renderMBank();}
+function mbGuarDel(id,i){var p=MGMT.find(function(x){return x.id===id;});if(!p)return;p.guarantors.splice(i,1);saveBank();renderMBank();}
+function setMbGuar(id,i,v){var p=MGMT.find(function(x){return x.id===id;});if(p){p.guarantors[i]=v;saveBank();}}
+function gotoGuar(name){name=(name||'').trim();if(!name){tab('gbank');return;}GBQ=name;var hit=GUAR.find(function(x){return (x.name||'').trim().toLowerCase()===name.toLowerCase();});CURGB=hit?hit.id:null;tab('gbank');if(!hit)toast('保証会社DBに未登録です。ゆる書きで追加できます');}
+function guarKindOf(name){var g=GUAR.find(function(x){return (x.name||'').trim().toLowerCase()===(name||'').trim().toLowerCase();});return g?(g.kind||'不明'):'';}
+function renderMBank(){
+ var q=(MBQ||'').trim().toLowerCase();
+ var list=MGMT.filter(function(x){return !q||(x.name||'').toLowerCase().indexOf(q)>=0||(x.phone||'').toLowerCase().indexOf(q)>=0;});
+ var h='<div class="bkcard"><div class="qlabel" style="margin-top:0">ゆる書きで追加・更新（保存時にGeminiが構造化）</div>';
+ h+='<textarea id="mb_in" placeholder="例：住友林業レジデンシャル ナビダイヤル3で契約2で物確 担当無愛想 物確基本itandi 退去前は先行契約のみ"></textarea>';
+ h+='<button class="btn btn-pri" id="mb_go" style="margin-top:8px" onclick="bankIngest(\'mgmt\')">Geminiで読み取って登録／更新</button></div>';
+ h+='<input class="bkq" id="mb_q" placeholder="管理会社名・電話番号で検索" value="'+esc(MBQ)+'" oninput="MBQ=this.value;renderMBank()">';
+ h+='<div class="bkgrid">';
+ h+='<div class="bklist">';
+ if(!list.length)h+='<div class="bkempty">該当なし</div>';
+ list.forEach(function(x){h+='<div class="bkitem'+(x.id===CURMB?' on':'')+'" onclick="CURMB=\''+x.id+'\';renderMBank()"><b>'+esc(x.name)+'</b>'+(x.phone?'<span class="bksub">'+esc(x.phone)+'</span>':'')+'</div>';});
+ h+='</div>';
+ var p=MGMT.find(function(x){return x.id===CURMB;});
+ h+='<div class="bkedit">';
+ if(!p){h+='<div class="bkempty">左で選択、または上のゆる書きで追加してください</div>';}
+ else{
+  h+='<div class="bkfg2"><div><div class="qlabel" style="margin-top:0">管理会社名</div><input value="'+esc(p.name)+'" oninput="setMgmt(\''+p.id+'\',\'name\',this.value)"></div><div><div class="qlabel" style="margin-top:0">電話番号</div><input value="'+esc(p.phone||'')+'" oninput="setMgmt(\''+p.id+'\',\'phone\',this.value)"></div></div>';
+  // navi (目立たせる)
+  h+='<div class="bkhi"><div class="bkhihd">ナビダイヤル案内</div>';
+  (p.navi||[]).forEach(function(n,i){h+='<div class="navirow"><input class="navinum" value="'+esc(n.num||'')+'" placeholder="番号" oninput="setMbNavi(\''+p.id+'\','+i+',\'num\',this.value)"><span>番 →</span><input value="'+esc(n.role||'')+'" placeholder="用途（例：物件確認）" oninput="setMbNavi(\''+p.id+'\','+i+',\'role\',this.value)"><button class="btn-sm btn-danger" onclick="mbNaviDel(\''+p.id+'\','+i+')">×</button></div>';});
+  h+='<button class="btn-sm" onclick="mbNaviAdd(\''+p.id+'\')">＋案内を追加</button></div>';
+  // guarantors (目立たせる + 保証会社DBへ)
+  h+='<div class="bkhi"><div class="bkhihd">使用 保証会社</div>';
+  (p.guarantors||[]).forEach(function(gname,i){var k=guarKindOf(gname);h+='<div class="navirow"><span class="rank">第'+(i+1)+'</span><input value="'+esc(gname||'')+'" placeholder="保証会社名" oninput="setMbGuar(\''+p.id+'\','+i+',this.value)">'+(k?'<span class="kindtag '+kindCls(k)+'">'+esc(k)+'</span>':'<span class="kindtag k-unk">未登録</span>')+'<button class="btn-sm" onclick="gotoGuar(this.parentNode.querySelector(\'input\').value)">DBで見る</button><button class="btn-sm btn-danger" onclick="mbGuarDel(\''+p.id+'\','+i+')">×</button></div>';});
+  h+='<button class="btn-sm" onclick="mbGuarAdd(\''+p.id+'\')">＋保証会社を追加</button></div>';
+  h+='<div class="bkfg2"><div><div class="qlabel">物件確認方法</div><input value="'+esc(p.confirmMethod||'')+'" oninput="setMgmt(\''+p.id+'\',\'confirmMethod\',this.value)"></div><div><div class="qlabel">申込方法</div><input value="'+esc(p.applyMethod||'')+'" oninput="setMgmt(\''+p.id+'\',\'applyMethod\',this.value)"></div></div>';
+  h+='<div class="bkfg2"><div><div class="qlabel">営業時間</div><input value="'+esc(p.hours||'')+'" oninput="setMgmt(\''+p.id+'\',\'hours\',this.value)"></div><div><div class="qlabel">定休日</div><input value="'+esc(p.holiday||'')+'" oninput="setMgmt(\''+p.id+'\',\'holiday\',this.value)"></div></div>';
+  h+='<div class="qlabel">弊社との契約実績</div><textarea oninput="setMgmt(\''+p.id+'\',\'dealHistory\',this.value)">'+esc(p.dealHistory||'')+'</textarea>';
+  h+='<div class="qlabel">管理会社のイメージ</div><textarea oninput="setMgmt(\''+p.id+'\',\'image\',this.value)">'+esc(p.image||'')+'</textarea>';
+  h+='<div class="qlabel">メモ</div><textarea oninput="setMgmt(\''+p.id+'\',\'memo\',this.value)">'+esc(p.memo||'')+'</textarea>';
+  h+='<div class="row" style="margin-top:10px"><button class="btn btn-sec" onclick="delMgmt(\''+p.id+'\')">削除</button></div>';
+ }
+ h+='</div></div>';
+ document.getElementById('mbankbody').innerHTML=h;
+}
+// ---- 共通: Gemini取り込み ----
+async function bankIngest(kind){
+ var ta=document.getElementById(kind==='guar'?'gb_in':'mb_in');
+ var txt=(ta&&ta.value||'').trim();
+ if(!txt){toast('メモを入力してください');return;}
+ if(!API){toast('共有設定（GASのURL）が未設定です。共有設定で設定してください');return;}
+ var btn=document.getElementById(kind==='guar'?'gb_go':'mb_go');
+ if(btn){btn.disabled=true;btn.textContent='読み取り中…';}
+ try{
+  var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'extractBank',kind:kind,text:txt})});
+  var o=await r.json();
+  if(!o||!o.ok){toast('読み取り失敗: '+((o&&o.error)||'不明'));}
+  else{ if(kind==='guar')mergeGuar(o.data||{}); else mergeMgmt(o.data||{}); if(ta)ta.value=''; }
+ }catch(e){toast('通信エラーが発生しました');}
+ finally{ if(btn){btn.disabled=false;btn.textContent='Geminiで読み取って登録／更新';} }
+}
+
 // ---------- tabs ----------
-function tab(t){CURTAB=t;['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review')renderReview();if(t==='report')renderReport();if(t==='cost')renderCost();var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}updateBadges();}
+function tab(t){CURTAB=t;['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank'].forEach(x=>{document.getElementById('v-'+x).style.display=x===t?'':'none';document.getElementById('tb-'+x).className=x===t?'on':'';});
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review')renderReview();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}updateBadges();}
 
 // ---------- DASHBOARD ----------
 function monthOptions(){
