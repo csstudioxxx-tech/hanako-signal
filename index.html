@@ -1859,7 +1859,7 @@ function mapCost(j){
  if(kv!=null&&!isNaN(kv)&&kv>0){COST.kasai=kv;COST.kasaiChk=false;}else{COST.kasai=20000;COST.kasaiChk=true;}
  if(j.kagi_koukan!=null&&j.kagi_koukan!==''&&Number(j.kagi_koukan)>0){COST.kagi=Math.round(Number(j.kagi_koukan));COST.kagiChk=false;}else{COST.kagi=20000;COST.kagiChk=true;}
  COST.sonotaOne=[];COST.sonotaMon=[];
- (j.sonota||[]).forEach(function(o){if(!o||!o.name)return;var t=o.timing||'',amt=Math.round(Number(o.amount)||0);
+ (j.sonota||[]).forEach(function(o){if(!o||!o.name)return;var t=o.timing||'',amt=Math.round(Number(o.amount)||0);var nm=String(o.name);if(/クリーニング|清掃|エアコン洗浄/.test(nm)){COST.sonotaOne.push({name:nm,amt:amt,clean:true});return;}
   if(t==='monthly')COST.sonotaMon.push({name:String(o.name),amt:amt});
   else if(t==='one_time')COST.sonotaOne.push({name:String(o.name),amt:amt});});
 }
@@ -1918,7 +1918,7 @@ function genCostText(){
  var pct=(COST.hoshouPct==null||COST.hoshouPct==='')?50:Number(COST.hoshouPct);
  var hoshou=Math.round((rent+mgmt)*pct/100);
  var kasai=Number(COST.kasai)||0,kagi=Number(COST.kagi)||0;
- var oneItems=(COST.sonotaOne||[]).filter(function(o){return o&&((o.name&&o.name.trim())||o.amt);});
+ var _allOne=(COST.sonotaOne||[]).filter(function(o){return o&&((o.name&&o.name.trim())||o.amt);});var oneItems=_allOne.filter(function(o){return !o.clean||shiki===0;});
  var sonotaTotal=oneItems.reduce(function(a,o){return a+(Number(o.amt)||0);},0);
  var init1=shiki+rei+chuukai+hoshou+kasai+kagi+sonotaTotal;
  var nextRent=rent+mgmt,pay2=nextRent,grand=init1+pay2;
@@ -1940,7 +1940,7 @@ function genCostText(){
  L.push('\u9375\u4ea4\u63db\u4ee3\u7b49 : '+fy(kagi)+(COST.kagiChk?' \u203b\u8981\u78ba\u8a8d':''));
  if(oneItems.length){
   L.push('\u305d\u306e\u4ed6 : '+fy(sonotaTotal));
-  var br=oneItems.map(function(o){var sname=(o.name||''),seg=sname+' : '+fy(o.amt);if(shiki===0&&/\u30af\u30ea\u30fc\u30cb\u30f3\u30b0/.test(sname))seg+='\uff08\u5165\u5c45\u6642\u306b\u652f\u6255\u3046\u53ef\u80fd\u6027\u3042\u308a\u203b\u8981\u78ba\u8a8d\uff09';return seg;}).join(' / ');
+  var br=oneItems.map(function(o){var sname=(o.name||''),seg=sname+' : '+fy(o.amt);if(shiki===0&&o.clean)seg+='\uff08\u5165\u5c45\u6642\u306b\u652f\u6255\u3046\u53ef\u80fd\u6027\u3042\u308a\u203b\u8981\u78ba\u8a8d\uff09';return seg;}).join(' / ');
   L.push('\u305d\u306e\u4ed6\u5185\u8a33 '+br);
  }
  L.push('----------');
