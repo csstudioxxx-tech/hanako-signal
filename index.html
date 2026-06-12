@@ -19,8 +19,11 @@ header{background:rgba(255,255,255,.85);backdrop-filter:saturate(180%) blur(12px
 header h1{margin:0;font-size:16px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:7px}
 header h1 .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
 header .sub{font-size:11px;color:var(--text3);margin-top:2px}
-.tabs{display:flex;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border2);position:sticky;top:53px;z-index:19;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
+.tabs{display:flex;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border2);position:sticky;top:53px;z-index:19;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:thin;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent 100%)}
+.tabs::-webkit-scrollbar{height:4px}
+.tabs::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:4px}
+.tabs::-webkit-scrollbar-track{background:transparent}
+.tabs button{scroll-snap-align:start}
 .tabs button{flex:none;border:0;background:none;padding:11px 13px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;position:relative;white-space:nowrap;transition:color .15s}
 .tabs button.on{color:var(--text)}
 .tabs button.on::after{content:"";position:absolute;left:11px;right:11px;bottom:-1px;height:2px;border-radius:2px;background:var(--accent)}
@@ -156,6 +159,7 @@ textarea{resize:vertical;min-height:54px}
 <div class="tabs">
 <button id="tb-dash" class="on" onclick="tab('dash')">ダッシュボード</button>
 <button id="tb-list" onclick="tab('list')">物件一覧</button>
+<button id="tb-cost" onclick="tab('cost')"><span class="tlab tlab-up">¥</span>初期費用</button>
 <button id="tb-add" onclick="tab('add')"><span class="tlab tlab-up">up</span>物件追加</button>
 <button id="tb-csv" onclick="tab('csv')"><span class="tlab tlab-up">up</span>データ取り込み</button>
 <button id="tb-review" onclick="tab('review')"><span class="tlab tlab-nyu">入稿</span>要データ確認<span class="badge" id="rvbadge" style="display:none"></span></button>
@@ -168,7 +172,6 @@ textarea{resize:vertical;min-height:54px}
 <button id="tb-otrend" onclick="tab('otrend')"><span class="tlab tlab-beta">β</span>オプション遷移</button>
 <button id="tb-ana" onclick="tab('ana')"><span class="tlab tlab-beta">β</span>反響分析</button>
 <button id="tb-report" onclick="tab('report')"><span class="tlab tlab-beta">β</span>現状レポート</button>
-<button id="tb-cost" onclick="tab('cost')"><span class="tlab tlab-up">¥</span>初期費用</button>
 </div>
 <div class="wrap">
 <div id="groupbar" style="display:none"></div>
