@@ -1962,4 +1962,7 @@ function genCostText(){
  var out=document.getElementById('c_out');if(out)out.value=L.join('\n');
 }
 
+
+/* メニュー: 縦ホイールで横スクロール */
+(function(){try{var nav=document.querySelector('.tabs');if(!nav)return;nav.addEventListener('wheel',function(e){if(nav.scrollWidth<=nav.clientWidth)return;var d=Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX;if(!d)return;var atStart=nav.scrollLeft<=0,atEnd=nav.scrollLeft+nav.clientWidth>=nav.scrollWidth-1;if((d<0&&atStart)||(d>0&&atEnd))return;e.preventDefault();nav.scrollLeft+=d;},{passive:false});}catch(e){}})();
 </script></body></html>
