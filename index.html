@@ -184,8 +184,8 @@ textarea{resize:vertical;min-height:54px}
 .rvit.s-ok .tg{background:#e3f5f1;color:#0d9488}.rvit.s-mg .tg{background:#f1e8fd;color:#7c3aed}
 .rvit .lt{font-size:9.5px;font-weight:700;color:#c2410c;margin-top:3px}
 .rvwrap.lc .rvlhd .t,.rvwrap.lc .rvcounts,.rvwrap.lc .rvitems{display:none}
-.rvwork{flex:1;display:grid;grid-template-columns:minmax(0,52fr) minmax(0,48fr);gap:12px;min-width:0}
-.rvpdfcard{border:1px solid var(--border2);border-radius:12px;background:#fff;display:flex;flex-direction:column;overflow:hidden;min-height:560px}
+.rvwork{flex:1;display:grid;grid-template-columns:minmax(0,57fr) minmax(0,43fr);gap:12px;min-width:0}
+.rvpdfcard{border:1px solid var(--border2);border-radius:12px;background:#fff;display:flex;flex-direction:column;overflow:hidden;min-height:78vh}
 .rvpdfhd{padding:7px 11px;border-bottom:1px solid var(--border2);font-weight:700;font-size:12px;display:flex;justify-content:space-between;align-items:center}
 .rvpdfwrap{flex:1;background:#525659;min-height:0;position:relative}
 .rvpdfframe{width:100%;height:100%;border:0;display:block}
@@ -204,7 +204,7 @@ textarea{resize:vertical;min-height:54px}
 .rvfhd{padding:9px 14px;border-bottom:1px solid var(--border2);font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
 .rvfhd .rvst{margin-left:auto;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px}
 .rvst.un{background:#fff8e6;color:#a07700}.rvst.ok{background:#e3f5f1;color:#0d9488}.rvst.mg{background:#f1e8fd;color:#7c3aed}
-.rvfbody{padding:12px 14px;overflow:auto;display:flex;flex-direction:column;gap:11px;max-height:62vh}
+.rvfbody{padding:13px 15px;overflow:auto;display:flex;flex-direction:column;gap:13px;max-height:70vh}
 .rvsec{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--text3);border-bottom:1px solid var(--border2);padding-bottom:4px}
 .rvmediarow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .rvmtag{font-size:11px;font-weight:700;padding:3px 11px;border-radius:99px;border:1px solid var(--border2);color:var(--text3)}
@@ -230,12 +230,12 @@ textarea{resize:vertical;min-height:54px}
 .rvmgmemo{border:1px solid #d9c4f5;background:#faf6ff;border-radius:9px;padding:9px 11px}
 .rvmgmemo .t{font-size:10.5px;font-weight:700;color:#7c3aed;margin-bottom:5px}
 .rvmgmemo textarea{width:100%;min-height:50px;border:1px solid #e0d3f3;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12px;box-sizing:border-box}
-.rvbtns{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--border2);background:#fbfcfe}
-.rvbtns .b{border:none;font-family:inherit;font-weight:700;font-size:12.5px;padding:9px 14px;border-radius:9px;cursor:pointer}
-.rvbtns .b.ok{background:#0d9488;color:#fff;flex:1}
-.rvbtns .b.mg{background:#fff;border:1px solid #d9c4f5;color:#7c3aed}
-.rvbtns .b.gho{background:#fff;border:1px solid var(--border2);color:var(--text2)}
-.rvbtns .b.del{background:#fff;border:1px solid #f0c2b0;color:#c2410c}
+.rvbtns{display:flex;flex-direction:column;gap:7px;padding:10px 14px;border-top:1px solid var(--border2);background:#fbfcfe}.rvbtns .brow{display:flex;gap:7px}
+.rvbtns .b{border:none;font-family:inherit;font-weight:600;font-size:12px;padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.rvbtns .b.ok{background:#0d9488;color:#fff;width:100%;font-weight:700;font-size:12.5px;padding:10px}
+.rvbtns .b.mg{background:transparent;border:1px solid var(--border2);color:var(--text3);flex:1}
+.rvbtns .b.gho{background:#fff;border:1px solid var(--border2);color:var(--text3);flex:none}
+.rvbtns .b.del{background:#fff;border:1px solid var(--border2);color:#c2410c;flex:none}
 .rvempty{padding:40px;text-align:center;color:var(--text3)}
 @media(max-width:1500px){.rvfg{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:1100px){.rvwrap{flex-direction:column}.rvwork{grid-template-columns:1fr}.rvpdfcard{min-height:60vh}}
@@ -1139,7 +1139,7 @@ function renderReview(){
  h+='<div class="rvwrap'+(RVLISTOPEN?'':' lc')+'">';
  // list
  h+='<aside class="rvlist"><div class="rvlhd"><span class="t">未確認リスト</span><button onclick="rvToggleList()">'+(RVLISTOPEN?'‹':'›')+'</button></div>';
- h+='<div class="rvcounts"><div class="rvc un"><span class="d"></span>未確認<span class="n">'+c.un+'</span></div><div class="rvc mg"><span class="d"></span>マネージャー要確認<span class="n">'+c.mg+'</span></div><div class="rvc ok"><span class="d"></span>確認済み<span class="n">'+c.ok+'</span></div><div class="rvc tot"><span class="d"></span>合計<span class="n">'+c.total+'</span></div></div>';
+ h+='<div class="rvcounts"><div class="rvc un"><span class="d"></span>未確認<span class="n">'+c.un+'</span></div><div class="rvc mg"><span class="d"></span>マネージャー要確認<span class="n">'+c.mg+'</span></div><div class="rvc ok"><span class="d"></span>確認済み<span class="n">'+c.ok+'</span></div></div>';
  h+='<div class="rvitems">'+items.map(function(p){var st=p.revStatus||'un';var icon=st==='ok'?'<span class="tg">済</span>':st==='mg'?'<span class="tg">要確認</span>':'';var tail=st==='un'?'<div class="lt">確認待ち</div>':'';return '<div class="rvit s-'+st+(p.id===CURREV?' cur':'')+'" onclick="revSelect(\''+p.id+'\')"><div class="nm">'+esc(p.name||'(名称未設定)')+icon+'</div><div class="mt">'+esc((p.station||'')+' '+(p.madori||''))+'</div>'+tail+'</div>';}).join('')+'</div></aside>';
  // work
  var p=PROPS.find(function(x){return x.id===CURREV;});
@@ -1156,7 +1156,7 @@ function renderReview(){
  h+='<label class="rv_gate'+(p.equipOk?' done':'')+'" id="rv_gate" data-fldkey="__equip"><input type="checkbox" '+(p.equipOk?'checked':'')+' onchange="revEquip(\''+p.id+'\',this.checked)"> 設備を確認した（確認済みにするには必須）</label>';
  if(st==='mg')h+='<div class="rvmgmemo"><div class="t">マネージャーへの確認内容</div><textarea id="rv_mgmemo" oninput="revMgMemo(\''+p.id+'\',this.value)" placeholder="確認してほしい点を記載…">'+esc(p.mgMemo||'')+'</textarea></div>';
  h+='</div>';
- h+='<div class="rvbtns"><button class="b ok" onclick="revMarkOk(\''+p.id+'\')">データ確認済み → 次へ</button><button class="b mg" onclick="revToggleMg(\''+p.id+'\')">'+(st==='mg'?'マネージャー要確認を解除':'マネージャーへ要確認')+'</button><button class="b gho" onclick="viewPdf(\''+p.id+'\')">別窓で開く</button><button class="b del" onclick="deleteReviewProp(\''+p.id+'\')">物件削除</button></div>';
+ h+='<div class="rvbtns"><button class="b ok" onclick="revMarkOk(\''+p.id+'\')">確認済み → 次へ</button><div class="brow"><button class="b mg" onclick="revToggleMg(\''+p.id+'\')">'+(st==='mg'?'ﾏﾈｰｼﾞｬｰ解除':'マネージャー確認')+'</button><button class="b gho" onclick="viewPdf(\''+p.id+'\')">別窓</button><button class="b del" onclick="deleteReviewProp(\''+p.id+'\')">削除</button></div></div>';
  h+='</div></div></div>';
  document.getElementById('reviewbody').innerHTML=h;
  loadReviewPdf(p,document.getElementById('rv_pdf'));
