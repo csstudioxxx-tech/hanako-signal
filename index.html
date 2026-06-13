@@ -2392,7 +2392,7 @@ async function processHankyo(file){
  const secRow=M[hr-1]?M[hr-1].map(norm):[];
  let dstart=-1;for(let c=0;c<secRow.length;c++){if(/\d{2}年\d{2}月\d{2}日～\d{2}年\d{2}月\d{2}日/.test(secRow[c])){dstart=c;break;}}
  I.pv=dstart>=0?dstart+3:-1;I.inq=dstart>=0?dstart+7:-1;I.lv=dstart>=0?dstart+1:-1;
- let repDate=twoDaysAgo();if(dstart>=0){const m=secRow[dstart].match(/\d{2}年\d{2}月\d{2}日～(\d{2})年(\d{2})月(\d{2})日/);if(m)repDate='20'+m[1]+'-'+m[2]+'-'+m[3];}
+ var repDate=twoDaysAgo();var _dfound=false;for(var _r=0;_r<Math.min(M.length,Math.max(hr+1,9))&&!_dfound;_r++){var _rw=M[_r]||[];for(var _c=0;_c<_rw.length;_c++){var _cv=String(_rw[_c]==null?'':_rw[_c]);var _mm=_cv.match(/(\d{2})年(\d{2})月(\d{2})日\s*[~\uff5e\u301c-]\s*(\d{2})年(\d{2})月(\d{2})日/);if(_mm){repDate='20'+_mm[4]+'-'+_mm[5]+'-'+_mm[6];_dfound=true;break;}}}if(!_dfound){for(var _r2=0;_r2<Math.min(M.length,Math.max(hr+1,9))&&!_dfound;_r2++){var _rw2=M[_r2]||[];for(var _c2=0;_c2<_rw2.length;_c2++){var _cv2=String(_rw2[_c2]==null?'':_rw2[_c2]);var _ms=_cv2.match(/(\d{2})年(\d{2})月(\d{2})日/);if(_ms){repDate='20'+_ms[1]+'-'+_ms[2]+'-'+_ms[3];_dfound=true;break;}}}}
  if(I.name<0||I.pv<0){log('必要な列（物件名・当日PV）が見つかりませんでした。','err');return;}
  let matched=0,created=0,total=0;
  for(let r=hr+1;r<M.length;r++){
@@ -2468,15 +2468,32 @@ function processJDS(hdr,rows){
  const mc=Object.keys(seenProps).length;
  log('JDS取込：'+total+'行を処理（蓄積イベント '+added+'件）。'+mc+'物件にマッチ。同じファイルを再投入しても二重計上しません。','ok');
 }
+function bijikonCursor(){try{var v=localStorage.getItem('ibt_bjcursor');if(v)return v;}catch(e){}return twoDaysAgo();}
+function setBijikonCursor(d){try{localStorage.setItem('ibt_bjcursor',d);}catch(e){}}
 function promptBijikon(hdr,rows,file,autoDate){
  bijikonPending={hdr:hdr,rows:rows,file:file||null};
  if(autoDate){applyBijikon(autoDate);return;}
+ renderBijikonPrompt();
+}
+function renderBijikonPrompt(){
+ if(!bijikonPending){document.getElementById('csvpending').innerHTML='';return;}
+ var cur=bijikonCursor();
  document.getElementById('csvpending').innerHTML=
   '<div class="card fade"><div style="font-size:13px;font-weight:650">ビジコン（PV詳細）を検出</div>'
-  +'<div class="note" style="margin-top:4px">対象日を自動判定できませんでした。対象日を指定してください（前々日が既定）。同じ日付を入れ直すと上書きされ、二重になりません。</div>'
-  +'<label>対象日</label><input type="date" id="bjdate" value="'+twoDaysAgo()+'">'
-  +'<div class="row" style="gap:7px;margin-top:10px"><button class="btn btn-pri" style="width:auto;flex:1" onclick="applyBijikon()">この日付で取り込む</button><button class="btn btn-sec" style="width:auto" onclick="bijikonPending=null;document.getElementById(\'csvpending\').innerHTML=\'\'">キャンセル</button></div></div>';
+  +'<div class="note" style="margin-top:4px">ビジコンCSVには日付が入っていないため、<b>連続取込モード</b>で進めます。下の対象日で取り込むと、次回は自動で翌日に進みます。古い日付から順に上げてください。</div>'
+  +'<label>対象日（この日付で取り込みます）</label><input type="date" id="bjdate" value="'+cur+'" onchange="setBijikonCursor(this.value)">'
+  +'<div class="note" style="margin-top:6px;font-size:11px">取り込み後、対象日は自動で翌日へ。同じ日付を入れ直すと上書きされ二重になりません。</div>'
+  +'<div class="row" style="gap:7px;margin-top:10px"><button class="btn btn-pri" style="width:auto;flex:1" onclick="applyBijikonCursor()">この日付で取り込む（→翌日へ）</button><button class="btn btn-sec" style="width:auto" onclick="bijikonPending=null;document.getElementById(\'csvpending\').innerHTML=\'\'">キャンセル</button></div>'
+  +'<div class="row" style="gap:7px;margin-top:8px"><button class="btn btn-sec" style="width:auto;font-size:11px" onclick="resetBijikonCursor()">基準日をリセット（前々日に戻す）</button></div>'
+  +'</div>';
 }
+function applyBijikonCursor(){
+ var de=document.getElementById('bjdate');var d=de?de.value:bijikonCursor();
+ if(!d){toast('対象日を選択してください');return;}
+ applyBijikon(d);
+ setBijikonCursor(_ymd(_addDays(new Date(d+'T00:00:00'),1)));
+}
+function resetBijikonCursor(){setBijikonCursor(twoDaysAgo());renderBijikonPrompt();toast('基準日を前々日にリセットしました');}
 function applyBijikon(forceDate){
  if(!bijikonPending)return;
  var _de=document.getElementById('bjdate');
