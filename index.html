@@ -2322,11 +2322,28 @@ function setupCSV(){const dz=document.getElementById('csvdrop'),inp=document.get
  ['dragleave','dragend'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove('over');}));
  dz.addEventListener('drop',ev=>{ev.preventDefault();dz.classList.remove('over');var fs=ev.dataTransfer.files;if(fs&&fs.length)routeImportMany(fs);});
  inp.addEventListener('change',ev=>{if(ev.target.files&&ev.target.files.length)routeImportMany(ev.target.files);inp.value='';});}
-async function routeImportMany(files){var arr=[];for(var i=0;i<files.length;i++)arr.push(files[i]);
- // Excel/JDSを先に、ビジコン(日付確認が出る)を最後に
- arr.sort(function(a,b){var ac=/\.(xls|xlsx)$/i.test(a.name)?0:1;var bc=/\.(xls|xlsx)$/i.test(b.name)?0:1;return ac-bc;});
- for(var j=0;j<arr.length;j++){try{await routeImport(arr[j]);}catch(e){}}
- if(arr.length>1)toast(arr.length+'件のファイルを取り込みました');}
+async function routeImportMany(files){
+ var arr=[];for(var i=0;i<files.length;i++)arr.push(files[i]);
+ var xls=[],jds=[],biji=[];
+ for(var k=0;k<arr.length;k++){var f=arr[k],n=(f.name||'').toLowerCase();
+  if(n.endsWith('.xls')||n.endsWith('.xlsx')){xls.push(f);continue;}
+  var txt='';try{txt=await readCSVText(f);}catch(e){}
+  var lines=txt.split(/\r?\n/).filter(function(l){return l.trim();});
+  var hdr=lines.length?parseCSVRow(lines[0]).map(function(h){return h.trim();}):[];
+  if(colFind(hdr,['受信日時'])>=0){jds.push({f:f,txt:txt});}
+  else if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){biji.push({f:f,txt:txt,date:detectBijikonDate(txt)});}
+  else {jds.push({f:f,txt:txt});}
+ }
+ for(var a=0;a<xls.length;a++){try{await processHankyo(xls[a]);}catch(e){}}
+ for(var b=0;b<jds.length;b++){try{processCSVText(jds[b].txt,jds[b].f);}catch(e){}}
+ biji.sort(function(x,y){var dx=x.date||'',dy=y.date||'';return dx<dy?-1:(dx>dy?1:0);});
+ for(var c=0;c<biji.length;c++){try{
+   if(biji[c].date){var L=biji[c].txt.split(/\r?\n/).filter(function(l){return l.trim();});var hd=parseCSVRow(L[0]).map(function(h){return h.trim();});var rw=L.slice(1).map(parseCSVRow);bijikonPending={hdr:hd,rows:rw,file:biji[c].f};applyBijikon(biji[c].date);}
+   else {processCSVText(biji[c].txt,biji[c].f);}
+  }catch(e){}}
+ var tot=xls.length+jds.length+biji.length;
+ if(tot>1)toast(tot+'件のファイルを取り込みました（ビジコンは日付自動判定）');
+}
 async function routeImport(file){const n=(file.name||'').toLowerCase();if(n.endsWith('.xls')||n.endsWith('.xlsx')){await processHankyo(file);}else{await processCSV(file);}}
 function readCSVText(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{
  try{const u=new Uint8Array(r.result);
@@ -2348,13 +2365,14 @@ async function processCSV(file){
  const txt=await readCSVText(file);
  processCSVText(txt,file);
 }
+function detectBijikonDate(txt){if(!txt)return null;var m=txt.match(/(\d{2})\u5e74(\d{2})\u6708(\d{2})\u65e5\s*[~\uff5e\u301c-]\s*(\d{2})\u5e74(\d{2})\u6708(\d{2})\u65e5/);if(m)return '20'+m[4]+'-'+m[5]+'-'+m[6];var m2=txt.match(/(\d{2})\u5e74(\d{2})\u6708(\d{2})\u65e5/);if(m2)return '20'+m2[1]+'-'+m2[2]+'-'+m2[3];return null;}
 function processCSVText(txt,file){
  const lines=txt.split(/\r?\n/).filter(l=>l.trim());
  if(lines.length<2){log('CSVが空です。','err');return;}
  const hdr=parseCSVRow(lines[0]).map(h=>h.trim());
  const rows=lines.slice(1).map(parseCSVRow);
  if(colFind(hdr,['受信日時'])>=0){processJDS(hdr,rows);return;}
- if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){promptBijikon(hdr,rows,file);return;}
+ if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){promptBijikon(hdr,rows,file,detectBijikonDate(txt));return;}
  log('CSVの形式を認識できませんでした。JDS（反響）または ビジコン（PV詳細）を入れてください。','err');
 }
 async function processHankyo(file){
@@ -2450,17 +2468,19 @@ function processJDS(hdr,rows){
  const mc=Object.keys(seenProps).length;
  log('JDS取込：'+total+'行を処理（蓄積イベント '+added+'件）。'+mc+'物件にマッチ。同じファイルを再投入しても二重計上しません。','ok');
 }
-function promptBijikon(hdr,rows,file){
+function promptBijikon(hdr,rows,file,autoDate){
  bijikonPending={hdr:hdr,rows:rows,file:file||null};
+ if(autoDate){applyBijikon(autoDate);return;}
  document.getElementById('csvpending').innerHTML=
   '<div class="card fade"><div style="font-size:13px;font-weight:650">ビジコン（PV詳細）を検出</div>'
-  +'<div class="note" style="margin-top:4px">このデータの対象日を指定してください（前々日が既定）。同じ日付を入れ直すと上書きされ、二重になりません。</div>'
+  +'<div class="note" style="margin-top:4px">対象日を自動判定できませんでした。対象日を指定してください（前々日が既定）。同じ日付を入れ直すと上書きされ、二重になりません。</div>'
   +'<label>対象日</label><input type="date" id="bjdate" value="'+twoDaysAgo()+'">'
   +'<div class="row" style="gap:7px;margin-top:10px"><button class="btn btn-pri" style="width:auto;flex:1" onclick="applyBijikon()">この日付で取り込む</button><button class="btn btn-sec" style="width:auto" onclick="bijikonPending=null;document.getElementById(\'csvpending\').innerHTML=\'\'">キャンセル</button></div></div>';
 }
-function applyBijikon(){
+function applyBijikon(forceDate){
  if(!bijikonPending)return;
- const date=document.getElementById('bjdate').value;
+ var _de=document.getElementById('bjdate');
+ const date=forceDate||(_de?_de.value:'');
  if(!date){toast('対象日を選択してください');return;}
  const hdr=bijikonPending.hdr,rows=bijikonPending.rows;
  const I={
