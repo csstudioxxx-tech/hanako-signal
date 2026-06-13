@@ -1597,8 +1597,8 @@ function renderReview(){
  if(!CURREV||!items.some(function(p){return p.id===CURREV;}))CURREV=items.length?items[0].id:null;
  var c=revCounts();
  var h='<div class="rvtop"><span class="rc">確認済み '+c.ok+' 件を登録</span><button class="reg" '+(c.ok?'':'disabled')+' onclick="revRegister()">確認済みを入稿ページへ登録</button></div>';
- if(!items.length){h+='<div class="rvempty">未確認の物件はありません。物件登録でPDFを取り込むとここに表示されます。</div>';document.getElementById('reviewbody').innerHTML=h;updateBadges();return;}
- h+='<div class="rvsrc">'+[['all','全て'],['csv','CSV読み取り'],['pdf','PDFアップロード']].map(function(o){return '<button class="'+(REVSRC===o[0]?'on':'')+'" onclick="revSrc(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
+  h+='<div class="rvsrc">'+[['all','全て'],['csv','CSV読み取り'],['pdf','PDFアップロード']].map(function(o){return '<button class="'+(REVSRC===o[0]?'on':'')+'" onclick="revSrc(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
+if(!items.length){h+='<div class="rvempty">'+(REVSRC==='all'?'未確認の物件はありません。物件登録でPDFを取り込むとここに表示されます。':'この条件（'+(REVSRC==='csv'?'CSV読み取り':'PDFアップロード')+'）の未確認物件はありません。')+'</div>';document.getElementById('reviewbody').innerHTML=h;updateBadges();return;}
  h+='<div class="rvwrap'+(RVLISTOPEN?'':' lc')+'">';
  // list
  h+='<aside class="rvlist"><div class="rvlhd"><span class="t">未確認リスト</span><button onclick="rvToggleList()">'+(RVLISTOPEN?'‹':'›')+'</button></div>';
