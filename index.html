@@ -369,6 +369,7 @@ async function load(){
  else{PROPS=await gget(SK,[]);HIST=await gget(HK,{});EVENTS=await gget(EK,{});MGMT=await gget(MK,[]);GUAR=await gget(GK,[]);}
  MGMT.forEach(function(m){if(!m.logs)m.logs=[];if(m.summary==null)m.summary='';if(!m.navi)m.navi=[];if(!m.guarantors)m.guarantors=[];});GUAR.forEach(function(gz){if(!gz.logs)gz.logs=[];if(gz.summary==null)gz.summary='';});
  PROPS.forEach(p=>{
+  if(p.infoDate==null)p.infoDate='';
   if(!p.statusLog)p.statusLog=[];
   if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';if(p.stations==null)p.stations=[];if(p.waku==='未分類')p.waku='その他';if(p.media==null)p.media='';if(p.mediaOther==null)p.mediaOther='';if(p.rtMedia==null)p.rtMedia='-';if(p.rtUrl==null)p.rtUrl='';if(p.vacancyLog==null)p.vacancyLog=[];if(p.revStatus==null)p.revStatus='un';if(p.mgMemo==null)p.mgMemo='';if(p.equipOk==null)p.equipOk=false;['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
   if(p.csvPV==null)p.csvPV=0;if(p.csvInq==null)p.csvInq=0;if(p.csvInqB==null)p.csvInqB=0;
@@ -1002,6 +1003,7 @@ function mapGemini(j,rec){if(!j)return;
  if(j.motozuke_kaisha)rec.mgmtCo=String(j.motozuke_kaisha);
  if(j.motozuke_tel)rec.phone=String(j.motozuke_tel);
  if(j.bukken_bango)rec.propNo=String(j.bukken_bango);
+ if(j.joho_koukai_bi){var _id=parseDate(String(j.joho_koukai_bi))||String(j.joho_koukai_bi);rec.infoDate=_id;}
  rec.deposit=_feeFmt(j.shikikin);rec.keyMoney=_feeFmt(j.reikin);
  var ks=(j.kotsu||[]).filter(function(k){return k&&k.eki;}).map(function(k){return {line:k.ensen||'',sta:k.eki||'',walk:(k.toho_fun!=null?k.toho_fun+'分':''),walkMin:(k.toho_fun!=null?String(k.toho_fun):'')};});
  if(ks.length){rec.stations=ks;var mi=ks.findIndex(function(x){return RANK[x.sta];});if(mi<0)mi=0;rec.station=ks[mi].sta;rec.line=ks[mi].line;rec.walkMin=ks[mi].walkMin;}
@@ -1096,7 +1098,7 @@ async function savePend(){
    structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,
    propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',
    uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,
-   statusLog:log,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
+   statusLog:log,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:'',storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
    csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
   if(p.pdfData)_uploads.push({id:id,b64:p.pdfData});});
   var _dn=0;for(var _u=0;_u<_uploads.length;_u++){var _pp=PROPS.find(function(x){return x.id===_uploads[_u].id;});var _ok=false;if(_pp){_ok=await uploadPdfToDrive(_pp,_uploads[_u].b64);}if(_ok)_dn++;else{try{await gset('pdf_'+_uploads[_u].id,_uploads[_u].b64);}catch(e){}}}
@@ -1149,6 +1151,7 @@ function infoCard(p,agg){
  return '<div class="infocard">'
   +'<div class="ig"><div class="ih">物件概要</div><div class="fl">'+g('物件名',p.name)+g('間取り',p.madori)+g('構造',p.structure)+g('築年数',p.age)+g('面積',p.area)+g('階数',p.floor)+'</div></div>'
   +'<div class="ig"><div class="ih">立地</div><div class="fl">'+g('住所',p.address)+g('沿線',p.line)+g('駅',p.station)+g('徒歩',p.walkMin)+otherStHtml(p)+g('備考',p.nearby)+'</div></div>'
+  +'<div class="ig"><div class="ih">日付</div><div class="fl">'+g('情報公開(更新)日',p.infoDate)+g('アップロード日',p.uploadDate)+g('掲載日',p.listDate)+'</div></div>'
   +'<div class="ig"><div class="ih">条件</div><div class="fl">'+g('賃料(総額)',(p.rent!=null&&p.rent!=='')?totalRent(p).toFixed(1)+'万円':'')+g('敷金',p.deposit)+g('礼金',p.keyMoney)+g('BT別',p.btSep)+g('独立洗面台',p.washStand)+'</div></div>'+'<div class="ig"><div class="ih">設備</div><div class="fl">'+g('ペット相談',p.petOk)+g('敷金0',p.dep0)+g('礼金0',p.key0)+g('オートロック',p.autoLock)+g('宅配ボックス',p.delivBox)+g('2口コンロ',p.twoBurner)+'</div></div>'
   +'<div class="ig"><div class="ih">管理</div><div class="fl">'+g('管理会社名',p.mgmtCo)+g('管理会社TEL',p.phone)+g('管理会社FAX',p.fax)+g('家賃',(p.rent!=null&&p.rent!=='')?Number(p.rent).toFixed(1)+'万円':'')+g('管理費・共益費',(p.mgmt!=null&&p.mgmt!=='')?(((Number(p.mgmt)||0)/10000).toFixed(1)+'万円'):'')+g('掲載媒体',p.media==='その他'?(p.mediaOther||'その他'):(p.media||''))+g('物件番号',p.propNo)+(p.rtMedia&&p.rtMedia!=='-'?'<div class="fi"><b>R.T.確認媒体</b>'+(p.rtUrl?'<a href="'+esc(p.rtUrl)+'" target="_blank" rel="noopener">'+esc(p.rtMedia)+' ↗</a>':esc(p.rtMedia))+'</div>':'')+((p.vacancyLog&&p.vacancyLog.length)?'<div class="fi" style="flex-basis:100%"><b>空き状況</b>'+p.vacancyLog.map(function(v){return esc((v.date||'')+' '+(v.text||''));}).join(' / ')+'</div>':'')+g('定休日',p.holiday)+'</div></div>'
   +'<div class="ig"><div class="ih">オプション</div><div class="fl">'+g('店ピク(+4)',p.storePick?'○ 付与':'×')+g('得エリ(+2)',p.specArea?'○ 付与':'×')+g('CM(+2)',p.video?'○ 付与':'×')+(p.optAppliedAt?g('付与日',p.optAppliedAt):'')+'</div></div>'
@@ -1257,7 +1260,7 @@ function liveG(){return PROPS.filter(function(p){return p.status==='掲載中'&&
 function groupBar(){var opts=[['ALL','ALL（全体）'],['Demand','Demand'],['Opportunity','Opportunity'],['DO','Demand＋Opportunity'],['High-Hold','High-Hold'],['Insight','Insight(YOKOYAMA)'],['その他','その他(仮説検証群)']];var tot=0;PROPS.forEach(function(p){if(p.status==='掲載中')tot+=(+(p.csvInq||0)||0);});return '<div class="gbar">'+opts.map(function(o){return '<button class="gbtn'+(GROUP===o[0]?' on':'')+'" onclick="setGroup(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'<span class="gtot">全体の反響合計 '+tot+'</span></div>';}
 function setGroup(g){GROUP=g;tab(CURTAB);}
 let CURREV=null,RVLISTOPEN=true;
-var RVF=[['name','物件名'],['room','部屋番号'],['madori','間取り'],['rent','家賃(万)'],['mgmt','管理費(円)'],['area','面積'],['deposit','敷金'],['keyMoney','礼金'],['age','築年'],['structure','構造'],['floor','階'],['address','住所'],['mgmtCo','管理会社名'],['phone','管理会社TEL'],['fax','管理会社FAX'],['propNo','物件番号'],['rtMedia','R.T.確認媒体']];
+var RVF=[['name','物件名'],['room','部屋番号'],['madori','間取り'],['rent','家賃(万)'],['mgmt','管理費(円)'],['area','面積'],['deposit','敷金'],['keyMoney','礼金'],['age','築年'],['structure','構造'],['floor','階'],['address','住所'],['mgmtCo','管理会社名'],['phone','管理会社TEL'],['fax','管理会社FAX'],['propNo','物件番号'],['infoDate','情報公開日'],['rtMedia','R.T.確認媒体']];
 function revItems(){return PROPS.filter(function(p){return p.confirmed===false;});}
 function revCounts(){var it=revItems(),c={un:0,ok:0,mg:0,total:it.length};it.forEach(function(p){var st=p.revStatus||'un';if(st==='ok')c.ok++;else if(st==='mg')c.mg++;else c.un++;});return c;}
 function rvToggleList(){RVLISTOPEN=!RVLISTOPEN;renderReview();}
@@ -1584,7 +1587,7 @@ function listCard(p,_a){
   +'<div class="info">'+[p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ ')+'</div>'
   +metrics+line2
   +'<div class="suumorow"><span class="suumolb">SUUMOコード</span><input class="suumoin'+(p.suumoCode?'':' empty')+'" value="'+esc(p.suumoCode||'')+'" placeholder="未登録 — ここに入力" onchange="setSuumo(\''+p.id+'\',this.value)"><button class="btn-sm" onclick="copyText(this.previousElementSibling.value,\'SUUMOコード\')">コピー</button></div>'
-  +'<div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="muted" style="font-size:11px">状況メモ:</span>'+memoChip(p)+'<span class="muted" style="font-size:10.5px">登録 '+(p.uploadDate||'—')+'</span></div>'
+  +'<div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="muted" style="font-size:11px">状況メモ:</span>'+memoChip(p)+'<span class="muted" style="font-size:10.5px">情報公開 '+(p.infoDate||'—')+' ・ アップ '+(p.uploadDate||'—')+' ・ 掲載 '+(p.listDate||'—')+'</span></div>'
   +'<div class="det">'+infoCard(p,_a)+'<button class="pdfbtn" onclick="viewPdf(\''+p.id+'\')">'+ic('doc')+'PDFを見る</button><button class="pdfbtn" onclick="pickPdf(\''+p.id+'\')">'+ic('clip')+'PDFを追加/差し替え</button>'+statusBlock(p)
   +'<div class="row" style="gap:6px;margin-top:10px">'
   +(p.status==='掲載中'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\')">落とし済み</button>':'')
@@ -2034,7 +2037,7 @@ async function processHankyo(file){
    p.stations=_sts;if(_main){p.station=_main.sta;p.line=_main.line;p.walkMin=_main.walkMin;p.waku=autoWakuImport(_main.sta,mad,String(totFromParts(rent,mgmtV)||'0'));}
    PROPS.push(p);created++;
   }else{matched++;if(code&&!p.suumoCode)p.suumoCode=code;p.stations=_sts;if(p.waku!=='Insight'&&p.waku!=='High-Hold'&&p.waku!=='その他'&&_main){p.station=_main.sta;p.line=_main.line;p.walkMin=_main.walkMin;p.waku=autoWakuImport(_main.sta,mad,String(totFromParts(rent,mgmtV)||p.rent||'0'));}}
-  if(first){if(!p.suumoListStart)p.suumoListStart=first;if(!p.listDate)p.listDate=first;}
+  if(first){p.suumoListStart=first;p.listDate=first;} // CSVが正：掲載日はCSVで上書き
   if(!HIST[repDate])HIST[repDate]={};
   HIST[repDate][p.id]=Object.assign(HIST[repDate][p.id]||{},{inqB:inq,score:p.csvScore||'',b0:p.belowCount||'',b1:p.t1Count||'',b2:p.t2Count||'',b3:p.t3Count||'',comp:(p.compTotal||''),photo:p.photoCount||'',sp:!!p.storePick,sa:!!p.specArea,vd:!!p.video,status:p.status||'',rent:p.rent||'',mgmt:p.mgmt||''}); // pv(PCのみ)は取り込まない。PVはビジコンから
   Object.keys(EVENTS).forEach(k=>{if(k.indexOf('X|'+repDate+'|'+p.id+'|')===0)delete EVENTS[k];});
