@@ -2192,6 +2192,9 @@ function renderOpt(){
 }
 
 // ---------- CSV IMPORT ----------
+function fileToB64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){try{var u8=new Uint8Array(r.result);var bs='';for(var i=0;i<u8.length;i++)bs+=String.fromCharCode(u8[i]);res(btoa(bs));}catch(e){rej(e);}};r.onerror=rej;r.readAsArrayBuffer(file);});}
+async function saveImportFileToDrive(b64,name,mime,date){if(!API||!b64)return false;try{var body=JSON.stringify({action:'savePdf',sub:'取込ファイル',name:name,mime:mime||'application/octet-stream',date:date||today(),data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();return !!(d&&d.ok);}catch(e){return false;}}
+async function archiveImport(file,label,date){try{if(!API||!file)return;var b64=await fileToB64(file);var ext=((file.name||'').split('.').pop()||'').toLowerCase();var mime=ext==='csv'?'text/csv':(ext==='xls'?'application/vnd.ms-excel':(ext==='xlsx'?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'application/octet-stream'));var fn=label+'_'+(date||today())+'.'+(ext||'dat');var ok=await saveImportFileToDrive(b64,fn,mime,date);if(ok)toast('元ファイルをドライブに保管しました（取込ファイル/'+(date||today())+'）');}catch(e){}}
 function setupCSV(){const dz=document.getElementById('csvdrop'),inp=document.getElementById('csvin');
  dz.addEventListener('click',()=>inp.click());
  ['dragenter','dragover'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('over');}));
@@ -2217,15 +2220,15 @@ function findProp(name,code,room){
 }
 async function processCSV(file){
  const txt=await readCSVText(file);
- processCSVText(txt);
+ processCSVText(txt,file);
 }
-function processCSVText(txt){
+function processCSVText(txt,file){
  const lines=txt.split(/\r?\n/).filter(l=>l.trim());
  if(lines.length<2){log('CSVが空です。','err');return;}
  const hdr=parseCSVRow(lines[0]).map(h=>h.trim());
  const rows=lines.slice(1).map(parseCSVRow);
  if(colFind(hdr,['受信日時'])>=0){processJDS(hdr,rows);return;}
- if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){promptBijikon(hdr,rows);return;}
+ if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){promptBijikon(hdr,rows,file);return;}
  log('CSVの形式を認識できませんでした。JDS（反響）または ビジコン（PV詳細）を入れてください。','err');
 }
 async function processHankyo(file){
@@ -2292,6 +2295,7 @@ async function processHankyo(file){
   }
  }
  recompute();saveAll();
+ archiveImport(file,'反響報告書',repDate);
  log('反響報告書取込：'+repDate+'分 '+total+'行（更新'+matched+'件／新規'+created+'件）。反響・オプション・名寄点数・競合数・掲載開始日を反映（PVはPC閲覧のみのため取り込まず、PVはビジコンから取得します）。','ok');
 }
 function processJDS(hdr,rows){
@@ -2320,8 +2324,8 @@ function processJDS(hdr,rows){
  const mc=Object.keys(seenProps).length;
  log('JDS取込：'+total+'行を処理（蓄積イベント '+added+'件）。'+mc+'物件にマッチ。同じファイルを再投入しても二重計上しません。','ok');
 }
-function promptBijikon(hdr,rows){
- bijikonPending={hdr:hdr,rows:rows};
+function promptBijikon(hdr,rows,file){
+ bijikonPending={hdr:hdr,rows:rows,file:file||null};
  document.getElementById('csvpending').innerHTML=
   '<div class="card fade"><div style="font-size:13px;font-weight:650">ビジコン（PV詳細）を検出</div>'
   +'<div class="note" style="margin-top:4px">このデータの対象日を指定してください（前々日が既定）。同じ日付を入れ直すと上書きされ、二重になりません。</div>'
@@ -2375,7 +2379,8 @@ function applyBijikon(){
  let ended=0;
  PROPS.forEach(p=>{if(p.status==='掲載中'&&!seen[p.id]){p.status='落とし済み';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン未掲載のため掲載終了',ts:nowTS()});ended++;}});
  recompute();saveAll();
- bijikonPending=null;document.getElementById('csvpending').innerHTML='';
+ var _bjfile=bijikonPending&&bijikonPending.file;bijikonPending=null;document.getElementById('csvpending').innerHTML='';
+ if(_bjfile)archiveImport(_bjfile,'ビジコン',date);
  log('ビジコン取込：'+date+'分。更新'+matched+'件／新規'+created+'件／掲載終了'+ended+'件。PV・一覧PV・オプション・名寄点数・競合数を反映（新規はC印・基本情報は反響報告書で補完されます）。','ok');
 }
 function log(msg,kind){
