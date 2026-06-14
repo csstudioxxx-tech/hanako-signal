@@ -2653,7 +2653,7 @@ function renderOpt(){
 // ---------- CSV IMPORT ----------
 function fileToB64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){try{var u8=new Uint8Array(r.result);var bs='';for(var i=0;i<u8.length;i++)bs+=String.fromCharCode(u8[i]);res(btoa(bs));}catch(e){rej(e);}};r.onerror=rej;r.readAsArrayBuffer(file);});}
 async function saveImportFileToDrive(b64,name,mime,date){if(!API||!b64)return false;try{var body=JSON.stringify({action:'savePdf',sub:'取込ファイル',replaceSame:true,name:name,mime:mime||'application/octet-stream',date:date||today(),data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();return !!(d&&d.ok);}catch(e){return false;}}
-async function archiveImport(file,label,date){try{if(!API||!file)return;var b64=await fileToB64(file);var ext=((file.name||'').split('.').pop()||'').toLowerCase();var mime=ext==='csv'?'text/csv':(ext==='xls'?'application/vnd.ms-excel':(ext==='xlsx'?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'application/octet-stream'));var fn=label+'_'+(date||today())+'.'+(ext||'dat');var ok=await saveImportFileToDrive(b64,fn,mime,date);if(ok)toast('元ファイルをドライブに保管しました（取込ファイル/'+(date||today())+'）');}catch(e){}}
+async function archiveImport(file,label,date){try{if(!API||!file)return;var b64=await fileToB64(file);var ext=((file.name||'').split('.').pop()||'').toLowerCase();var mime=ext==='csv'?'text/csv':(ext==='xls'?'application/vnd.ms-excel':(ext==='xlsx'?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'application/octet-stream'));var fn=(date||today()).replace(/-/g,'.')+'-'+label+'.'+(ext||'dat');var ok=await saveImportFileToDrive(b64,fn,mime,date);if(ok)toast('元ファイルをドライブに保管しました（取込ファイル/'+(date||today())+'）');}catch(e){}}
 function setupCSV(){const dz=document.getElementById('csvdrop'),inp=document.getElementById('csvin');
  dz.addEventListener('click',()=>inp.click());
  ['dragenter','dragover'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('over');}));
@@ -2912,7 +2912,7 @@ function applyBijikon(forceDate){
  var _bff=freshFastSweep();var _bik=autoIkariSweep();
  recompute();saveAll();
  var _bjfile=bijikonPending&&bijikonPending.file;bijikonPending=null;document.getElementById('csvpending').innerHTML='';
- if(_bjfile)archiveImport(_bjfile,'ビジコン',date);
+ if(_bjfile)archiveImport(_bjfile,'ビジコンCSV',date);
  log('ビジコン取込：'+date+'分。更新'+matched+'件／新規'+created+'件／掲載終了'+ended+'件'+(_bik?'／IKARI自動'+_bik+'件':'')+(_bff?'／新着即上げ'+_bff+'件':'')+'。PV・一覧PV・オプション・名寄点数・競合数を反映（新規はC印・基本情報は反響報告書で補完されます）。','ok');
 }
 function log(msg,kind){
