@@ -509,6 +509,22 @@ header{padding-left:54px}
 .trow b{color:var(--text,#222);font-size:13.5px}
 .treassign select{width:auto;padding:5px 8px;border-radius:8px;font-size:12px;margin-left:4px}
 @media(max-width:720px){.tkpi{grid-template-columns:1fr 1fr}.tkrow{grid-template-columns:22px 56px 1fr auto}}
+.rrpanel{padding:14px}
+.rrhd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px}
+.rrhd .t{font-weight:800;font-size:14.5px}
+.rrhd .rrsub{font-size:11px;color:var(--text2,#888)}
+.rrlist{display:flex;flex-direction:column;gap:8px}
+.rritem{border:1px solid #eceef2;border-radius:12px;padding:10px 12px;background:#fff}
+.rrtop{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.rrtop .nm{font-weight:700;font-size:14px}
+.rrwait{font-size:10px;font-weight:700;color:var(--amber,#b8860b);background:var(--amber-bg,#fdf4dd);padding:1px 7px;border-radius:6px}
+.rrdate{margin-left:auto;font-size:11px;color:var(--text2,#999);font-family:ui-monospace,monospace}
+.rrinfo{font-size:12.5px;color:var(--text2,#666);margin:5px 0 7px}
+.rrmet{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text2,#666)}
+.rrmet b{color:var(--text,#222);font-size:13.5px}
+.rrmet .btn-sm{margin-left:auto}
+.rrmet .btn-sm+.btn-sm{margin-left:0}
+.rrnopdf{font-size:11px;color:var(--text3,#aaa);margin-left:auto}
 </style></head><body>
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <div class="navsc" id="navsc" onclick="navClose()"></div>
@@ -865,7 +881,7 @@ function gprogShow(label){
  _gpn++;
  try{
   var el=document.getElementById('gprog');
-  if(!el){el=document.createElement('div');el.id='gprog';el.innerHTML='<div class="gpcard"><div class="gpring"><svg width="38" height="38" viewBox="0 0 38 38"><circle class="tr" cx="19" cy="19" r="15.5" fill="none" stroke-width="4"/><circle class="pr" cx="19" cy="19" r="15.5" fill="none" stroke-width="4" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg><div class="gppct">0%</div></div><div><div class="gplab">Gemini解析中</div><div class="gpsub"></div></div></div>';document.body.appendChild(el);}
+  if(!el){el=document.createElement('div');el.id='gprog';el.innerHTML='<div class="gpcard"><div class="gpring"><svg width="38" height="38" viewBox="0 0 38 38"><circle class="tr" cx="19" cy="19" r="15.5" fill="none" stroke-width="4"/><circle class="pr" cx="19" cy="19" r="15.5" fill="none" stroke-width="4" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg><div class="gppct">0%</div></div><div><div class="gplab">Gemini解析中</div><div class="gpsub"></div></div></div>';document.body.appendChild(el);el.style.cursor='pointer';el.title='タップで物件登録へ戻る';el.onclick=function(){try{tab('add');}catch(e){}};}
   el.style.display='block';requestAnimationFrame?requestAnimationFrame(function(){el.classList.add('on');}):el.classList.add('on');
   var lb=el.querySelector('.gpsub');if(lb)lb.textContent=label||'';
   if(_gpn===1){_gppct=2;clearInterval(_gpt);_gpt=setInterval(function(){_gppct+=(_gppct<70?(70-_gppct)*0.10:(93-_gppct)*0.05);if(_gppct>93)_gppct=93;_gpset();},180);_gpset();}
@@ -1555,8 +1571,16 @@ function setupDrop(){const dz=document.getElementById('drop'),inp=document.getEl
  dz.addEventListener('drop',ev=>{ev.preventDefault();dz.classList.remove('over');handleFiles(ev.dataTransfer.files);});
  inp.addEventListener('change',ev=>{handleFiles(ev.target.files);inp.value='';});}
 function mkRec(){return{fid:'P'+Date.now()+Math.random().toString(36).slice(2,5),pdfName:'',auto:'',name:'',madori:'',line:'',station:'',walkMin:'',structure:'',age:'',area:'',address:'',mgmtCo:'',fax:'',phone:'',holiday:'',propNo:'',pubDate:'',nearby:'',rent:'',btSep:'',washStand:'',floor:'',deposit:'',keyMoney:'',uploadDate:today(),deadline:nextSun(),commentA:'',commentB:'',analysisMemo:'',prospect:'',waku:'Demand',pendStatus:'',pendMemo:'',rawText:'',pdfData:null};}
-function handleFiles(files){[...files].forEach(f=>{if(!/pdf/i.test(f.type)&&!/\.pdf$/i.test(f.name))return;
- const rec=mkRec();rec.pdfName=f.name;rec.auto='読取中…';PEND.push(rec);renderPend();extractInto(f,rec);});if(PEND.length)tab('add');}
+function handleFiles(files){
+ var fs=[...files].filter(function(f){return /pdf/i.test(f.type)||/\.pdf$/i.test(f.name);});
+ if(!fs.length)return;
+ var recs=fs.map(function(f){var rec=mkRec();rec.pdfName=f.name;rec.auto='読取中…';PEND.push(rec);return {f:f,rec:rec};});
+ renderPend();tab('add');
+ Promise.all(recs.map(function(o){return extractInto(o.f,o.rec);})).then(function(){
+  var ok=recs.filter(function(o){return o.rec.name&&o.rec.auto!=='読取不可（手入力）';}).length;
+  showUploadDone(ok||recs.length);
+ });
+}
 function _needPng(j){return !j||!j.bukken_mei||j.chinryo==null;}
 let GEMERR='';
 async function geminiExtract(b64,mime){gprogShow('Gemini解析中（マイソク読み取り）');try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'extractPdf',data:b64,mime:mime})});var tx=await r.text();var d=null;try{d=JSON.parse(tx);}catch(pe){GEMERR='GAS\u5fdc\u7b54\u304cJSON\u3067\u306f\u3042\u308a\u307e\u305b\u3093\uff08\u518d\u30c7\u30d7\u30ed\u30a4\u672a\u5b9f\u65bd\u304b\u516c\u958b\u8a2d\u5b9a\u306e\u53ef\u80fd\u6027\uff09';return null;}if(d&&d.ok&&d.data){GEMERR='';return d.data;}GEMERR=(d&&d.error)?String(d.error):'GAS\u304c extractPdf \u3092\u51e6\u7406\u3057\u3066\u3044\u307e\u305b\u3093\uff08\u65b0\u30d0\u30fc\u30b8\u30e7\u30f3\u3067\u306e\u518d\u30c7\u30d7\u30ed\u30a4\u304c\u5fc5\u8981\uff09';return null;}catch(e){GEMERR='\u901a\u4fe1\u30a8\u30e9\u30fc: '+e.message;return null;}finally{gprogDone();}}
@@ -1828,7 +1852,7 @@ async function viewPdf(id){var _pp=PROPS.find(function(x){return x.id===id;});if
 function inEd(id,field,val,ph,typ){return '<input class="ined" type="'+(typ||'text')+'" value="'+esc(val==null?'':String(val))+'" placeholder="'+(ph||'')+'" onchange="editProp(\''+id+'\',\''+field+'\',this.value)">';}
 function inSel(id,field,val,opts){return '<select class="ined" onchange="editProp(\''+id+'\',\''+field+'\',this.value)">'+opts.map(function(o){return '<option'+(String(val)===String(o)?' selected':'')+'>'+o+'</option>';}).join('')+'</select>';}
 function editProp(id,field,val){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p[field]=val;recompute();save();updateBadges();}
-function confirmReview(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.confirmed=true;recompute();save();renderReview();toast('確認済みにしました');}
+function confirmReview(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(!p.tantou){toast('担当者をプルダウンで選択してください');return;}p.confirmed=true;recompute();save();renderReview();toast('確認済みにしました');}
 function bjResolve(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.bjOkAt=nowTS();save();renderReview();toast('修正済みにしました');}
 function bjApply(id,field,raw){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(field==='storePick'||field==='specArea'||field==='video')p[field]=(raw==='○'||raw===true||raw==='true');else p[field]=raw;recompute();save();renderReview();updateBadges();}
 function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
@@ -1911,12 +1935,29 @@ function revMarkOk(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)re
 function revToggleMg(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.revStatus=(p.revStatus==='mg')?'un':'mg';save();renderReview();updateBadges();if(p.revStatus==='mg'){var t=document.getElementById('rv_mgmemo');if(t)t.focus();toast('マネージャー要確認にしました（このページに残ります）');}}
 function revMgMemo(id,v){var p=PROPS.find(function(x){return x.id===id;});if(p){p.mgMemo=v;save();}}
 function revEquip(id,ck){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.equipOk=ck;save();var g=document.getElementById('rv_gate');if(g)g.classList.toggle('done',ck);document.querySelectorAll('[data-chipkey="__equip"]').forEach(function(c){c.classList.toggle('done',ck);});}
-function revRegister(){var ok=revItems().filter(function(p){return (p.revStatus||'un')==='ok';});if(!ok.length){toast('確認済みの物件がありません');return;}ok.forEach(function(p){p.confirmed=true;p.revStatus='un';});recompute();save();updateBadges();CURREV=null;renderReview();toast(ok.length+'件を入稿ページへ登録しました（確認済みのみ移動）');}
+function revRegister(){var all=revItems().filter(function(p){return (p.revStatus||'un')==='ok';});var ok=all.filter(function(p){return !!p.tantou;});var noT=all.length-ok.length;if(!ok.length){toast(noT?'担当者が未選択の物件があります。担当者をプルダウンで選んでください':'確認済みの物件がありません');return;}ok.forEach(function(p){p.confirmed=true;p.revStatus='un';});recompute();save();updateBadges();CURREV=null;renderReview();toast(ok.length+'件を入稿ページへ登録しました'+(noT?'（担当者未選択 '+noT+'件は保留）':'（確認済みのみ移動）'));}
 var STAFF=['弘中','横山','宮本','田邊','生沼'];
 function tantouTag(p){return p.tantou?('<span class="ttag">'+esc(p.tantou)+'</span>'):'';}
 function tantouSet(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.tantou=v||'';save();updateBadges();if(CURTAB==='review'||CURTAB==='regconf')renderReview();else if(CURTAB==='tantou')renderTantou();else if(CURTAB==='list')renderList();else if(CURTAB==='dash')renderDash();}
 function _isoBackN(n){var d=new Date();d.setDate(d.getDate()-n);return _ymd(d);}
 function staffAgg(name){var ps=PROPS.filter(function(p){return p.tantou===name;});var pv=0,inq=0,inqB=0,live=0,pre=0;ps.forEach(function(p){pv+=+(p.csvPV||0);inq+=+(p.csvInq||0);inqB+=+(p.csvInqB||0);if(p.status==='掲載中')live++;else if(p.status==='要入稿')pre++;});var wk=_isoBackN(7);var wkN=ps.filter(function(p){return (p.regDate||'')>=wk;}).length;return {name:name,props:ps,count:ps.length,live:live,pre:pre,pv:pv,inq:inq,inqB:inqB,week:wkN};}
+function recentRegItems(days){var cut=_isoBackN(days);return PROPS.filter(function(p){return p.tantou&&(p.regDate||'')>=cut;}).sort(function(a,b){var d=String(b.regDate||'').localeCompare(String(a.regDate||''));return d||String(b.id||'').localeCompare(String(a.id||''));});}
+function recentRegPanel(){
+ var items=recentRegItems(3);
+ var h='<div class="card fade rrpanel"><div class="rrhd"><span class="t">直近3日の登録物件（全員）</span><span class="rrsub">担当者設定済み・入稿前も含めて表示 ／ '+items.length+'件</span></div>';
+ if(!items.length){h+='<div class="empty" style="padding:14px">直近3日に登録された物件はありません。</div></div>';return h;}
+ h+='<div class="rrlist">'+items.map(function(p){
+   var has=listHasPdf(p);var pv=+(p.csvPV||0),inq=+(p.csvInq||0);
+   var sc=p.status==='要入稿'?'p-pre':p.status==='掲載中'?'p-act':'p-done';
+   var stx=(p.confirmed===false)?'<span class="rrwait">データ確認中</span>':'';
+   return '<div class="rritem"><div class="rrtop">'+tantouTag(p)+nmLink(p)+csBadge(p)+'<span class="pill '+sc+'">'+p.status+'</span>'+stx+'<span class="rrdate">登録 '+(p.regDate||'—')+'</span></div>'
+     +'<div class="rrinfo">'+([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ ')||'情報未入力')+'</div>'
+     +'<div class="rrmet"><span>PV <b>'+pv.toLocaleString()+'</b></span><span>反響 <b>'+inq+'</b></span>'
+     +(has?'<button class="btn-sm" onclick="viewPdf(\''+p.id+'\')">PDF確認</button>':'<span class="rrnopdf">PDFなし</span>')
+     +'<button class="btn-sm btn-sec" onclick="openProp(\''+p.id+'\')">情報を見る</button></div></div>';
+ }).join('')+'</div></div>';
+ return h;
+}
 function dashStaffCard(){
  var arr=STAFF.map(function(nm){return staffAgg(nm);});
  if(!arr.some(function(a){return a.count>0;}))return '';
@@ -1939,7 +1980,7 @@ function renderTantou(){
  recompute();
  var host=document.getElementById('tantoubody');if(!host)return;
  if(!TANTOU_WHO||STAFF.indexOf(TANTOU_WHO)<0)TANTOU_WHO=STAFF[0];
- var h='<div class="tsel">'+STAFF.map(function(nm){var a=staffAgg(nm);return '<button class="'+(TANTOU_WHO===nm?'on':'')+'" onclick="setTantouWho(\''+nm+'\');renderTantou()">'+esc(nm)+'<small>'+a.count+'件</small></button>';}).join('')+'</div>';
+ var h=recentRegPanel();h+='<div class="sec-h" style="margin-top:18px">担当者別の成績</div>';h+='<div class="tsel">'+STAFF.map(function(nm){var a=staffAgg(nm);return '<button class="'+(TANTOU_WHO===nm?'on':'')+'" onclick="setTantouWho(\''+nm+'\');renderTantou()">'+esc(nm)+'<small>'+a.count+'件</small></button>';}).join('')+'</div>';
  var a=staffAgg(TANTOU_WHO);
  h+='<div class="tkpi">'
    +'<div class="tk"><div class="l">担当物件</div><div class="n">'+a.count+'</div><div class="s">掲載中 '+a.live+' ／ 要入稿 '+a.pre+'</div></div>'
@@ -1954,7 +1995,7 @@ function renderTantou(){
  host.innerHTML=h;
 }
 function regConfirmDone(){
- var okN=0;PROPS.forEach(function(p){if(p.confirmed===false&&REG_SCOPE&&REG_SCOPE.indexOf(p.id)>=0&&(p.revStatus||'un')==='ok'){p.confirmed=true;p.revStatus='un';okN++;}});
+ var okN=0;PROPS.forEach(function(p){if(p.confirmed===false&&REG_SCOPE&&REG_SCOPE.indexOf(p.id)>=0&&(p.revStatus||'un')==='ok'&&p.tantou){p.confirmed=true;p.revStatus='un';okN++;}});
  var leftover=PROPS.filter(function(p){return p.confirmed===false&&REG_SCOPE&&REG_SCOPE.indexOf(p.id)>=0;}).length;
  recompute();save();updateBadges();REG_SCOPE=null;CURREV=null;
  if(okN){toast(okN+'件を要入稿へ登録しました'+(leftover?('／'+leftover+'件は要データ確認に残ります'):''));tab('staff');}
@@ -3677,6 +3718,15 @@ function uiConfirm(msg,onYes){
  ov.querySelector('#_mno').onclick=()=>ov.remove();
  ov.querySelector('#_myes').onclick=()=>{ov.remove();onYes();};
  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+}
+function showUploadDone(n){
+ if(!n)return;
+ var ov=document.createElement('div');ov.className='ovl';
+ ov.innerHTML='<div class="modal"><div class="mmsg" style="text-align:center"><div style="margin-bottom:6px"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.4 12.3l2.3 2.3 4.8-5"/></svg></div><div style="font-weight:800;font-size:16px;margin-bottom:4px">無事にアップできました</div><div style="font-size:13px;color:var(--text2);line-height:1.6">マイソクを '+n+' 件 読み込みました。<br>内容を確認して担当者を選び、登録に進めます。</div></div><div class="mbtns"><button class="btn btn-sec" id="_udclose">閉じる</button><button class="btn btn-pri" id="_udgo">アップしたデータを確認する</button></div></div>';
+ document.body.appendChild(ov);
+ ov.querySelector('#_udclose').onclick=function(){ov.remove();};
+ ov.querySelector('#_udgo').onclick=function(){ov.remove();tab('add');};
+ ov.onclick=function(e){if(e.target===ov)ov.remove();};
 }
 
 // ---------- backup ----------
