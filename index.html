@@ -525,6 +525,40 @@ header{padding-left:54px}
 .rrmet .btn-sm{margin-left:auto}
 .rrmet .btn-sm+.btn-sm{margin-left:0}
 .rrnopdf{font-size:11px;color:var(--text3,#aaa);margin-left:auto}
+/* ===== 案C 読み込み＆所感ステッパー ===== */
+.rsbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.rsbar .rst{font-size:15px;font-weight:800}
+.rsbar .rssub{font-size:12px;color:var(--text2)}
+.rsbar .rsgo{width:auto;margin-left:auto;padding:9px 16px}
+.rschips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.rschip{appearance:none;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;color:var(--text2)}
+.rschip.done{color:var(--green);border-color:#bfe6d3}
+.rschip.load{color:var(--amber)}
+.rschip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.rscard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;max-width:620px}
+.rsprev{height:150px;border:1px dashed var(--border);border-radius:var(--r2);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--text3);margin-bottom:13px}
+.rsprev span{font-size:12px}
+.rsname{font-size:16px;font-weight:800}
+.rsloading{display:inline-flex;align-items:center;gap:6px;color:var(--text2);font-weight:600;font-size:14px}
+.rsinfo{font-size:13px;color:var(--text2);margin-top:4px}
+.rslab{font-size:11.5px;font-weight:700;color:var(--text2);margin:14px 0 6px}
+.rsshokan{width:100%;min-height:96px;font-size:14px;padding:11px 13px;border:1px solid var(--border);border-radius:var(--r2);font-family:inherit;background:var(--bg);resize:vertical}
+.rsshokan:focus{outline:none;border-color:var(--accent);background:#fff}
+.rsnav{display:flex;align-items:center;gap:10px;margin-top:14px}
+.rsnav .btn{width:auto;padding:9px 16px}
+.rsnav .rspos{margin-left:auto;margin-right:auto;font-size:12px;color:var(--text2);font-family:ui-monospace,monospace}
+.kshokan{background:var(--amber-bg);border:1px solid #ecdca8;border-radius:var(--r2);padding:11px 13px;margin-bottom:12px}
+.kshokan-h{font-size:11.5px;font-weight:700;color:var(--amber);margin-bottom:7px;letter-spacing:.03em}
+.kshokan textarea{width:100%;min-height:64px;font-size:13.5px;padding:9px 11px;border:1px solid #e6d9b0;border-radius:8px;font-family:inherit;background:#fff;resize:vertical}
+.kshokan textarea:focus{outline:none;border-color:var(--amber)}
+.staffsum{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2)}
+.staffsum-t{font-size:13px;font-weight:800}
+.stcnt{font-size:12px;color:var(--text2);background:var(--bg);border:1px solid var(--border2);border-radius:999px;padding:3px 10px}
+.stcnt b{color:var(--accent2);font-size:13px;margin-left:2px}
+.stcnt.none{color:var(--text3)}
+.stcnt.none b{color:var(--amber)}
+.rsdup{display:flex;align-items:flex-start;gap:8px;background:#fbecea;border:1px solid #f0c2b0;color:#a83a35;border-radius:var(--r2);padding:10px 12px;margin-bottom:12px;font-size:12.5px;line-height:1.6}
+.rsdup b{display:block;font-size:13px;margin-bottom:1px}
 </style></head><body>
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <div class="navsc" id="navsc" onclick="navClose()"></div>
@@ -598,6 +632,7 @@ header{padding-left:54px}
 <div id="v-drop" style="display:none"><div id="dropbody"></div></div>
 <div id="v-review" style="display:none"><div id="reviewbody"></div></div>
 <div id="v-tantou" style="display:none"><div id="tantoubody"></div></div>
+<div id="v-regstep" style="display:none"><div id="regstepbody"></div></div>
 <div id="v-report" style="display:none"><div id="reportbody"></div></div>
 <div id="v-mbank" style="display:none"><div id="mbankbody"></div></div>
 <div id="v-gbank" style="display:none"><div id="gbankbody"></div></div>
@@ -698,7 +733,7 @@ async function load(){
   if(!p.statusLog)p.statusLog=[];
   if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';if(p.stations==null)p.stations=[];if(p.waku==='未分類')p.waku='その他';if(p.media==null)p.media='';if(p.mediaOther==null)p.mediaOther='';if(p.rtMedia==null)p.rtMedia='-';if(p.rtUrl==null)p.rtUrl='';if(p.vacancyLog==null)p.vacancyLog=[];if(p.revStatus==null)p.revStatus='un';if(p.mgMemo==null)p.mgMemo='';if(p.equipOk==null)p.equipOk=false;['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
   if(p.csvPV==null)p.csvPV=0;if(p.csvInq==null)p.csvInq=0;if(p.csvInqB==null)p.csvInqB=0;
-  if(p.tantou==null)p.tantou='';if(p.regDate==null)p.regDate=(p.listDate||((p.wakuLog&&p.wakuLog[0]&&p.wakuLog[0].date)||''));
+  if(p.tantou==null)p.tantou='';if(p.regDate==null)p.regDate=(p.listDate||((p.wakuLog&&p.wakuLog[0]&&p.wakuLog[0].date)||''));if(p.shokan==null)p.shokan='';
   if(p.csvAsOf==null)p.csvAsOf='';
   if(p.optReviewed==null)p.optReviewed=false;if(p.compDataAt==null)p.compDataAt='';if(p.optAppliedAt==null)p.optAppliedAt='';
   if(p.needShoot==null)p.needShoot=false;if(p.shootDate==null)p.shootDate='';if(p.subStdJudge==null)p.subStdJudge='';if(p.subStdAction==null)p.subStdAction='';
@@ -881,7 +916,7 @@ function gprogShow(label){
  _gpn++;
  try{
   var el=document.getElementById('gprog');
-  if(!el){el=document.createElement('div');el.id='gprog';el.innerHTML='<div class="gpcard"><div class="gpring"><svg width="38" height="38" viewBox="0 0 38 38"><circle class="tr" cx="19" cy="19" r="15.5" fill="none" stroke-width="4"/><circle class="pr" cx="19" cy="19" r="15.5" fill="none" stroke-width="4" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg><div class="gppct">0%</div></div><div><div class="gplab">Gemini解析中</div><div class="gpsub"></div></div></div>';document.body.appendChild(el);el.style.cursor='pointer';el.title='タップで物件登録へ戻る';el.onclick=function(){try{tab('add');}catch(e){}};}
+  if(!el){el=document.createElement('div');el.id='gprog';el.innerHTML='<div class="gpcard"><div class="gpring"><svg width="38" height="38" viewBox="0 0 38 38"><circle class="tr" cx="19" cy="19" r="15.5" fill="none" stroke-width="4"/><circle class="pr" cx="19" cy="19" r="15.5" fill="none" stroke-width="4" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg><div class="gppct">0%</div></div><div><div class="gplab">Gemini解析中</div><div class="gpsub"></div></div></div>';document.body.appendChild(el);el.style.cursor='pointer';el.title='タップで読み込み画面へ戻る';el.onclick=function(){try{tab('regstep');}catch(e){}};}
   el.style.display='block';requestAnimationFrame?requestAnimationFrame(function(){el.classList.add('on');}):el.classList.add('on');
   var lb=el.querySelector('.gpsub');if(lb)lb.textContent=label||'';
   if(_gpn===1){_gppct=2;clearInterval(_gpt);_gpt=setInterval(function(){_gppct+=(_gppct<70?(70-_gppct)*0.10:(93-_gppct)*0.05);if(_gppct>93)_gppct=93;_gpset();},180);_gpset();}
@@ -1278,10 +1313,10 @@ function navInit(){try{_autoPaused=localStorage.getItem('ibt_autopause')==='1';}
 function tab(t){
  if(DEVTABS.indexOf(t)>=0&&!devOK()){DEVPEND=t;t='devlock';}
  CURTAB=t;
- var ALL=['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank','del','is','plan','tantou','devlock'];
+ var ALL=['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank','del','is','plan','tantou','regstep','devlock'];
  ALL.forEach(x=>{var _sh=(x===t)||(t==='regconf'&&x==='review');var v=document.getElementById('v-'+x);if(v)v.style.display=_sh?'':'none';var b=document.getElementById('tb-'+x);if(b)b.className=_sh?'sn-it on':'sn-it';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();
- var _W=document.querySelector('.wrap');if(_W)_W.classList.toggle('wide',['review','staff','mbank','gbank','del','is','plan','regconf','tantou'].indexOf(t)>=0);
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();
+ var _W=document.querySelector('.wrap');if(_W)_W.classList.toggle('wide',['review','staff','mbank','gbank','del','is','plan','regconf','tantou','regstep'].indexOf(t)>=0);
  var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}
  navClose();
  updateBadges();}
@@ -1570,12 +1605,12 @@ function setupDrop(){const dz=document.getElementById('drop'),inp=document.getEl
  ['dragleave','dragend'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove('over');}));
  dz.addEventListener('drop',ev=>{ev.preventDefault();dz.classList.remove('over');handleFiles(ev.dataTransfer.files);});
  inp.addEventListener('change',ev=>{handleFiles(ev.target.files);inp.value='';});}
-function mkRec(){return{fid:'P'+Date.now()+Math.random().toString(36).slice(2,5),pdfName:'',auto:'',name:'',madori:'',line:'',station:'',walkMin:'',structure:'',age:'',area:'',address:'',mgmtCo:'',fax:'',phone:'',holiday:'',propNo:'',pubDate:'',nearby:'',rent:'',btSep:'',washStand:'',floor:'',deposit:'',keyMoney:'',uploadDate:today(),deadline:nextSun(),commentA:'',commentB:'',analysisMemo:'',prospect:'',waku:'Demand',pendStatus:'',pendMemo:'',rawText:'',pdfData:null};}
+function mkRec(){return{fid:'P'+Date.now()+Math.random().toString(36).slice(2,5),pdfName:'',auto:'',name:'',madori:'',line:'',station:'',walkMin:'',structure:'',age:'',area:'',address:'',mgmtCo:'',fax:'',phone:'',holiday:'',propNo:'',pubDate:'',nearby:'',rent:'',btSep:'',washStand:'',floor:'',deposit:'',keyMoney:'',uploadDate:today(),deadline:nextSun(),commentA:'',commentB:'',analysisMemo:'',prospect:'',waku:'Demand',pendStatus:'',pendMemo:'',shokan:'',rawText:'',pdfData:null};}
 function handleFiles(files){
  var fs=[...files].filter(function(f){return /pdf/i.test(f.type)||/\.pdf$/i.test(f.name);});
  if(!fs.length)return;
  var recs=fs.map(function(f){var rec=mkRec();rec.pdfName=f.name;rec.auto='読取中…';PEND.push(rec);return {f:f,rec:rec};});
- renderPend();tab('add');
+ renderPend();REGSTEP_I=0;tab('regstep');
  Promise.all(recs.map(function(o){return extractInto(o.f,o.rec);})).then(function(){
   var ok=recs.filter(function(o){return o.rec.name&&o.rec.auto!=='読取不可（手入力）';}).length;
   showUploadDone(ok||recs.length);
@@ -1670,7 +1705,7 @@ async function extractInto(file,rec){
  if(API&&rec.pdfData){try{
   var gj=await geminiExtract(rec.pdfData,'application/pdf');
   if(_needPng(gj)){var png=await pdfToPng(file);if(png){var gj2=await geminiExtract(png,'image/png');if(gj2&&gj2.bukken_mei)gj=gj2;}}
-  if(gj&&gj.bukken_mei){mapGemini(gj,rec);try{var _rawc=await pdfText(file);fillContacts(rec,_rawc);}catch(e){}if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');renderPend();return;}
+  if(gj&&gj.bukken_mei){mapGemini(gj,rec);try{var _rawc=await pdfText(file);fillContacts(rec,_rawc);}catch(e){}if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');renderPend();if(CURTAB==='regstep')renderRegStep();return;}
  }catch(e){}}
  try{const raw=await pdfText(file);const f=extractFields(raw,file.name);
   const okread=f._readable,manual=f._manual,mr=f._manualReason||'';
@@ -1682,8 +1717,32 @@ async function extractInto(file,rec){
   if(rec.station&&rec.madori)rec.waku=autoWaku(rec.station,rec.madori,String(totFromParts(rec.rent,rec.mgmtFee)||'0'));
   rec.rawText=raw.normalize('NFKC').replace(/\u2ec4/g,'\u897f').slice(0,2000);
  }catch(e){rec.auto='読取不可（手入力）';}
- renderPend();}
+ renderPend();if(CURTAB==='regstep')renderRegStep();}
 function addBlank(){const r=mkRec();r.pdfName='手動入力';r.auto='手動';PEND.push(r);renderPend();tab('add');}
+var REGSTEP_I=0;
+function regStepGo(i){var n=PEND.length;if(!n)return;REGSTEP_I=Math.max(0,Math.min(n-1,i));renderRegStep();}
+function setPendShokan(i,v){if(PEND[i])PEND[i].shokan=v;}
+function viewPendPdf(i){var p=PEND[i];if(!p||!p.pdfData){toast('PDFがありません');return;}try{var bin=atob(p.pdfData);var u8=new Uint8Array(bin.length);for(var k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));var w=window.open(url,'_blank');if(!w){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}setTimeout(function(){URL.revokeObjectURL(url);},60000);}catch(e){toast('PDFを開けませんでした');}}
+function renderRegStep(){
+ var host=document.getElementById('regstepbody');if(!host)return;
+ var n=PEND.length;
+ if(!n){host.innerHTML='<div class="empty" style="padding:20px">読み込み中の物件はありません。<br>「物件登録」でマイソクを取り込むと、ここで所感を書きながら順番に確認できます。</div>';return;}
+ if(REGSTEP_I>=n)REGSTEP_I=n-1;if(REGSTEP_I<0)REGSTEP_I=0;
+ var doneN=PEND.filter(function(p){return p.auto!=='読取中…';}).length;
+ var h='<div class="rsbar"><span class="rst">読み込み＆所感</span><span class="rssub">読込完了 '+doneN+' / '+n+'</span><button class="btn btn-pri rsgo" '+(doneN?'':'disabled')+' onclick="savePend()">読み込めた'+doneN+'件をデータ確認へ</button></div>';
+ h+='<div class="rschips">'+PEND.map(function(p,i){var rd=p.auto!=='読取中…';var ic=rd?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10.5"/></svg>':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>';return '<button class="rschip'+(i===REGSTEP_I?' on':'')+(rd?' done':' load')+'" onclick="regStepGo('+i+')">'+ic+'<span>'+(i+1)+'</span></button>';}).join('')+'</div>';
+ var p=PEND[REGSTEP_I];var rd=p.auto!=='読取中…';
+ var dup=rd?pendDup(p):null;
+ h+='<div class="rscard">';
+ if(dup)h+='<div class="rsdup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b>既に登録済みの可能性</b>「'+esc(dup.name||'')+(dup.room?' '+esc(dup.room):'')+'」が既にあります（担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+' ・ 登録 '+esc(dup.regDate||dup.listDate||'—')+'）。このまま進めると重複登録になります（データ確認へ送る際に自動でスキップされます）。</div></div>';
+ h+='<div class="rsprev"'+(p.pdfData?' onclick="viewPendPdf('+REGSTEP_I+')" style="cursor:pointer"':'')+'><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><span>'+(p.pdfData?'マイソクを開く':'PDFなし')+'</span></div>';
+ h+='<div class="rsname">'+(rd?esc(p.name||p.pdfName||'(名称未設定)'):'<span class="rsloading"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>読込中… '+esc(p.pdfName)+'</span>')+'</div>';
+ h+='<div class="rsinfo">'+(([p.station,p.walkMin?'徒歩'+p.walkMin:'',p.madori,rentMan(p)].filter(Boolean).join(' ・ '))||(rd?'情報なし':'解析中…'))+'</div>';
+ h+='<div class="rslab">担当者所感（登録後は物件詳細でも編集できます）</div><textarea class="rsshokan" placeholder="この物件の所感（強み・競合・推し方・気になる点…）読み込み中でも書けます" oninput="setPendShokan('+REGSTEP_I+',this.value)">'+esc(p.shokan||'')+'</textarea>';
+ h+='<div class="rsnav"><button class="btn btn-sec" '+(REGSTEP_I<=0?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I-1)+')">‹ 前へ</button><span class="rspos">'+(REGSTEP_I+1)+' / '+n+'</span><button class="btn btn-sec" '+(REGSTEP_I>=n-1?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I+1)+')">次へ ›</button></div>';
+ h+='</div>';
+ host.innerHTML=h;
+}
 function statusChips(idx){return STATUSES.map(s=>'<button type="button" class="chip" onclick="pendStat('+idx+',\''+s+'\',this)">'+s+'</button>').join('');}
 function pendStat(i,s,el){PEND[i].pendStatus=(PEND[i].pendStatus===s?'':s);[...el.parentNode.children].forEach(c=>c.classList.remove('on'));if(PEND[i].pendStatus)el.classList.add('on');}
 function wakuChips(i){const opts=['Demand','Opportunity','Insight','High-Hold','IKARI','その他'];return '<div class="chips">'+opts.map(w=>'<button type="button" class="chip'+(PEND[i].waku===w?' on':'')+'" onclick="setPendWaku('+i+',\''+w+'\')">'+w+'</button>').join('')+'</div>';}
@@ -1743,8 +1802,9 @@ async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var _dt
 function pendDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
 async function savePend(){
  const doSave=async()=>{
- var skipped=[];var _uploads=[];var _newIds=[];
+ var skipped=[];var _uploads=[];var _newIds=[];var remain=[];
  PEND.forEach(p=>{
+  if(p.auto==='読取中…'){remain.push(p);return;}
   if(pendDup(p)){skipped.push(p.name||p.pdfName);return;}
   const id='PR'+Date.now()+Math.random().toString(36).slice(2,5);
   const log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});
@@ -1753,11 +1813,11 @@ async function savePend(){
    structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,
    propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',
    uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,
-   statusLog:log,regDate:today(),tantou:'',listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
+   statusLog:log,regDate:today(),tantou:'',shokan:(p.shokan||''),listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
    csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
   _newIds.push(id);if(p.pdfData)_uploads.push({id:id,b64:p.pdfData});});
   var _dn=0;for(var _u=0;_u<_uploads.length;_u++){var _pp=PROPS.find(function(x){return x.id===_uploads[_u].id;});var _ok=false;if(_pp){_ok=await uploadPdfToDrive(_pp,_uploads[_u].b64);}if(_ok)_dn++;else{try{await gset('pdf_'+_uploads[_u].id,_uploads[_u].b64);}catch(e){}}}
-  await save();var _added=PEND.length-skipped.length;PEND=[];renderPend();toast(_added+'件登録'+(skipped.length?'（重複'+skipped.length+'件スキップ）':'')+(_uploads.length?'／PDFドライブ保存 '+_dn+'/'+_uploads.length:''));if(_newIds.length){REG_SCOPE=_newIds;CURREV=_newIds[0];tab('regconf');}else{tab('review');}
+  await save();var _added=_newIds.length;PEND=remain;renderPend();toast(_added+'件をデータ確認へ'+(skipped.length?'（重複'+skipped.length+'件スキップ）':'')+(remain.length?'／読込中 '+remain.length+'件は完了後に追加できます':'')+(_uploads.length?'／PDF保存 '+_dn+'/'+_uploads.length:''));if(_newIds.length){REG_SCOPE=_newIds;CURREV=_newIds[0];tab('regconf');}else if(remain.length){toast('まだ読み込み中です。完了したらデータ確認へ進めます');tab('regstep');}else{tab('review');}
  };
   doSave();
 }
@@ -1938,19 +1998,20 @@ function revEquip(id,ck){var p=PROPS.find(function(x){return x.id===id;});if(!p)
 function revRegister(){var all=revItems().filter(function(p){return (p.revStatus||'un')==='ok';});var ok=all.filter(function(p){return !!p.tantou;});var noT=all.length-ok.length;if(!ok.length){toast(noT?'担当者が未選択の物件があります。担当者をプルダウンで選んでください':'確認済みの物件がありません');return;}ok.forEach(function(p){p.confirmed=true;p.revStatus='un';});recompute();save();updateBadges();CURREV=null;renderReview();toast(ok.length+'件を入稿ページへ登録しました'+(noT?'（担当者未選択 '+noT+'件は保留）':'（確認済みのみ移動）'));}
 var STAFF=['弘中','横山','宮本','田邊','生沼'];
 function tantouTag(p){return p.tantou?('<span class="ttag">'+esc(p.tantou)+'</span>'):'';}
+function setShokan(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.shokan=v;save();}
 function tantouSet(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.tantou=v||'';save();updateBadges();if(CURTAB==='review'||CURTAB==='regconf')renderReview();else if(CURTAB==='tantou')renderTantou();else if(CURTAB==='list')renderList();else if(CURTAB==='dash')renderDash();}
 function _isoBackN(n){var d=new Date();d.setDate(d.getDate()-n);return _ymd(d);}
 function staffAgg(name){var ps=PROPS.filter(function(p){return p.tantou===name;});var pv=0,inq=0,inqB=0,live=0,pre=0;ps.forEach(function(p){pv+=+(p.csvPV||0);inq+=+(p.csvInq||0);inqB+=+(p.csvInqB||0);if(p.status==='掲載中')live++;else if(p.status==='要入稿')pre++;});var wk=_isoBackN(7);var wkN=ps.filter(function(p){return (p.regDate||'')>=wk;}).length;return {name:name,props:ps,count:ps.length,live:live,pre:pre,pv:pv,inq:inq,inqB:inqB,week:wkN};}
-function recentRegItems(days){var cut=_isoBackN(days);return PROPS.filter(function(p){return p.tantou&&(p.regDate||'')>=cut;}).sort(function(a,b){var d=String(b.regDate||'').localeCompare(String(a.regDate||''));return d||String(b.id||'').localeCompare(String(a.id||''));});}
+function recentRegItems(days){var cut=_isoBackN(days);return PROPS.filter(function(p){return (p.regDate||'')>=cut;}).sort(function(a,b){var d=String(b.regDate||'').localeCompare(String(a.regDate||''));return d||String(b.id||'').localeCompare(String(a.id||''));});}
 function recentRegPanel(){
  var items=recentRegItems(3);
- var h='<div class="card fade rrpanel"><div class="rrhd"><span class="t">直近3日の登録物件（全員）</span><span class="rrsub">担当者設定済み・入稿前も含めて表示 ／ '+items.length+'件</span></div>';
+ var h='<div class="card fade rrpanel"><div class="rrhd"><span class="t">直近3日の登録物件（全員）</span><span class="rrsub">入稿前・担当者未設定も含めて表示 ／ '+items.length+'件</span></div>';
  if(!items.length){h+='<div class="empty" style="padding:14px">直近3日に登録された物件はありません。</div></div>';return h;}
  h+='<div class="rrlist">'+items.map(function(p){
    var has=listHasPdf(p);var pv=+(p.csvPV||0),inq=+(p.csvInq||0);
    var sc=p.status==='要入稿'?'p-pre':p.status==='掲載中'?'p-act':'p-done';
    var stx=(p.confirmed===false)?'<span class="rrwait">データ確認中</span>':'';
-   return '<div class="rritem"><div class="rrtop">'+tantouTag(p)+nmLink(p)+csBadge(p)+'<span class="pill '+sc+'">'+p.status+'</span>'+stx+'<span class="rrdate">登録 '+(p.regDate||'—')+'</span></div>'
+   return '<div class="rritem"><div class="rrtop">'+(p.tantou?tantouTag(p):'<span class="ttag-none">未割当</span>')+nmLink(p)+csBadge(p)+'<span class="pill '+sc+'">'+p.status+'</span>'+stx+'<span class="rrdate">登録 '+(p.regDate||'—')+'</span></div>'
      +'<div class="rrinfo">'+([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ ')||'情報未入力')+'</div>'
      +'<div class="rrmet"><span>PV <b>'+pv.toLocaleString()+'</b></span><span>反響 <b>'+inq+'</b></span>'
      +(has?'<button class="btn-sm" onclick="viewPdf(\''+p.id+'\')">PDF確認</button>':'<span class="rrnopdf">PDFなし</span>')
@@ -2819,10 +2880,13 @@ function renderStaff(){
  var host=document.getElementById('sbody');
  if(!items.length){host.innerHTML='<div class="rvempty">要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。</div>';return;}
  if(!CURSTAFF||!items.some(function(p){return p.id===CURSTAFF;}))CURSTAFF=items[0].id;
- var h='<div class="rvwrap'+(STAFFLISTOPEN?'':' lc')+'">';
+ var byT={};items.forEach(function(x){var t=x.tantou||'未割当';byT[t]=(byT[t]||0)+1;});
+ var sumChips=STAFF.concat(['未割当']).filter(function(t){return byT[t];}).map(function(t){return '<span class="stcnt'+(t==='未割当'?' none':'')+'">'+esc(t)+' <b>'+byT[t]+'</b></span>';}).join('');
+ var h='<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>';
+ h+='<div class="rvwrap'+(STAFFLISTOPEN?'':' lc')+'">';
  // list
  h+='<aside class="rvlist"><div class="rvlhd"><span class="t">入稿待ちリスト（'+items.length+'）</span><button onclick="staffToggleList()">'+(STAFFLISTOPEN?'‹':'›')+'</button></div>';
- h+='<div class="rvitems">'+items.map(function(p){return '<div class="rvit'+(p.id===CURSTAFF?' cur':'')+'" onclick="staffSelect(\''+p.id+'\')"><div class="nm">'+esc(p.name||'(名称未設定)')+(p.room?' '+esc(p.room):'')+'</div><div class="mt">'+esc((p.station||'')+' '+(p.madori||''))+(p.deadline?' ・ 納期'+esc(p.deadline.slice(5)):'')+'</div></div>';}).join('')+'</div></aside>';
+ h+='<div class="rvitems">'+items.map(function(p){return '<div class="rvit'+(p.id===CURSTAFF?' cur':'')+'" onclick="staffSelect(\''+p.id+'\')"><div class="nm">'+esc(p.name||'(名称未設定)')+(p.room?' '+esc(p.room):'')+(p.tantou?tantouTag(p):'<span class="ttag-none">未割当</span>')+'</div><div class="mt">'+esc((p.station||'')+' '+(p.madori||''))+(p.deadline?' ・ 納期'+esc(p.deadline.slice(5)):'')+'</div></div>';}).join('')+'</div></aside>';
  // work
  var p=PROPS.find(function(x){return x.id===CURSTAFF;});
  var mode=STAFFMODE[p.id]||'live';
@@ -3661,6 +3725,7 @@ function openProp(id){
  h+='<div class="pdfhost" id="karte_pdf"></div>';
  // 右：分析＋情報
  h+='<div class="kside">';
+ h+='<div class="kshokan"><div class="kshokan-h">担当者所感'+(p.tantou?'（'+esc(p.tantou)+'）':'')+'</div><textarea oninput="setShokan(\''+p.id+'\',this.value)" placeholder="この物件の所感（強み・競合・推し方・気になる点…）">'+esc(p.shokan||'')+'</textarea></div>';
  // パフォーマンス
  h+='<div class="kstats">'
  +'<div class="kstat"><div class="t">物件スコア</div><div class="n">'+(sc!=null?'<span class="ksc">'+scoreTier(sc)+'</span> '+sc:'—')+'</div></div>'
@@ -3725,7 +3790,7 @@ function showUploadDone(n){
  ov.innerHTML='<div class="modal"><div class="mmsg" style="text-align:center"><div style="margin-bottom:6px"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.4 12.3l2.3 2.3 4.8-5"/></svg></div><div style="font-weight:800;font-size:16px;margin-bottom:4px">無事にアップできました</div><div style="font-size:13px;color:var(--text2);line-height:1.6">マイソクを '+n+' 件 読み込みました。<br>内容を確認して担当者を選び、登録に進めます。</div></div><div class="mbtns"><button class="btn btn-sec" id="_udclose">閉じる</button><button class="btn btn-pri" id="_udgo">アップしたデータを確認する</button></div></div>';
  document.body.appendChild(ov);
  ov.querySelector('#_udclose').onclick=function(){ov.remove();};
- ov.querySelector('#_udgo').onclick=function(){ov.remove();tab('add');};
+ ov.querySelector('#_udgo').onclick=function(){ov.remove();tab('regstep');};
  ov.onclick=function(e){if(e.target===ov)ov.remove();};
 }
 
