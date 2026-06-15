@@ -612,7 +612,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span></h1><div class="sub">運を、構造化する。</div></header><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0615-g</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span></div></header><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -765,6 +765,8 @@ function maybeAutoRefresh(){
 function toggleAuto(){_autoPaused=!_autoPaused;try{localStorage.setItem('ibt_autopause',_autoPaused?'1':'0');}catch(e){}updateAutoBtn();toast(_autoPaused?'自動更新を一時停止しました（再読込は手動でできます）':'自動更新を再開しました');if(!_autoPaused&&_pendingRefresh&&!isEditing())doRefreshNow();}
 async function saveAll(){if(API){schedulePush();return;}await gset(SK,PROPS);await gset(HK,HIST);await gset(EK,EVENTS);}
 async function save(){if(API){schedulePush();return;}await gset(SK,PROPS);}
+function updateDbDiag(){var el=document.getElementById('dbdiag');if(!el)return;var url=API||'';var tail=url?('…'+url.slice(-14)):'(URL未設定)';var histD=0,evN=0;try{histD=Object.keys(HIST).length;}catch(e){}try{evN=Object.keys(EVENTS).filter(function(k){return k.indexOf('X|')===0;}).length;}catch(e){}el.textContent='DB '+tail+' ・ PV履歴 '+histD+'日 ・ 反響 '+evN+'件';}
+function showDbDiag(){var url=API||'(未設定)';var ov=(localStorage.getItem('ibt_api')||'').trim();var src=ov?'共有設定で上書き中':'内蔵URL';var histD=0,pv=0;try{Object.keys(HIST).forEach(function(d){histD++;var o=HIST[d];Object.keys(o).forEach(function(pid){if(o[pid]&&o[pid].pv!=null)pv++;});});}catch(e){}var evN=0;try{evN=Object.keys(EVENTS).filter(function(k){return k.indexOf('X|')===0;}).length;}catch(e){}var ok=url.indexOf('UimUgbi4hKOQ')>=0;alert('接続中の共有DB（'+src+'）\n'+url+'\n\n'+(ok?'✓ 正しいURLに接続しています':'⚠ URLが想定と違います（末尾 …UimUgbi4hKOQ/exec が正）。「共有設定」で直してください')+'\n\n物件 '+PROPS.length+'件 ／ PV履歴 '+histD+'日（PV記録 '+pv+'件）／ 反響(JDS) '+evN+'件\n\nPV履歴が0日なら、ビジコン/反響報告書がこのDBに未取込です。');}
 
 // ---------- recompute month-to-date metrics from HIST + EVENTS ----------
 function recompute(){
@@ -3804,7 +3806,7 @@ async function importJ(ev){const f=ev.target.files[0];if(!f)return;try{const o=J
 
 // ---------- init ----------
 (async function(){try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}catch(e){}
- await load();navInit();setupDrop();setupCSV();renderDash();updateBadges();})();
+ await load();navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}})();
 let _lastRefresh=Date.now();
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')maybeAutoRefresh();});
 document.addEventListener('focusin',function(e){var t=e.target;if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))_editing=true;});
