@@ -612,7 +612,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0615-g</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span></div></header><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0615-g</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -720,8 +720,8 @@ async function gset(k,v){
  try{if(window.storage){await window.storage.set(k,JSON.stringify(v));return;}}catch(e){}
  try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 async function load(){
- if(API){try{const d=await apiGet();PROPS=d.props||[];HIST=d.hist||{};EVENTS=d.events||{};MGMT=d.mgmt||[];GUAR=d.guar||[];LOADED=true;}catch(e){LOADED=false;/* ★失敗時はメモリのデータを空にしない＝直後の自動送信でDBを消さない */toast('共有データの取得に失敗（安全のため保存を一時停止中）。通信を確認して再読み込みしてください');}}
- else{PROPS=await gget(SK,[]);HIST=await gget(HK,{});EVENTS=await gget(EK,{});MGMT=await gget(MK,[]);GUAR=await gget(GK,[]);LOADED=true;}
+ if(API){try{const d=await apiGet();PROPS=d.props||[];HIST=d.hist||{};EVENTS=d.events||{};MGMT=d.mgmt||[];GUAR=d.guar||[];LOADED=true;var _bb=document.getElementById('dbbanner');if(_bb)_bb.style.display='none';}catch(e){LOADED=false;/* ★失敗時はメモリのデータを空にしない＝直後の自動送信でDBを消さない */var _bb=document.getElementById('dbbanner');if(_bb)_bb.style.display='block';toast('共有データの取得に失敗（安全のため保存を一時停止中）。通信を確認して再読み込みしてください');}}
+ else{PROPS=await gget(SK,[]);HIST=await gget(HK,{});EVENTS=await gget(EK,{});MGMT=await gget(MK,[]);GUAR=await gget(GK,[]);LOADED=true;var _bb2=document.getElementById('dbbanner');if(_bb2)_bb2.style.display='none';}
  MGMT.forEach(function(m){if(!m.logs)m.logs=[];if(m.summary==null)m.summary='';if(!m.navi)m.navi=[];if(!m.guarantors)m.guarantors=[];});GUAR.forEach(function(gz){if(!gz.logs)gz.logs=[];if(gz.summary==null)gz.summary='';});
  PROPS.forEach(p=>{
   if(p.infoDate==null)p.infoDate='';
