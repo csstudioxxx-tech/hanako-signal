@@ -603,6 +603,30 @@ header{padding-left:54px}
 .spk svg{display:block}
 .spk-lab{font-size:12px;font-weight:800;color:var(--text3);margin-left:8px}
 .rvsec-d{font-size:10.5px;font-weight:600;color:var(--text3);margin-left:8px}
+.todayout{margin-bottom:12px}
+.tohd{display:flex;align-items:baseline;gap:10px}
+.tohd .t{font-size:14px;font-weight:800}
+.tonum{margin-left:auto;font-size:13px;color:var(--text2)}
+.tonum b{font-size:22px;font-weight:900;color:var(--accent)}
+.tobrk{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.tochip{font-size:11.5px;font-weight:700;background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:3px 10px;color:var(--text2)}
+.tochip b{color:var(--accent2);margin-left:2px}
+.tochip.none b{color:var(--amber)}
+.tochip.ok{color:var(--green);background:var(--green-bg,#e6f6ee);border-color:#bfe6d3}
+.tomut{font-size:11px;color:var(--text3)}
+.kcom{background:var(--bg);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px}
+.kstamps{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.kstamp{appearance:none;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:3px 9px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;color:var(--text2);font-family:inherit}
+.kstamp:hover{border-color:var(--accent)}
+.kstamp b{font-size:10.5px;font-weight:800;color:var(--accent2)}
+.kclist{margin-bottom:8px}
+.kcrow{display:flex;gap:8px;padding:4px 0;font-size:12.5px}
+.kcwho{font-weight:800;color:var(--text2);flex:none;font-size:11px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1px 7px;height:fit-content}
+.kctxt{flex:1;line-height:1.5}
+.kcin{display:flex;gap:6px}
+.kcin input{flex:1;min-width:60px;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)}
+.kcin input:focus{outline:none;border-color:var(--accent)}
+.kcin select{border:1px solid var(--border);border-radius:8px;padding:7px 7px;font-family:inherit;font-size:11px;background:var(--surface);color:var(--text2)}
 </style></head><body>
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <div class="navsc" id="navsc" onclick="navClose()"></div>
@@ -777,7 +801,7 @@ async function load(){
   if(!p.statusLog)p.statusLog=[];
   if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';if(p.stations==null)p.stations=[];if(p.waku==='未分類')p.waku='その他';if(p.media==null)p.media='';if(p.mediaOther==null)p.mediaOther='';if(p.rtMedia==null)p.rtMedia='-';if(p.rtUrl==null)p.rtUrl='';if(p.vacancyLog==null)p.vacancyLog=[];if(p.revStatus==null)p.revStatus='un';if(p.mgMemo==null)p.mgMemo='';if(p.equipOk==null)p.equipOk=false;['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
   if(p.csvPV==null)p.csvPV=0;if(p.csvInq==null)p.csvInq=0;if(p.csvInqB==null)p.csvInqB=0;
-  if(p.tantou==null)p.tantou='';if(p.regDate==null)p.regDate=(p.listDate||((p.wakuLog&&p.wakuLog[0]&&p.wakuLog[0].date)||''));if(p.shokan==null)p.shokan='';if(!Array.isArray(p.memos))p.memos=[];if(p.stars==null)p.stars=0;
+  if(p.tantou==null)p.tantou='';if(p.regDate==null)p.regDate=(p.listDate||((p.wakuLog&&p.wakuLog[0]&&p.wakuLog[0].date)||''));if(p.shokan==null)p.shokan='';if(!Array.isArray(p.memos))p.memos=[];if(p.stars==null)p.stars=0;if(!Array.isArray(p.comments))p.comments=[];if(!p.stamps||typeof p.stamps!=='object')p.stamps={};
   if(p.csvAsOf==null)p.csvAsOf='';
   if(p.optReviewed==null)p.optReviewed=false;if(p.compDataAt==null)p.compDataAt='';if(p.optAppliedAt==null)p.optAppliedAt='';
   if(p.needShoot==null)p.needShoot=false;if(p.shootDate==null)p.shootDate='';if(p.subStdJudge==null)p.subStdJudge='';if(p.subStdAction==null)p.subStdAction='';
@@ -1610,7 +1634,7 @@ function renderDash(){
  h+='<div class="hero fade"><div class="t">'+viewYM+' 反響目標</div><div class="n">'+total+' <small>/ '+TARGETS.total+'</small></div>'
   +'<div class="bar" style="height:6px;margin-top:9px"><div class="fill" style="width:'+Math.min(total/TARGETS.total*100,100)+'%;background:var(--accent)"></div></div>'
   +'<div class="s">D+O '+doInq+'/'+TARGETS.do_inq+' ・ Insight(YOKOYAMA) '+isInq+'/'+TARGETS.is_inq+' ・ High-Hold '+(iq.hh||0)+' ・ IKARI '+(iq.ik||0)+'</div></div>';
- var _sc=statusCounts();h+='<div class="stsum fade">'+'<div class="stsum-c st-pre"><div class="stsum-n">'+_sc['要入稿']+'</div><div class="stsum-l">要入稿</div></div>'+'<div class="stsum-c st-live"><div class="stsum-n">'+_sc['掲載中']+'</div><div class="stsum-l">掲載中</div></div>'+'<div class="stsum-c st-hold"><div class="stsum-n">'+_sc['保留']+'</div><div class="stsum-l">保留</div></div>'+'<div class="stsum-c st-drop"><div class="stsum-n">'+_sc['落とし済み']+'</div><div class="stsum-l">落とし</div></div>'+'</div>';h+=uploadGapCard();h+=pvCompareCard();h+=dashStaffCard();h+='<div class="stat-grid fade">';
+ var _sc=statusCounts();h+='<div class="stsum fade">'+'<div class="stsum-c st-pre"><div class="stsum-n">'+_sc['要入稿']+'</div><div class="stsum-l">要入稿</div></div>'+'<div class="stsum-c st-live"><div class="stsum-n">'+_sc['掲載中']+'</div><div class="stsum-l">掲載中</div></div>'+'<div class="stsum-c st-hold"><div class="stsum-n">'+_sc['保留']+'</div><div class="stsum-l">保留</div></div>'+'<div class="stsum-c st-drop"><div class="stsum-n">'+_sc['落とし済み']+'</div><div class="stsum-l">落とし</div></div>'+'</div>';h+=todayOutCard();h+=uploadGapCard();h+=pvCompareCard();h+=dashStaffCard();h+='<div class="stat-grid fade">';
  [['dm','Demand','反響ランキング','var(--accent)'],['op','Opportunity','オポゾーン','var(--red)'],['is','Insight','経験・知見','var(--green)'],['hh','High-Hold','高額キープ','var(--amber)'],['ik','IKARI','30日経過','var(--purple)']].forEach(a=>{
   h+='<div class="stat '+a[0]+'"><div class="t">'+a[1]+'</div><div class="n">'+ct[a[0]]+'<small>/'+TARGETS[a[0]]+'</small></div><div class="s">'+a[2]+'</div><div class="statiq">反響 <b>'+(iq[a[0]]||0)+'</b></div><div class="bar"><div class="fill" style="width:'+Math.min(ct[a[0]]/TARGETS[a[0]]*100,100)+'%;background:'+a[3]+'"></div></div></div>';});
  h+='</div>';
@@ -1880,7 +1904,7 @@ async function savePend(){
    structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,
    propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',
    uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,
-   statusLog:log,regDate:today(),tantou:'',shokan:(p.shokan||''),memos:(p.memos||[]),stars:0,listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
+   statusLog:log,regDate:today(),tantou:'',shokan:(p.shokan||''),memos:(p.memos||[]),stars:0,comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
    csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
   _newIds.push(id);if(p.pdfData)_uploads.push({id:id,b64:p.pdfData});});
   var _dn=0;for(var _u=0;_u<_uploads.length;_u++){var _pp=PROPS.find(function(x){return x.id===_uploads[_u].id;});var _ok=false;if(_pp){_ok=await uploadPdfToDrive(_pp,_uploads[_u].b64);}if(_ok)_dn++;else{try{await gset('pdf_'+_uploads[_u].id,_uploads[_u].b64);}catch(e){}}}
@@ -2069,6 +2093,21 @@ var STAR_COL={5:['#a07a08','#fff4cf','#E8B30A'],4:['#b5610c','#ffe6c7','#F08A24'
 function starChip(n){n=+n||0;if(!n)return '<span class="ttag-none">★未評価</span>';var c=STAR_COL[n];var s='';for(var i=0;i<5;i++)s+='<svg width="10" height="10" viewBox="0 0 24 24" fill="'+(i<n?c[2]:'#dfe3e8')+'"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg>';return '<span class="starv" style="color:'+c[0]+';background:'+c[1]+'">'+s+'<b>'+n+'</b></span>';}
 function starPick(id,cur){cur=+cur||0;var col=cur?STAR_COL[cur][2]:'#dfe3e8';var s='';for(var i=1;i<=5;i++)s+='<button type="button" class="spk" onclick="setStars(\''+id+'\','+i+')"><svg width="26" height="26" viewBox="0 0 24 24" fill="'+(cur>=i?col:'#dfe3e8')+'"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg></button>';return '<div class="starpick">'+s+'<span class="spk-lab"'+(cur?' style="color:'+STAR_COL[cur][0]+'"':'')+'>'+(cur?'★'+cur+' 評価済み':'未評価（必須）')+'</span></div>';}
 function setStars(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.stars=(p.stars===v?0:v);save();if(CURTAB==='review'||CURTAB==='regconf')renderReview();}
+function todayOutCard(){
+ var t=today();var items=PROPS.filter(function(p){return (p.regDate||'')===t;});
+ var withT=items.filter(function(p){return p.tantou;}).length;var noT=items.length-withT;var total=items.length;var goal=8;
+ var pct=Math.min(total/goal*100,100);
+ return '<div class="card fade todayout"><div class="tohd"><span class="t">本日の物出し</span><span class="tonum"><b>'+total+'</b> / '+goal+'</span></div>'
+  +'<div class="bar" style="height:6px;margin:8px 0"><div class="fill" style="width:'+pct+'%;background:'+(total>=goal?'var(--green)':'var(--accent)')+'"></div></div>'
+  +'<div class="tobrk"><span class="tochip">担当 <b>'+withT+'</b></span><span class="tochip none">未割当 <b>'+noT+'</b></span>'+(total>=goal?'<span class="tochip ok">目標達成</span>':'<span class="tomut">担当優先で あと '+(goal-total)+' 件</span>')+'</div></div>';
+}
+function detMemoAdd(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;var ls=document.getElementById('dmlbl'),ts=document.getElementById('dmtext');var label=ls?ls.value:'指示';var text=ts?ts.value.trim():'';if(!text)return;if(!p.memos)p.memos=[];p.memos.push({label:label,text:text});save();openProp(id);}
+function detMemoDel(id,idx){var p=PROPS.find(function(x){return x.id===id;});if(!p||!p.memos)return;p.memos.splice(idx,1);save();openProp(id);}
+function detMemoTpl(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;var sel=document.getElementById('dmtpl');var t=cmtTpls()[+(sel?sel.value:0)];if(!t)return;if(!p.memos)p.memos=[];p.memos.push({label:'実コメント',text:t.body,tpl:true});save();openProp(id);}
+function detFeatAdd(id,f){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(!p.memos)p.memos=[];if(p.memos.some(function(m){return m.label==='特徴'&&m.text===f;})){p.memos=p.memos.filter(function(m){return !(m.label==='特徴'&&m.text===f);});}else{p.memos.push({label:'特徴',text:f});}save();openProp(id);}
+function detTplNew(id){var name=(prompt('テンプレ名','')||'').trim();if(!name)return;var body=(prompt('テンプレ本文','')||'').trim();if(!body)return;var list=cmtTpls().slice();list.push({name:name,body:body});EVENTS['CMTTPL__list']=JSON.stringify(list);save();toast('テンプレ「'+name+'」を追加（共有）');openProp(id);}
+function propStamp(id,e){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(!p.stamps||typeof p.stamps!=='object')p.stamps={};p.stamps[e]=(p.stamps[e]||0)+1;save();openProp(id);}
+function propComment(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;var inp=document.getElementById('pcmt'),sel=document.getElementById('pcmtwho');var t=inp?inp.value.trim():'';if(!t)return;var who=sel?sel.value:'';if(!Array.isArray(p.comments))p.comments=[];p.comments.push({who:who,anon:!who,t:t,ts:nowTS()});save();openProp(id);}
 function setShokan(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.shokan=v;save();}
 function tantouSet(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.tantou=v||'';save();updateBadges();if(CURTAB==='review'||CURTAB==='regconf')renderReview();else if(CURTAB==='tantou')renderTantou();else if(CURTAB==='list')renderList();else if(CURTAB==='dash')renderDash();}
 function _isoBackN(n){var d=new Date();d.setDate(d.getDate()-n);return _ymd(d);}
@@ -3811,7 +3850,14 @@ function openProp(id){
  // 右：分析＋情報
  h+='<div class="kside">';
  h+='<div class="kshokan"><div class="kshokan-h">担当者所感'+(p.tantou?'（'+esc(p.tantou)+'）':'')+' '+starChip(p.stars)+'</div><textarea oninput="setShokan(\''+p.id+'\',this.value)" placeholder="この物件の所感（強み・競合・推し方・気になる点…）">'+esc(p.shokan||'')+'</textarea></div>';
- if(p.memos&&p.memos.length){h+='<div class="kmemo"><div class="kmemo-h">コメント指示メモ</div>'+p.memos.map(function(m){return '<div class="kmrow"><span class="rmlbl '+lblCls(m.label,m.tpl)+'">'+(m.tpl?'テンプレ':esc(m.label))+'</span><span class="rmtxt">'+esc(m.text)+'</span></div>';}).join('')+'</div>';}
+ h+='<div class="kmemo"><div class="kmemo-h">コメント指示メモ（入稿担当への指示・実コメント）</div>';
+ if(p.memos&&p.memos.length){h+=p.memos.map(function(m,idx){return '<div class="kmrow"><span class="rmlbl '+lblCls(m.label,m.tpl)+'">'+(m.tpl?'テンプレ':esc(m.label))+'</span><span class="rmtxt">'+esc(m.text)+'</span><button class="rmdel" onclick="detMemoDel(\''+p.id+'\','+idx+')">×</button></div>';}).join('');}
+ h+='<div class="rmadd"><select id="dmlbl"><option>指示</option><option>実コメント</option></select><input id="dmtext" placeholder="指示や実コメントを入力…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();detMemoAdd(\''+p.id+'\');}"><button class="btn-sm" onclick="detMemoAdd(\''+p.id+'\')">追加</button></div>';
+ h+='<div class="rmtpl"><select id="dmtpl">'+cmtTpls().map(function(t,ti){return '<option value="'+ti+'">'+esc(t.name)+'</option>';}).join('')+'</select><button class="btn-sm" onclick="detMemoTpl(\''+p.id+'\')">テンプレを追加</button><button class="btn-sm" onclick="detTplNew(\''+p.id+'\')">＋新規テンプレ</button></div>';
+ h+='<div class="rmfeat">'+['敷礼0','AD付き','独立系','ペット可','駅近','築浅','即入居','フリーレント'].map(function(f){var on=(p.memos||[]).some(function(m){return m.label==='特徴'&&m.text===f;});return '<button class="rmfc'+(on?' on':'')+'" onclick="detFeatAdd(\''+p.id+'\',\''+f+'\')">'+f+'</button>';}).join('')+'</div></div>';
+ h+='<div class="kcom"><div class="kmemo-h">みんなのコメント・スタンプ</div><div class="kstamps">'+['👍','🔥','😂','🎉','👏','💪'].map(function(e){var c=(p.stamps&&p.stamps[e])||0;return '<button class="kstamp" onclick="propStamp(\''+p.id+'\',\''+e+'\')">'+e+(c?'<b>'+c+'</b>':'')+'</button>';}).join('')+'</div>';
+ if(p.comments&&p.comments.length){h+='<div class="kclist">'+p.comments.map(function(c){return '<div class="kcrow"><span class="kcwho">'+(c.anon?'匿名':esc(c.who||'匿名'))+'</span><span class="kctxt">'+esc(c.t)+'</span></div>';}).join('')+'</div>';}
+ h+='<div class="kcin"><input id="pcmt" placeholder="コメント…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();propComment(\''+p.id+'\');}"><select id="pcmtwho"><option value="">匿名</option>'+STAFF.map(function(s){return '<option>'+esc(s)+'</option>';}).join('')+'</select><button class="btn-sm" onclick="propComment(\''+p.id+'\')">投稿</button></div></div>';
  // パフォーマンス
  h+='<div class="kstats">'
  +'<div class="kstat"><div class="t">物件スコア</div><div class="n">'+(sc!=null?'<span class="ksc">'+scoreTier(sc)+'</span> '+sc:'—')+'</div></div>'
