@@ -790,7 +790,7 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 const API_BAKED='https://script.google.com/macros/s/AKfycbzYYeBjwumx6vEigIKjgW9kKUkfhm__xi3Rd00vZFI7s4ucN6LSn9GsPvUimUgbi4hKOQ/exec';
 let API=(()=>{try{const s=(localStorage.getItem('ibt_api')||'').trim();return s||API_BAKED;}catch(e){return API_BAKED;}})();
 function setAPI(){const u=prompt('GoogleスプレッドシートのGAS Web App URL（/exec）を貼り付けてください。全PCで同じURLを設定すればデータが共有されます。空欄でローカル保存に戻ります。',API);if(u===null)return;API=(u||'').trim();try{localStorage.setItem('ibt_api',API);}catch(e){}location.reload();}
-async function apiGet(){const r=await fetch(API+(API.indexOf('?')>=0?'&':'?')+'action=all',{method:'GET'});return await r.json();}
+async function apiGet(){var u=API+(API.indexOf('?')>=0?'&':'?')+'action=all&_='+Date.now();var r=await fetch(u,{method:'GET',cache:'no-store',redirect:'follow'});if(!r||r.ok===false)throw new Error('HTTP '+(r&&r.status));var t=await r.text();return JSON.parse(t);}
 let _pushT=null,_pushing=false,_again=false,LOADED=false,_dirty=false,_saveErr=false,_lastSaveTs=0;
 function _payload(){return JSON.stringify({props:PROPS,hist:HIST,events:EVENTS,mgmt:MGMT,guar:GUAR});}
 function updateSaveState(force){var el=document.getElementById('savestate');if(!el)return;var s=force||(_pushing?'saving':(_saveErr?'error':(_dirty?'pending':(_lastSaveTs?'saved':''))));if(s==='saving'){el.textContent='● 保存中…';el.style.color='#c77700';}else if(s==='error'){el.textContent='⚠ 保存エラー（タップで再保存）';el.style.color='#c0392b';}else if(s==='pending'){el.textContent='● 未保存…';el.style.color='#c77700';}else if(s==='saved'){el.textContent='✓ 保存済み '+new Date(_lastSaveTs).toLocaleTimeString().slice(0,5);el.style.color='var(--green)';}else{el.textContent='';}}
