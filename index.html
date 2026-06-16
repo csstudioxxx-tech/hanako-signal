@@ -701,7 +701,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0615-g</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0615-g</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -791,10 +791,12 @@ const API_BAKED='https://script.google.com/macros/s/AKfycbzYYeBjwumx6vEigIKjgW9k
 let API=(()=>{try{const s=(localStorage.getItem('ibt_api')||'').trim();return s||API_BAKED;}catch(e){return API_BAKED;}})();
 function setAPI(){const u=prompt('GoogleスプレッドシートのGAS Web App URL（/exec）を貼り付けてください。全PCで同じURLを設定すればデータが共有されます。空欄でローカル保存に戻ります。',API);if(u===null)return;API=(u||'').trim();try{localStorage.setItem('ibt_api',API);}catch(e){}location.reload();}
 async function apiGet(){const r=await fetch(API+(API.indexOf('?')>=0?'&':'?')+'action=all',{method:'GET'});return await r.json();}
-let _pushT=null,_pushing=false,_again=false,LOADED=false;
-function schedulePush(){if(!API)return;clearTimeout(_pushT);_pushT=setTimeout(doPush,500);}
-async function doPush(){if(!API)return;if(!LOADED){return;}/* ★読込が一度も成功していない間は絶対に送信しない（空データでのDB誤消去を防止） */if(_pushing){_again=true;return;}_pushing=true;try{await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({props:PROPS,hist:HIST,events:EVENTS,mgmt:MGMT,guar:GUAR})});}catch(e){}_pushing=false;if(_again){_again=false;schedulePush();}}
-
+let _pushT=null,_pushing=false,_again=false,LOADED=false,_dirty=false,_saveErr=false,_lastSaveTs=0;
+function _payload(){return JSON.stringify({props:PROPS,hist:HIST,events:EVENTS,mgmt:MGMT,guar:GUAR});}
+function updateSaveState(force){var el=document.getElementById('savestate');if(!el)return;var s=force||(_pushing?'saving':(_saveErr?'error':(_dirty?'pending':(_lastSaveTs?'saved':''))));if(s==='saving'){el.textContent='● 保存中…';el.style.color='#c77700';}else if(s==='error'){el.textContent='⚠ 保存エラー（タップで再保存）';el.style.color='#c0392b';}else if(s==='pending'){el.textContent='● 未保存…';el.style.color='#c77700';}else if(s==='saved'){el.textContent='✓ 保存済み '+new Date(_lastSaveTs).toLocaleTimeString().slice(0,5);el.style.color='var(--green)';}else{el.textContent='';}}
+function schedulePush(){if(!API)return;_dirty=true;updateSaveState('pending');clearTimeout(_pushT);_pushT=setTimeout(doPush,500);}
+async function doPush(){if(!API)return;if(!LOADED){return;}/* ★読込が一度も成功していない間は絶対に送信しない（空データでのDB誤消去を防止） */if(_pushing){_again=true;return;}_pushing=true;_saveErr=false;updateSaveState('saving');try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:_payload()});if(r&&r.ok===false)throw new Error('HTTP '+(r.status||''));_dirty=false;_lastSaveTs=Date.now();_saveErr=false;}catch(e){_saveErr=true;}_pushing=false;updateSaveState();if(_again){_again=false;schedulePush();}else if(_saveErr){clearTimeout(_pushT);_pushT=setTimeout(doPush,4000);/* 失敗時は自動リトライ */}}
+function _beaconSave(){try{if(!API||!LOADED||!_dirty)return;if(navigator.sendBeacon){navigator.sendBeacon(API,new Blob([_payload()],{type:'text/plain;charset=utf-8'}));}}catch(e){}}
 var _IDBp=null;
 function idbOpen(){if(_IDBp)return _IDBp;_IDBp=new Promise(function(res,rej){try{var r=indexedDB.open('hanako_pdf',1);r.onupgradeneeded=function(){r.result.createObjectStore('pdfs');};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};}catch(e){rej(e);}});return _IDBp;}
 function idbSet(k,v){return idbOpen().then(function(db){return new Promise(function(res,rej){var tx=db.transaction('pdfs','readwrite');tx.objectStore('pdfs').put(v,k);tx.oncomplete=function(){res(true);};tx.onerror=function(){rej(tx.error);};});});}
@@ -1816,6 +1818,7 @@ function addBlank(){const r=mkRec();r.pdfName='手動入力';r.auto='手動';PEN
 var REGSTEP_I=0;
 function regStepGo(i){var n=PEND.length;if(!n)return;REGSTEP_I=Math.max(0,Math.min(n-1,i));renderRegStep();}
 function setPendShokan(i,v){if(PEND[i])PEND[i].shokan=v;}
+function regStepDel(){if(!PEND[REGSTEP_I])return;var nm=PEND[REGSTEP_I].name||PEND[REGSTEP_I].pdfName||'物件';PEND.splice(REGSTEP_I,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);renderRegStep();renderPend();toast('「'+nm+'」を読み込みから削除しました');}
 var CMT_TPL_DEFAULT=[
  {name:'初期費用格安',body:'初期費用格安でご案内できます！ご相談ください！'},
  {name:'安易審査-独立系',body:'審査不安な方も、ここなら通ります！審査通りやすい他の物件も紹介します。'},
@@ -1841,7 +1844,7 @@ function renderRegStep(){
  var p=PEND[REGSTEP_I];var rd=p.auto!=='読取中…';
  var dup=rd?pendDup(p):null;
  h+='<div class="rscard">';
- if(dup)h+='<div class="rsdup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b>既に登録済みの可能性</b>「'+esc(dup.name||'')+(dup.room?' '+esc(dup.room):'')+'」が既にあります（担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+' ・ 登録 '+esc(dup.regDate||dup.listDate||'—')+'）。このまま進めると重複登録になります（データ確認へ送る際に自動でスキップされます）。</div></div>';
+ if(dup)h+='<div class="rsdup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div style="flex:1"><b>重複の可能性</b>同名または酷似の物件「'+esc(dup.name||'')+'」が既にあります（号室は無視 ・ 担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+'）。重複ならこの読み込みを削除してください。</div><button class="btn-sm btn-danger" style="flex:none;align-self:center" onclick="regStepDel()">この物件を削除</button></div>';
  h+='<div class="rsprev"'+(p.pdfData?' onclick="viewPendPdf('+REGSTEP_I+')" style="cursor:pointer"':'')+'><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><span>'+(p.pdfData?'マイソクを開く':'PDFなし')+'</span></div>';
  h+='<div class="rsname">'+(rd?esc(p.name||p.pdfName||'(名称未設定)'):'<span class="rsloading"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>読込中… '+esc(p.pdfName)+'</span>')+'</div>';
  h+='<div class="rsinfo">'+(([p.station,p.walkMin?'徒歩'+p.walkMin:'',p.madori,rentMan(p)].filter(Boolean).join(' ・ '))||(rd?'情報なし':'解析中…'))+'</div>';
@@ -1873,7 +1876,7 @@ function renderPend(){
   return '<div class="card'+(fix?' needfix':'')+'">'
   +'<div class="spread"><span class="nm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'+esc(p.pdfName)+'</span><div class="row" style="gap:6px">'+(dup?'<span class="pill pr" style="align-self:center">重複</span>':'')+autoPill(p.auto)+'<button class="btn-sm btn-danger" onclick="PEND.splice('+i+',1);renderPend()">削除</button></div></div>'
   +'<div class="info">'+[p.station,p.walkMin?'徒歩'+p.walkMin:'',p.madori,rentMan(p)].filter(Boolean).join(' ・ ')+'</div>'
-  +(dup?'<div class="warnbox">'+ic('warn')+'この物件は号室含めて既に登録済みです。登録時はスキップされます。</div>':'')
+  +(dup?'<div class="warnbox">'+ic('warn')+'同名または酷似の物件「'+esc(dup.name||'')+'」が既にあります（号室は無視 ・ 担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+'）。重複なら右上の「削除」で取り除いてください。</div>':'')
   +(fix?'<div class="warnbox">'+ic('warn')+'自動読取が不確実です'+(p.auto.indexOf('：')>=0?'（'+esc(p.auto.split('：')[1])+'）':'')+'。下の詳細で駅・条件をご確認のうえ手修正してください。</div>':'')
   +'<div class="qlabel">枠の振り分け（必須・タップで選択）</div>'+wakuChips(i)
   +'<div class="qlabel">I.S. Memo（空き状況・申込方・内見開始日など）</div><textarea oninput="PEND['+i+'].isMemo=this.value" placeholder="例：先行契約のみ可能 ・ 退去6/20">'+esc(p.isMemo||'')+'</textarea>'
@@ -1911,13 +1914,17 @@ function renderPend(){
 }
 async function testDrive(){if(!API){alert('共有設定（GASのURL）が未設定です。物件追加→共有設定で設定してください。');return;}toast('ドライブ保存をテスト中…');try{var body=JSON.stringify({action:'savePdf',name:'_接続テスト_'+Date.now()+'.pdf',date:today(),data:btoa('%PDF-1.4\n% hanako test\n')});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var t=await r.text();var ok=false,url='';try{var d=JSON.parse(t);ok=d&&d.ok;url=d&&d.url||'';}catch(e){}alert((ok?'成功：ドライブに保存できました。\n日付フォルダ（'+today()+'）の中を確認してください。\n'+url:'失敗：GASからの応答↓\n'+t.slice(0,600))+'\n\n（成功なのにDBが消えた場合はdoPostの分岐位置を確認）');}catch(e){alert('通信エラー：'+e.message+'\n→ GASを「新バージョン」で再デプロイしたか、URLが正しいか、Drive権限を承認したかを確認してください。');}}
 async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var _dt=(prop.uploadDate||today());var _base=(prop.name?((prop.name+'')+(prop.room?('-'+prop.room):'')):(prop.pdfName||'maisoku'));var _fname=(_dt+'_'+_base).replace(/\.pdf$/i,'').replace(/[\\/:*?"<>|]/g,'_').slice(0,90)+'.pdf';var body=JSON.stringify({action:'savePdf',name:_fname,date:_dt,data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
-function pendDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
+function _nkey(s){return normName(s||'').toLowerCase().replace(/[（）()【】\[\]『』「」・･,，、。\.\-―ー－_\/／\s]/g,'');}
+function _lev(a,b){var m=a.length,n=b.length;if(!m)return n;if(!n)return m;var dp=[],i,j;for(i=0;i<=n;i++)dp[i]=i;for(i=1;i<=m;i++){var prev=dp[0];dp[0]=i;for(j=1;j<=n;j++){var t=dp[j];dp[j]=Math.min(dp[j]+1,dp[j-1]+1,prev+(a.charAt(i-1)===b.charAt(j-1)?0:1));prev=t;}}return dp[n];}
+function nameSimilar(a,b){if(!a||!b)return false;if(a===b)return true;var lo=a.length<=b.length?a:b,hi=a.length<=b.length?b:a;if(lo.length>=4&&hi.indexOf(lo)>=0)return true;var ml=Math.max(a.length,b.length);if(ml<4)return false;return (1-_lev(a,b)/ml)>=0.8;}
+function pendDup(p){var nn=_nkey(p.name||p.pdfName||'');if(!nn)return null;return PROPS.find(function(x){var xn=_nkey(x.name||'');return xn&&nameSimilar(nn,xn);});}
+function pendExactDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
 async function savePend(){
  const doSave=async()=>{
  var skipped=[];var _uploads=[];var _newIds=[];var remain=[];
  PEND.forEach(p=>{
   if(p.auto==='読取中…'){remain.push(p);return;}
-  if(pendDup(p)){skipped.push(p.name||p.pdfName);return;}
+  if(pendExactDup(p)){skipped.push(p.name||p.pdfName);return;}
   const id='PR'+Date.now()+Math.random().toString(36).slice(2,5);
   const log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});
   PROPS.push({id:id,status:'要入稿',confirmed:false,bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:false,waku:p.waku||'その他',suumoCode:'',
@@ -3360,7 +3367,7 @@ async function processHankyo(file){
    if(!p.madori&&mad)p.madori=mad;if((p.rent===''||p.rent==null)&&rent!=='')p.rent=rent;if(!p.station&&station)p.station=station;if(!p.line&&line)p.line=line;if(!p.walkMin&&wm)p.walkMin=wm;if((p.mgmt===''||p.mgmt==null)&&mgmtV!=='')p.mgmt=mgmtV;if((p.waku==='その他'||!p.waku)&&p.station&&p.madori)p.waku=autoWakuImport(p.station,p.madori,String(totFromParts(p.rent,p.mgmt)||'0'));
   }
  }
- var _ff=freshFastSweep();var _ik=autoIkariSweep();recompute();saveAll();
+ var _ff=freshFastSweep();var _ik=autoIkariSweep();recompute();saveAll();flushPush();
  archiveImport(file,'反響報告書',repDate);
  log('反響報告書取込：'+repDate+'分 '+total+'行（更新'+matched+'件／新規'+created+'件'+(_ik?'／IKARI自動'+_ik+'件':'')+'）。反響・オプション・名寄点数・競合数・掲載開始日を反映（PVはPC閲覧のみのため取り込まず、PVはビジコンから取得します）。','ok');
 }
@@ -3386,7 +3393,7 @@ function processJDS(hdr,rows){
   total++;
  });
  added=Object.keys(EVENTS).length;
- recompute();saveAll();
+ recompute();saveAll();flushPush();
  const mc=Object.keys(seenProps).length;
  log('JDS取込：'+total+'行を処理（蓄積イベント '+added+'件）。'+mc+'物件にマッチ。同じファイルを再投入しても二重計上しません。','ok');
 }
@@ -3484,7 +3491,7 @@ function applyBijikon(forceDate){
  let ended=0;
  PROPS.forEach(p=>{if(p.status==='掲載中'&&!seen[p.id]){p.status='落とし済み';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン未掲載のため掲載終了',ts:nowTS()});ended++;}});
  var _bff=freshFastSweep();var _bik=autoIkariSweep();
- recompute();saveAll();
+ recompute();saveAll();flushPush();
  var _bjfile=bijikonPending&&bijikonPending.file;bijikonPending=null;document.getElementById('csvpending').innerHTML='';
  if(_bjfile)archiveImport(_bjfile,'ビジコン',date);
  log('ビジコン取込：'+date+'分。更新'+matched+'件／新規'+created+'件／掲載終了'+ended+'件'+(PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length?'／代表候補なしアラート'+PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length+'件':'')+(_bik?'／IKARI自動'+_bik+'件':'')+(_bff?'／新着即上げ'+_bff+'件':'')+'。物件掲載○で掲載中／○なし・物件名なしは掲載終了。代表候補○なしはアラート（Jiro連携）。','ok');
@@ -3974,9 +3981,11 @@ async function importJ(ev){const f=ev.target.files[0];if(!f)return;try{const o=J
 
 // ---------- init ----------
 (async function(){try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}catch(e){}
- await load();navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}})();
+ await load();navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}try{updateSaveState();}catch(e){}})();
 let _lastRefresh=Date.now();
-document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')maybeAutoRefresh();});
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')maybeAutoRefresh();else _beaconSave();});
+window.addEventListener('pagehide',_beaconSave);
+window.addEventListener('beforeunload',_beaconSave);
 document.addEventListener('focusin',function(e){var t=e.target;if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))_editing=true;});
 document.addEventListener('focusout',function(){_editing=false;setTimeout(function(){if(!isEditing()&&_pendingRefresh&&!_autoPaused)doRefreshNow();},900);});
 
