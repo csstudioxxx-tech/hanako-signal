@@ -627,6 +627,27 @@ header{padding-left:54px}
 .kcin input{flex:1;min-width:60px;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)}
 .kcin input:focus{outline:none;border-color:var(--accent)}
 .kcin select{border:1px solid var(--border);border-radius:8px;padding:7px 7px;font-family:inherit;font-size:11px;background:var(--surface);color:var(--text2)}
+.rvcsvbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--amber-bg);border:1px solid #ecdca8;border-radius:10px;padding:9px 12px;margin-bottom:10px}
+.rvcsv-t{font-size:11.5px;font-weight:600;color:var(--amber);flex:1;min-width:160px;line-height:1.5}
+.rvcsvbar .btn-sm{flex:none}
+.repalert{margin-bottom:12px;border:1px solid #f0c2b0;background:#fdf4f2}
+.rahd{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:800;color:#c0392b}
+.rahd b{font-size:15px}
+.rajiro{font-size:9.5px;font-weight:800;color:#fff;background:#C0392B;border-radius:999px;padding:2px 8px;margin-left:auto}
+.ramut{font-size:11px;color:var(--text2);margin:5px 0 8px}
+.ralist{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rachip{appearance:none;border:1px solid #f0c2b0;background:#fff;color:#a83a35;font-family:inherit;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;cursor:pointer}
+.kalert{display:flex;align-items:center;gap:7px;background:#fbecea;border:1px solid #f0c2b0;color:#a83a35;border-radius:var(--r2);padding:9px 11px;margin-bottom:12px;font-size:12px;font-weight:700;line-height:1.45}
+.kalert svg{flex:none}
+.badge.blue{background:#2a6df5}
+.ratable{overflow-x:auto;margin-top:8px}
+.ratable table{width:100%;border-collapse:collapse;font-size:12.5px}
+.ratable th{font-size:10.5px;color:#a83a35;text-align:left;font-weight:700;padding:6px 8px;white-space:nowrap}
+.ratable th.r,.ratable td.r{text-align:right}
+.ratable td{padding:7px 8px;border-top:1px solid #f0d5cd;vertical-align:top}
+.ratable td b{font-weight:700}
+.ramini{font-size:10.5px;color:var(--text3);margin-top:1px}
+.ratan{font-size:11px;font-weight:700;color:var(--accent2);background:var(--accent-soft);border-radius:6px;padding:2px 8px;white-space:nowrap}
 </style></head><body>
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <div class="navsc" id="navsc" onclick="navClose()"></div>
@@ -639,7 +660,7 @@ header{padding-left:54px}
  <div class="sn-hd" onclick="navGrp('staffg')"><span>入稿staff</span><svg class="sn-arr" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 3.5l3 3 3-3"/></svg></div>
  <div class="sn-coll">
   <div class="sn-it" id="tb-review" onclick="tab('review')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5l2.2 2.2L15.5 9"/><rect x="4" y="3.5" width="16" height="17" rx="3"/></svg><span class="sn-t">要データ確認</span><span class="badge" id="rvbadge" style="display:none"></span></div>
-  <div class="sn-it" id="tb-staff" onclick="tab('staff')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10.5 13.5M21 3l-7 18-3.5-7.5L3 10z"/></svg><span class="sn-t">要入稿</span><span class="badge" id="stbadge" style="display:none"></span></div>
+  <div class="sn-it" id="tb-staff" onclick="tab('staff')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10.5 13.5M21 3l-7 18-3.5-7.5L3 10z"/></svg><span class="sn-t">要入稿</span><span class="badge" id="stbadge" style="display:none"></span><span class="badge blue" id="stalert" style="display:none"></span></div>
   <div class="sn-it" id="tb-tantou" onclick="tab('tantou')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.4a3 3 0 0 1 0 5.2"/><path d="M17.5 14.6a5.5 5.5 0 0 1 3 5.4"/></svg><span class="sn-t">反響獲得実績</span></div>
  </div>
 </div>
@@ -801,7 +822,7 @@ async function load(){
   if(!p.statusLog)p.statusLog=[];
   if(p.suumoCode==null)p.suumoCode='';if(p.room==null)p.room='';if(p.fax==null)p.fax='';if(p.stations==null)p.stations=[];if(p.waku==='未分類')p.waku='その他';if(p.media==null)p.media='';if(p.mediaOther==null)p.mediaOther='';if(p.rtMedia==null)p.rtMedia='-';if(p.rtUrl==null)p.rtUrl='';if(p.vacancyLog==null)p.vacancyLog=[];if(p.revStatus==null)p.revStatus='un';if(p.mgMemo==null)p.mgMemo='';if(p.equipOk==null)p.equipOk=false;['petOk','dep0','key0','autoLock','delivBox','twoBurner','btSep','washStand'].forEach(function(k){if(p[k]==null)p[k]='';});
   if(p.csvPV==null)p.csvPV=0;if(p.csvInq==null)p.csvInq=0;if(p.csvInqB==null)p.csvInqB=0;
-  if(p.tantou==null)p.tantou='';if(p.regDate==null)p.regDate=(p.listDate||((p.wakuLog&&p.wakuLog[0]&&p.wakuLog[0].date)||''));if(p.shokan==null)p.shokan='';if(!Array.isArray(p.memos))p.memos=[];if(p.stars==null)p.stars=0;if(!Array.isArray(p.comments))p.comments=[];if(!p.stamps||typeof p.stamps!=='object')p.stamps={};
+  if(p.tantou==null)p.tantou='';if(p.regDate==null)p.regDate=(p.listDate||((p.wakuLog&&p.wakuLog[0]&&p.wakuLog[0].date)||''));if(p.shokan==null)p.shokan='';if(!Array.isArray(p.memos))p.memos=[];if(p.stars==null)p.stars=0;if(!Array.isArray(p.comments))p.comments=[];if(!p.stamps||typeof p.stamps!=='object')p.stamps={};if(p.repAlert==null)p.repAlert=false;
   if(p.csvAsOf==null)p.csvAsOf='';
   if(p.optReviewed==null)p.optReviewed=false;if(p.compDataAt==null)p.compDataAt='';if(p.optAppliedAt==null)p.optAppliedAt='';
   if(p.needShoot==null)p.needShoot=false;if(p.shootDate==null)p.shootDate='';if(p.subStdJudge==null)p.subStdJudge='';if(p.subStdAction==null)p.subStdAction='';
@@ -2016,7 +2037,7 @@ function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
  if(r.photo!=null&&r.photo!==''&&String(p.photoCount||'')!==String(r.photo||''))d.push({f:'photoCount',label:'写真数',cur:p.photoCount||'',bj:r.photo||''});
  return d;}
 function bjMismatch(p){return !!(p.bjRef && !p.bjOkAt && bjDiff(p).length>0);}
-function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length+PROPS.filter(bjMismatch).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}}catch(e){}}
+function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length+PROPS.filter(bjMismatch).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}var ac=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length;var ae=document.getElementById('stalert');if(ae){if(ac>0){ae.textContent=ac;ae.style.display='';}else{ae.style.display='none';}}}catch(e){}}
 function rvFields(p){
  var f=function(field,label,typ){return '<div class="rvf"><label>'+label+'</label>'+inEd(p.id,field,p[field],'',typ)+'</div>';};
  var statusSel='<div class="rvf"><label>状態</label>'+inSel(p.id,'status',p.status,['掲載中','要入稿','落とし済み'])+'</div>';
@@ -2080,7 +2101,8 @@ function revBulkToggle(){REVBULK=!REVBULK;if(!REVBULK)REVSEL={};renderReview();}
 function revToggleSel(id){if(REVSEL[id])delete REVSEL[id];else REVSEL[id]=1;renderReview();}
 function revSelAll(){revItems().forEach(function(p){REVSEL[p.id]=1;});renderReview();}
 function revSelNone(){REVSEL={};renderReview();}
-function revBulkConfirm(){var ids=Object.keys(REVSEL).filter(function(id){return REVSEL[id];});var n=0,skip=0;ids.forEach(function(id){var p=PROPS.find(function(x){return x.id===id;});if(p){if(!p.tantou||!p.stars){skip++;return;}p.revStatus='ok';if(!p.equipOk)p.equipOk=true;n++;}});if(!n){toast(skip?'担当者・物件評価★が未入力のため確認できません':'物件が選択されていません');return;}REVSEL={};save();updateBadges();renderReview();toast(n+'件を確認済みにしました'+(skip?'（担当者/★未入力 '+skip+'件はスキップ）':''));}
+function revConfirmAllCsv(){var its=PROPS.filter(function(p){return p.confirmed===false&&p.fromCsv;});if(!its.length){toast('CSV取込の未確認データはありません');return;}if(!confirm('CSV取込の未確認 '+its.length+'件を確定します。\nステータス（掲載中／落とし）はビジコンの掲載状況のままにします。\n（すでに掲載済みのため要入稿には送りません）\nよろしいですか？'))return;var nLive=0,nDrop=0;its.forEach(function(p){p.confirmed=true;p.revStatus='un';if(p.status==='落とし済み')nDrop++;else nLive++;});recompute();save();updateBadges();renderReview();toast('CSV '+its.length+'件を確定（掲載中 '+nLive+' ／ 落とし '+nDrop+'）');}
+function revBulkConfirm(){var ids=Object.keys(REVSEL).filter(function(id){return REVSEL[id];});var nOk=0,nCsv=0,nDrop=0,skip=0;ids.forEach(function(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(p.fromCsv){p.confirmed=true;p.revStatus='un';if(p.status==='落とし済み')nDrop++;nCsv++;return;}if(!p.tantou||!p.stars){skip++;return;}p.revStatus='ok';if(!p.equipOk)p.equipOk=true;nOk++;});if(!nOk&&!nCsv){toast(skip?'担当者・物件評価★が未入力のため確認できません':'物件が選択されていません');return;}REVSEL={};recompute();save();updateBadges();renderReview();toast((nCsv?'CSV '+nCsv+'件を確定（うち落とし '+nDrop+'）':'')+(nCsv&&nOk?' ／ ':'')+(nOk?nOk+'件を確認済みに':'')+(skip?'（担当者/★未入力 '+skip+'件はスキップ）':''));}
 function revSelect(id){var _sy=window.scrollY;CURREV=id;renderReview();window.scrollTo(0,_sy);requestAnimationFrame(function(){window.scrollTo(0,_sy);});}
 function revMarkOk(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(!p.tantou){toast('担当者をプルダウンで選択してください');var _ts=document.querySelector('.rvtsel');if(_ts){_ts.focus();_ts.scrollIntoView({block:'center'});}return;}if(!p.stars){toast('物件評価（★1〜5）を入れてください');var _sp=document.querySelector('.starpick');if(_sp)_sp.scrollIntoView({block:'center'});return;}if(!p.equipOk){toast('設備の確認にチェックを入れてください');var g=document.getElementById('rv_gate');if(g)g.scrollIntoView({block:'center'});return;}p.revStatus='ok';save();updateBadges();var it=revItems();var nx=it.find(function(x){return x.id!==id&&(x.revStatus||'un')!=='ok';});CURREV=nx?nx.id:id;renderReview();toast('「'+(p.name||'物件')+'」を確認済みにしました');}
 function revToggleMg(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.revStatus=(p.revStatus==='mg')?'un':'mg';save();renderReview();updateBadges();if(p.revStatus==='mg'){var t=document.getElementById('rv_mgmemo');if(t)t.focus();toast('マネージャー要確認にしました（このページに残ります）');}}
@@ -2100,6 +2122,15 @@ function todayOutCard(){
  return '<div class="card fade todayout"><div class="tohd"><span class="t">本日の物出し</span><span class="tonum"><b>'+total+'</b> / '+goal+'</span></div>'
   +'<div class="bar" style="height:6px;margin:8px 0"><div class="fill" style="width:'+pct+'%;background:'+(total>=goal?'var(--green)':'var(--accent)')+'"></div></div>'
   +'<div class="tobrk"><span class="tochip">担当 <b>'+withT+'</b></span><span class="tochip none">未割当 <b>'+noT+'</b></span>'+(total>=goal?'<span class="tochip ok">目標達成</span>':'<span class="tomut">担当優先で あと '+(goal-total)+' 件</span>')+'</div></div>';
+}
+function repAlertCard(){
+ var its=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';});
+ if(!its.length)return '';
+ return '<div class="card fade repalert"><div class="rahd"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>代表候補なしアラート <b>'+its.length+'件</b><span class="rajiro">Jiro連携</span></div>'
+  +'<div class="ramut">ビジコン「代表候補」列に○が無い掲載中物件です。代表物件として選ばれていません。確認・差し替えを検討してください。</div>'
+  +'<div class="ratable"><table><thead><tr><th>物件</th><th>担当</th><th class="r">名寄せ</th><th class="r">写真</th><th></th></tr></thead><tbody>'
+  +its.map(function(p){return '<tr><td><b>'+esc(p.name||'(名称未設定)')+(p.room?' '+esc(p.room):'')+'</b><div class="ramini">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</div></td><td>'+(p.tantou?'<span class="ratan">'+esc(p.tantou)+'</span>':'<span class="ttag-none">未割当</span>')+'</td><td class="r mono">'+(p.csvScore||'—')+'</td><td class="r mono">'+(p.photoCount||'—')+'</td><td class="r"><button class="btn-sm" onclick="openProp(\''+p.id+'\')">詳細</button></td></tr>';}).join('')
+  +'</tbody></table></div></div>';
 }
 function detMemoAdd(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;var ls=document.getElementById('dmlbl'),ts=document.getElementById('dmtext');var label=ls?ls.value:'指示';var text=ts?ts.value.trim():'';if(!text)return;if(!p.memos)p.memos=[];p.memos.push({label:label,text:text});save();openProp(id);}
 function detMemoDel(id,idx){var p=PROPS.find(function(x){return x.id===id;});if(!p||!p.memos)return;p.memos.splice(idx,1);save();openProp(id);}
@@ -2249,7 +2280,9 @@ function renderReview(){
  }
  h+='<div class="rvsrc" style="margin-left:8px">'+[['default','標準順'],['points','確認ポイント数順']].map(function(o){return '<button class="'+(REVSORT===o[0]?'on':'')+'" onclick="revSortSet(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
 if(!items.length){h+='<div class="rvempty">'+(REG_SCOPE?'登録した物件はすべて確認できました。<br><button class="btn btn-pri" style="margin-top:10px" onclick="regConfirmDone()">要入稿へ進む</button>':(REVSRC==='all'?'未確認の物件はありません。物件登録でPDFを取り込むとここに表示されます。':'この条件（'+(REVSRC==='csv'?'CSV読み取り':'PDFアップロード')+'）の未確認物件はありません。'))+'</div>';document.getElementById('reviewbody').innerHTML=h;updateBadges();return;}
- h+='<div class="rvbulkbar"><button class="rvbulk-tg'+(REVBULK?' on':'')+'" onclick="revBulkToggle()">'+(REVBULK?'一括確認モード：ON':'一括確認モードにする')+'</button>'+(REVBULK?'<span class="rvbulk-hint">物件をタップで選択 → まとめて確認済みに</span>':'')+'</div>';
+ var _csvN=PROPS.filter(function(p){return p.confirmed===false&&p.fromCsv;}).length;
+ if(_csvN)h+='<div class="rvcsvbar"><div class="rvcsv-t">CSV取込分 '+_csvN+'件（過去掲載・PDFなし等）。情報不備でもまとめて確定。ステータスは<b>ビジコンの掲載状況</b>（掲載中／掲載終了＝落とし）のまま、要入稿には送りません。</div><button class="btn-sm btn-pri" onclick="revConfirmAllCsv()">CSVを全選択して確定</button></div>';
+ h+='<div class="rvbulkbar"><button class="rvbulk-tg'+(REVBULK?' on':'')+'" onclick="revBulkToggle()">'+(REVBULK?'一括確認モード：ON':'一括確認モードにする')+'</button>'+(REVBULK?'<span class="rvbulk-hint">物件をタップで選択 → まとめて確認済みに（CSVは担当/★なしでも確定）</span>':'')+'</div>';
  if(REVBULK){var _selN=items.filter(function(p){return REVSEL[p.id];}).length;h+='<div class="rvbulkact"><button class="btn-sm btn-sec" onclick="revSelAll()">表示中を全選択</button><button class="btn-sm btn-sec" onclick="revSelNone()">選択解除</button><button class="btn-sm btn-pri" '+(_selN?'':'disabled')+' onclick="revBulkConfirm()">選択した'+_selN+'件を確認済みに</button></div>';}
  h+='<div class="rvwrap'+(RVLISTOPEN?'':' lc')+'">';
  // list
@@ -3002,11 +3035,11 @@ function renderStaff(){
  var _a=anaAgg();
  var items=staffItems();
  var host=document.getElementById('sbody');
- if(!items.length){host.innerHTML='<div class="rvempty">要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。</div>';return;}
+ if(!items.length){host.innerHTML=repAlertCard()+'<div class="rvempty">要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。</div>';return;}
  if(!CURSTAFF||!items.some(function(p){return p.id===CURSTAFF;}))CURSTAFF=items[0].id;
  var byT={};items.forEach(function(x){var t=x.tantou||'未割当';byT[t]=(byT[t]||0)+1;});
  var sumChips=STAFF.concat(['未割当']).filter(function(t){return byT[t];}).map(function(t){return '<span class="stcnt'+(t==='未割当'?' none':'')+'">'+esc(t)+' <b>'+byT[t]+'</b></span>';}).join('');
- var h='<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>';
+ var h=repAlertCard()+'<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>';
  h+='<div class="rvwrap'+(STAFFLISTOPEN?'':' lc')+'">';
  // list
  h+='<aside class="rvlist"><div class="rvlhd"><span class="t">入稿待ちリスト（'+items.length+'）</span><button onclick="staffToggleList()">'+(STAFFLISTOPEN?'‹':'›')+'</button></div>';
@@ -3401,7 +3434,8 @@ function applyBijikon(forceDate){
   photo:colFind(hdr,['画像数','写真数']),sp:colFind(hdr,['店舗案内ピックアップ掲載']),
   sa:colFind(hdr,['得意なエリア枠掲載']),vd:colFind(hdr,['動画掲載']),cm:colFind(hdr,['物件CM掲載']),
   line:colFind(hdr,['沿線']),station:colFind(hdr,['駅']),walk:colFind(hdr,['交通']),mad:colFind(hdr,['間取']),
-  area:colFind(hdr,['専有面積']),rent:colFind(hdr,['現在賃料','賃料']),mgmt:colFind(hdr,['管理費']),addr:colFind(hdr,['物件所在地','所在地']),built:colFind(hdr,['竣工年月'])
+  area:colFind(hdr,['専有面積']),rent:colFind(hdr,['現在賃料','賃料']),mgmt:colFind(hdr,['管理費']),addr:colFind(hdr,['物件所在地','所在地']),built:colFind(hdr,['竣工年月']),
+  listed:(function(){var c=colFind(hdr,['物件掲載']);return c>=0?c:17;})(),rep:(function(){var c=colFind(hdr,['代表候補']);return c>=0?c:37;})()
  };
  if(!HIST[date])HIST[date]={};
  let matched=0,created=0;const total=rows.length;const seen={};
@@ -3410,7 +3444,10 @@ function applyBijikon(forceDate){
   const room=I.room>=0?(row[I.room]||'').trim():'';
   const code=I.code>=0?(row[I.code]||'').trim():'';
   var p=findProp(name,code,room);if(!p){p=_bijiNew(name,room,code);PROPS.push(p);created++;}else{matched++;}seen[p.id]=1;
-  if(p.status!=='掲載中'){p.status='掲載中';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン掲載確認により掲載中に更新',ts:nowTS()});}
+  var _isLatest=(!p.csvAsOf||date>=p.csvAsOf);
+  var _listed=(I.listed<0)?true:/[○◯〇●⚪]/.test(String(row[I.listed]||''));
+  var _rep=(I.rep<0)?true:/[○◯〇●⚪]/.test(String(row[I.rep]||''));
+  if(_isLatest){var _newSt=_listed?'掲載中':'落とし済み';if(p.status!==_newSt){p.status=_newSt;if(!Array.isArray(p.statusLog))p.statusLog=[];p.statusLog.push({memo:(_listed?'ビジコン物件掲載○＝掲載中':'ビジコン物件掲載○なし＝掲載終了')+'('+date+')',ts:nowTS()});}p.repAlert=!_rep;}
   if(code&&!p.suumoCode)p.suumoCode=code;
   // 基本情報の空欄補完（ビジコン）
   var _bl=I.line>=0?String(row[I.line]||'').trim():'';if(_bl&&!p.line)p.line=_bl;
@@ -3450,7 +3487,7 @@ function applyBijikon(forceDate){
  recompute();saveAll();
  var _bjfile=bijikonPending&&bijikonPending.file;bijikonPending=null;document.getElementById('csvpending').innerHTML='';
  if(_bjfile)archiveImport(_bjfile,'ビジコン',date);
- log('ビジコン取込：'+date+'分。更新'+matched+'件／新規'+created+'件／掲載終了'+ended+'件'+(_bik?'／IKARI自動'+_bik+'件':'')+(_bff?'／新着即上げ'+_bff+'件':'')+'。PV・一覧PV・オプション・名寄点数・競合数を反映（新規はC印・基本情報は反響報告書で補完されます）。','ok');
+ log('ビジコン取込：'+date+'分。更新'+matched+'件／新規'+created+'件／掲載終了'+ended+'件'+(PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length?'／代表候補なしアラート'+PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length+'件':'')+(_bik?'／IKARI自動'+_bik+'件':'')+(_bff?'／新着即上げ'+_bff+'件':'')+'。物件掲載○で掲載中／○なし・物件名なしは掲載終了。代表候補○なしはアラート（Jiro連携）。','ok');
 }
 function log(msg,kind){
  const c=kind==='err'?'p-pre':kind==='ok'?'p-act':'p-st';
@@ -3849,6 +3886,7 @@ function openProp(id){
  h+='<div class="pdfhost" id="karte_pdf"></div>';
  // 右：分析＋情報
  h+='<div class="kside">';
+ if(p.repAlert)h+='<div class="kalert"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>代表候補アラート：ビジコン「代表候補」列に○がありません（Jiro連携）</div>';
  h+='<div class="kshokan"><div class="kshokan-h">担当者所感'+(p.tantou?'（'+esc(p.tantou)+'）':'')+' '+starChip(p.stars)+'</div><textarea oninput="setShokan(\''+p.id+'\',this.value)" placeholder="この物件の所感（強み・競合・推し方・気になる点…）">'+esc(p.shokan||'')+'</textarea></div>';
  h+='<div class="kmemo"><div class="kmemo-h">コメント指示メモ（入稿担当への指示・実コメント）</div>';
  if(p.memos&&p.memos.length){h+=p.memos.map(function(m,idx){return '<div class="kmrow"><span class="rmlbl '+lblCls(m.label,m.tpl)+'">'+(m.tpl?'テンプレ':esc(m.label))+'</span><span class="rmtxt">'+esc(m.text)+'</span><button class="rmdel" onclick="detMemoDel(\''+p.id+'\','+idx+')">×</button></div>';}).join('');}
