@@ -747,8 +747,8 @@ header{padding-left:54px}
 <div id="v-del" style="display:none"><div id="delbody"></div></div>
 <div id="v-cost" style="display:none"><div id="costbody"></div></div>
 <div id="v-csv" style="display:none">
- <div class="drop" id="csvdrop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M4 20V10M10 20V4M16 20v-7M20 20H3"/></svg>CSV / Excelをドロップ</div><div class="ds">ビジコン＝PV（アプリ・スマホ込）／ 反響報告書(Excel)＝反響・オプション ／ JDS＝反響</div></div>
- <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-sec" onclick="bijikonDriveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからビジコン取込</button><button class="btn btn-sec" onclick="testDrive()">ドライブ保存テスト</button></div>
+ <div class="drop" id="csvdrop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M4 20V10M10 20V4M16 20v-7M20 20H3"/></svg>CSV / Excelをドロップ</div><div class="ds">ビジコン(CSV)＝詳細PV ／ 反響報告書(Excel・入稿分析システム)＝反響・オプション ／ JDS(CSV)＝反響速報</div></div>
+ <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-pri" id="drvimpbtn" onclick="driveBatchImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Driveから一括取込</button><button class="btn btn-sec" onclick="testDrive()">ドライブ保存テスト</button></div>
  <input type="file" id="csvin" accept=".csv,.xls,.xlsx" multiple style="display:none">
  <div id="csvpending"></div>
  <div id="csvlog"></div>
@@ -876,7 +876,7 @@ function toggleAuto(){_autoPaused=!_autoPaused;try{localStorage.setItem('ibt_aut
 async function saveAll(){if(API){schedulePush();return;}await gset(SK,PROPS);await gset(HK,HIST);await gset(EK,EVENTS);}
 async function save(){if(API){schedulePush();return;}await gset(SK,PROPS);}
 function updateDbDiag(){var el=document.getElementById('dbdiag');if(!el)return;var url=API||'';var tail=url?('…'+url.slice(-14)):'(URL未設定)';var histD=0,evN=0;try{histD=Object.keys(HIST).length;}catch(e){}try{evN=Object.keys(EVENTS).filter(function(k){return k.indexOf('X|')===0;}).length;}catch(e){}el.textContent='DB '+tail+' ・ PV履歴 '+histD+'日 ・ 反響 '+evN+'件';}
-function showDbDiag(){var url=API||'(未設定)';var ov=(localStorage.getItem('ibt_api')||'').trim();var src=ov?'共有設定で上書き中':'内蔵URL';var histD=0,pv=0;try{Object.keys(HIST).forEach(function(d){histD++;var o=HIST[d];Object.keys(o).forEach(function(pid){if(o[pid]&&o[pid].pv!=null)pv++;});});}catch(e){}var evN=0;try{evN=Object.keys(EVENTS).filter(function(k){return k.indexOf('X|')===0;}).length;}catch(e){}var ok=url.indexOf('UimUgbi4hKOQ')>=0;var biDates=[];try{Object.keys(HIST).forEach(function(d){if(_hasBijikon(d))biDates.push(d);});}catch(e){}biDates.sort().reverse();var hkDates=[];try{Object.keys(HIST).forEach(function(d){if(_hasHankyo(d))hkDates.push(d);});Object.keys(EVENTS).forEach(function(k){if(k.indexOf('X|')===0){var dt=k.split('|')[1];if(dt&&hkDates.indexOf(dt)<0)hkDates.push(dt);}});}catch(e){}hkDates.sort().reverse();var fmt=function(a){return a.length?a.slice(0,16).map(function(d){return d.slice(5).replace('-','/');}).join('・')+(a.length>16?' …他'+(a.length-16)+'日':''):'なし';};alert('接続中の共有DB（'+src+'）\n'+url+'\n\n'+(ok?'\u2713 正しいURLに接続しています':'\u26a0 URLが想定と違います（末尾 …UimUgbi4hKOQ/exec が正）')+'\n\n物件 '+PROPS.length+'件 ／ PV履歴 '+histD+'日（PV記録 '+pv+'件）／ 反響(JDS) '+evN+'件\n\n■ビジコンのある日付（'+biDates.length+'日）\n'+fmt(biDates)+'\n\n■反響のある日付（'+hkDates.length+'日）\n'+fmt(hkDates)+'\n\nここに日付が並べば取込済み。日付が「なし」ならDBにデータが届いていません（取込時の対象日 or 保存失敗）。カレンダーが赤でも日付が出るなら表示不具合です。');}
+function showDbDiag(){var url=API||'(未設定)';var ov=(localStorage.getItem('ibt_api')||'').trim();var src=ov?'共有設定で上書き中':'内蔵URL';var histD=0,pv=0;try{Object.keys(HIST).forEach(function(d){histD++;var o=HIST[d];Object.keys(o).forEach(function(pid){if(o[pid]&&o[pid].pv!=null)pv++;});});}catch(e){}var evN=0;try{evN=Object.keys(EVENTS).filter(function(k){return k.indexOf('X|')===0;}).length;}catch(e){}var ok=url.indexOf('UimUgbi4hKOQ')>=0;var biDates=[];try{Object.keys(HIST).forEach(function(d){if(_hasBijikon(d))biDates.push(d);});}catch(e){}biDates.sort().reverse();var hkDates=[];try{Object.keys(HIST).forEach(function(d){if(_hasHankyo(d))hkDates.push(d);});Object.keys(EVENTS).forEach(function(k){if(k.indexOf('X|')===0){var dt=k.split('|')[1];if(dt&&hkDates.indexOf(dt)<0)hkDates.push(dt);}});}catch(e){}hkDates.sort().reverse();var fmt=function(a){return a.length?a.slice(0,16).map(function(d){return d.slice(5).replace('-','/');}).join('・')+(a.length>16?' …他'+(a.length-16)+'日':''):'なし';};alert('接続中の共有DB（'+src+'）\n'+url+'\n\n'+(ok?'\u2713 正しいURLに接続しています':'\u26a0 URLが想定と違います（末尾 …UimUgbi4hKOQ/exec が正）')+'\n\n物件 '+PROPS.length+'件 ／ PV履歴 '+histD+'日（PV記録 '+pv+'件）／ 反響（入稿分析） '+evN+'件\n\n■ビジコンのある日付（'+biDates.length+'日）\n'+fmt(biDates)+'\n\n■反響のある日付（'+hkDates.length+'日）\n'+fmt(hkDates)+'\n\nここに日付が並べば取込済み。ビジコンが「なし」ならPV未取込です（反響報告書だけでは詳細PVは入りません＝別途ビジコンCSVの取込が必要）。日付が「なし」ならDBに届いていません（取込時の対象日 or 保存失敗）。');}
 
 // ---------- recompute month-to-date metrics from HIST + EVENTS ----------
 function _ymHasData(m){if(!m)return false;var f=false;Object.keys(HIST).forEach(function(d){if(ym(d)===m)f=true;});if(f)return true;Object.keys(EVENTS).forEach(function(k){var e=EVENTS[k];if(e&&e.date&&ym(e.date)===m)f=true;});return f;}
@@ -1443,7 +1443,7 @@ function monthOptions(){
 function _ymd(d){var z=function(n){return ('0'+n).slice(-2);};return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
 function _addDays(base,n){var d=new Date(base);d.setDate(base.getDate()+n);return d;}
 function _last30(){var base=new Date();var a=[];for(var k=0;k<30;k++)a.push(_ymd(_addDays(base,-k)));return a;}
-function _hasBijikon(dt){var o=HIST[dt];if(!o)return false;return Object.keys(o).some(function(pid){var e=o[pid];return e&&(e.pv!=null||e.listv!=null||e.score!=null||e.comp!=null);});}
+function _hasBijikon(dt){var o=HIST[dt];if(!o)return false;return Object.keys(o).some(function(pid){var e=o[pid];return e&&(e.pv!=null||e.listv!=null);});}
 function _hasHankyo(dt){if(Object.keys(EVENTS).some(function(k){return k.indexOf('X|'+dt+'|')===0;}))return true;var o=HIST[dt];if(!o)return false;return Object.keys(o).some(function(pid){var e=o[pid];return e&&(e.pcpv!=null||e.inqB!=null);});}
 function pvCompareCard(){
  var days=_last30();var total=0,pc=0;
@@ -1937,7 +1937,7 @@ function renderPend(){
   +'</div></div>';}).join('');
 }
 async function testDrive(){if(!API){alert('共有設定（GASのURL）が未設定です。物件追加→共有設定で設定してください。');return;}toast('ドライブ保存をテスト中…');try{var body=JSON.stringify({action:'savePdf',name:'_接続テスト_'+Date.now()+'.pdf',date:today(),data:btoa('%PDF-1.4\n% hanako test\n')});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var t=await r.text();var ok=false,url='';try{var d=JSON.parse(t);ok=d&&d.ok;url=d&&d.url||'';}catch(e){}alert((ok?'成功：ドライブに保存できました。\n日付フォルダ（'+today()+'）の中を確認してください。\n'+url:'失敗：GASからの応答↓\n'+t.slice(0,600))+'\n\n（成功なのにDBが消えた場合はdoPostの分岐位置を確認）');}catch(e){alert('通信エラー：'+e.message+'\n→ GASを「新バージョン」で再デプロイしたか、URLが正しいか、Drive権限を承認したかを確認してください。');}}
-async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var _dt=(prop.uploadDate||today());var _base=(prop.name?((prop.name+'')+(prop.room?('-'+prop.room):'')):(prop.pdfName||'maisoku'));var _fname=(_dt+'_'+_base).replace(/\.pdf$/i,'').replace(/[\\/:*?"<>|]/g,'_').slice(0,90)+'.pdf';var body=JSON.stringify({action:'savePdf',name:_fname,date:_dt,data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
+async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var _dt=(prop.uploadDate||today());var _base=(prop.name?((prop.name+'')+(prop.room?('-'+prop.room):'')):(prop.pdfName||'maisoku'));var _fname=(_dt+'_'+_base).replace(/\.pdf$/i,'').replace(/[\\/:*?"<>|]/g,'_').slice(0,90)+'.pdf';var body=JSON.stringify({action:'savePdf',date:'登録物件',sub:_dt,name:_fname,data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
 function _nkey(s){return normName(s||'').toLowerCase().replace(/[（）()【】\[\]『』「」・･,，、。\.\-―ー－_\/／\s]/g,'');}
 function _lev(a,b){var m=a.length,n=b.length;if(!m)return n;if(!n)return m;var dp=[],i,j;for(i=0;i<=n;i++)dp[i]=i;for(i=1;i<=m;i++){var prev=dp[0];dp[0]=i;for(j=1;j<=n;j++){var t=dp[j];dp[j]=Math.min(dp[j]+1,dp[j-1]+1,prev+(a.charAt(i-1)===b.charAt(j-1)?0:1));prev=t;}}return dp[n];}
 function nameSimilar(a,b){if(!a||!b)return false;if(a===b)return true;var lo=a.length<=b.length?a:b,hi=a.length<=b.length?b:a;if(lo.length>=4&&hi.indexOf(lo)>=0)return true;var ml=Math.max(a.length,b.length);if(ml<4)return false;return (1-_lev(a,b)/ml)>=0.8;}
@@ -3263,8 +3263,56 @@ function renderOpt(){
 
 // ---------- CSV IMPORT ----------
 function fileToB64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){try{var u8=new Uint8Array(r.result);var bs='';for(var i=0;i<u8.length;i++)bs+=String.fromCharCode(u8[i]);res(btoa(bs));}catch(e){rej(e);}};r.onerror=rej;r.readAsArrayBuffer(file);});}
-async function saveImportFileToDrive(b64,name,mime,date){if(!API||!b64)return false;try{var body=JSON.stringify({action:'savePdf',sub:'取込ファイル',replaceSame:true,name:name,mime:mime||'application/octet-stream',date:date||today(),data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();return !!(d&&d.ok);}catch(e){return false;}}
-async function archiveImport(file,label,date){try{if(!API||!file)return;var b64=await fileToB64(file);var ext=((file.name||'').split('.').pop()||'').toLowerCase();var mime=ext==='csv'?'text/csv':(ext==='xls'?'application/vnd.ms-excel':(ext==='xlsx'?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'application/octet-stream'));var fn=label+'_'+(date||today())+'.'+(ext||'dat');var ok=await saveImportFileToDrive(b64,fn,mime,date);if(ok)toast('元ファイルをドライブに保管しました（取込ファイル/'+(date||today())+'）');}catch(e){}}
+async function saveImportFileToDrive(b64,name,mime,folder){if(!API||!b64)return false;try{var body=JSON.stringify({action:'savePdf',date:(folder||'取込ファイル'),replaceSame:true,name:name,mime:mime||'application/octet-stream',data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();return !!(d&&d.ok);}catch(e){return false;}}
+async function archiveImport(file,label,date){try{if(!API||!file)return;var b64=await fileToB64(file);var ext=((file.name||'').split('.').pop()||'').toLowerCase();var mime=ext==='csv'?'text/csv':(ext==='xls'?'application/vnd.ms-excel':(ext==='xlsx'?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'application/octet-stream'));var ymd=(date||today()).replace(/-/g,'');var fn=ymd+'-'+label+'.'+(ext||'dat');var ok=await saveImportFileToDrive(b64,fn,mime,label);if(ok)toast('元ファイルをドライブに保管しました（'+label+' / '+fn+'）');}catch(e){}}
+var _importBatch=false;
+function _impDone(){var e=EVENTS['IMP__done'];return (e&&e.files&&typeof e.files==='object')?e.files:{};}
+function _markImp(id,meta){var f=_impDone();f[id]=Object.assign({at:nowTS()},meta||{});EVENTS['IMP__done']={kind:'imp',files:f};}
+function _b64ToU8(b64){var bin=atob(b64);var u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u;}
+function _decodeCsvBytes(u){try{if(u[0]===0xEF&&u[1]===0xBB&&u[2]===0xBF){return new TextDecoder('utf-8').decode(u);}var sj=new TextDecoder('shift_jis').decode(u);if((sj.match(/\uFFFD/g)||[]).length>5){return new TextDecoder('utf-8').decode(u);}return sj;}catch(e){try{return new TextDecoder('utf-8').decode(u);}catch(e2){return '';}}}
+function _dateFromName(n){var m=(n||'').match(/(\d{4})(\d{2})(\d{2})/);return m?(m[1]+'-'+m[2]+'-'+m[3]):'';}
+async function driveBatchImport(){
+ if(!API){alert('共有設定（GASのURL）が未設定です。物件追加→共有設定で設定してください。');return;}
+ if(!confirm('Driveの「ビジコンCSV」「反響報告書」フォルダから、まだ取り込んでいないファイルを一括取込します。\nよろしいですか？'))return;
+ var btn=document.getElementById('drvimpbtn');if(btn){btn.disabled=true;btn.textContent='取込中…';}
+ toast('Driveを確認中…');
+ var done=_impDone();
+ var folders=[{name:'ビジコンCSV',type:'biji'},{name:'反響報告書',type:'hankyo'}];
+ var all=[];
+ for(var fI=0;fI<folders.length;fI++){try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'listFolder',folder:folders[fI].name})});var d=await r.json();if(d&&d.ok&&Array.isArray(d.files)){d.files.forEach(function(x){x._type=folders[fI].type;all.push(x);});}}catch(e){}}
+ if(all.length===0){if(btn){btn.disabled=false;btn.textContent='Driveから一括取込';}alert('Driveのフォルダにファイルが見つかりませんでした。\n（各CSVを一度手動で取り込むとDriveに保存され、次回から一括取込できます）');return;}
+ var todo=all.filter(function(x){return !done[x.id];});
+ var skip=all.length-todo.length;
+ if(todo.length===0){if(btn){btn.disabled=false;btn.textContent='Driveから一括取込';}alert('新しいファイルはありません。\n対象 '+all.length+'件はすべて取込済みです。');return;}
+ todo.sort(function(a,b){return (a.name||'')<(b.name||'')?-1:1;});
+ var okB=0,okH=0,ng=0,ngList=[];
+ _importBatch=true;
+ for(var i=0;i<todo.length;i++){var file=todo[i];if(btn)btn.textContent='取込中… '+(i+1)+'/'+todo.length;
+  try{
+   var rr=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'getPdf',fileId:file.id})});
+   var dd=await rr.json();
+   if(!dd||!dd.ok||!dd.b64){ng++;ngList.push(file.name);continue;}
+   var u8=_b64ToU8(dd.b64);
+   if(file._type==='biji'){
+    var txt=_decodeCsvBytes(u8);var L=txt.split(/\r?\n/).filter(function(l){return l.trim();});
+    if(L.length<2){ng++;ngList.push(file.name);continue;}
+    var hd=parseCSVRow(L[0]).map(function(h){return h.trim();});var rw=L.slice(1).map(parseCSVRow);
+    var dt=_dateFromName(file.name)||detectBijikonDate(txt);
+    if(!dt){ng++;ngList.push(file.name+'(日付不明)');continue;}
+    bijikonPending={hdr:hd,rows:rw,file:null};applyBijikon(dt);okB++;
+   }else{
+    var blob=new File([u8],file.name||'反響報告書.xlsx');await processHankyo(blob);okH++;
+   }
+   _markImp(file.id,{name:file.name,type:file._type});
+  }catch(e){ng++;ngList.push(file.name);}
+ }
+ _importBatch=false;
+ try{recompute();}catch(e){}
+ if(typeof _saveDB==='function')_saveDB();if(typeof flushPush==='function'){try{flushPush();}catch(e){}}
+ try{refreshCurrentTab();}catch(e){}
+ if(btn){btn.disabled=false;btn.textContent='Driveから一括取込';}
+ alert('Drive一括取込 完了\n\nビジコン '+okB+'件 ／ 反響報告書 '+okH+'件'+(skip?'\nスキップ（取込済）'+skip+'件':'')+(ng?'\n失敗 '+ng+'件：'+ngList.slice(0,6).join('、'):''));
+}
 function setupCSV(){const dz=document.getElementById('csvdrop'),inp=document.getElementById('csvin');
  dz.addEventListener('click',()=>inp.click());
  ['dragenter','dragover'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('over');}));
@@ -3346,6 +3394,7 @@ async function processHankyo(file){
  I.pv=dstart>=0?dstart+3:-1;I.inq=dstart>=0?dstart+7:-1;I.lv=dstart>=0?dstart+1:-1;
  var repDate=twoDaysAgo();var _dfound=false;for(var _r=0;_r<Math.min(M.length,Math.max(hr+1,9))&&!_dfound;_r++){var _rw=M[_r]||[];for(var _c=0;_c<_rw.length;_c++){var _cv=String(_rw[_c]==null?'':_rw[_c]);var _mm=_cv.match(/(\d{2})年(\d{2})月(\d{2})日\s*[~\uff5e\u301c-]\s*(\d{2})年(\d{2})月(\d{2})日/);if(_mm){repDate='20'+_mm[4]+'-'+_mm[5]+'-'+_mm[6];_dfound=true;break;}}}if(!_dfound){for(var _r2=0;_r2<Math.min(M.length,Math.max(hr+1,9))&&!_dfound;_r2++){var _rw2=M[_r2]||[];for(var _c2=0;_c2<_rw2.length;_c2++){var _cv2=String(_rw2[_c2]==null?'':_rw2[_c2]);var _ms=_cv2.match(/(\d{2})年(\d{2})月(\d{2})日/);if(_ms){repDate='20'+_ms[1]+'-'+_ms[2]+'-'+_ms[3];_dfound=true;break;}}}}
  if(I.name<0||I.pv<0){log('必要な列（物件名・当日PV）が見つかりませんでした。','err');return;}
+ if(!_importBatch&&_hasHankyo(repDate)){if(!confirm('この日付（'+repDate+'）の反響報告書は既に取込済みです。\n上書きして取り込みますか？')){log('取込を中止しました。','err');return;}}
  let matched=0,created=0,total=0;
  for(let r=hr+1;r<M.length;r++){
   const row=M[r];if(!row)continue;const name=String(row[I.name]||'').trim();if(!name)continue;total++;
@@ -3401,8 +3450,8 @@ async function processHankyo(file){
    if(!p.madori&&mad)p.madori=mad;if((p.rent===''||p.rent==null)&&rent!=='')p.rent=rent;if(!p.station&&station)p.station=station;if(!p.line&&line)p.line=line;if(!p.walkMin&&wm)p.walkMin=wm;if((p.mgmt===''||p.mgmt==null)&&mgmtV!=='')p.mgmt=mgmtV;if((p.waku==='その他'||!p.waku)&&p.station&&p.madori)p.waku=autoWakuImport(p.station,p.madori,String(totFromParts(p.rent,p.mgmt)||'0'));
   }
  }
- var _ff=freshFastSweep();var _ik=autoIkariSweep();viewYM=_latestDataYM()||viewYM;recompute();saveAll();flushPush();
- archiveImport(file,'反響報告書',repDate);
+ var _ff=freshFastSweep();var _ik=autoIkariSweep();viewYM=_latestDataYM()||viewYM;if(!_importBatch){recompute();saveAll();flushPush();}
+ if(!_importBatch)archiveImport(file,'反響報告書',repDate);
  log('反響報告書取込：'+repDate+'分 '+total+'行（更新'+matched+'件／新規'+created+'件'+(_ik?'／IKARI自動'+_ik+'件':'')+'）。反響・オプション・名寄点数・競合数・掲載開始日を反映（PVはPC閲覧のみのため取り込まず、PVはビジコンから取得します）。','ok');
 }
 function processJDS(hdr,rows){
@@ -3462,6 +3511,7 @@ function applyBijikon(forceDate){
  var _de=document.getElementById('bjdate');
  const date=forceDate||(_de?_de.value:'');
  if(!date){toast('対象日を選択してください');return;}
+ if(!_importBatch&&_hasBijikon(date)){if(!confirm('この日付（'+date+'）のビジコンは既に取込済みです。\n上書きして取り込みますか？')){toast('取込を中止しました');return;}}
  const hdr=bijikonPending.hdr,rows=bijikonPending.rows;
  const I={
   name:colFind(hdr,['物件名']),room:colFind(hdr,['部屋番号','号室']),code:colFind(hdr,['物件コード','SUUMO物件コード','管理番号']),
@@ -3525,9 +3575,9 @@ function applyBijikon(forceDate){
  let ended=0;
  PROPS.forEach(p=>{if(p.status==='掲載中'&&!seen[p.id]){p.status='落とし済み';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン未掲載のため掲載終了',ts:nowTS()});ended++;}});
  var _bff=freshFastSweep();var _bik=autoIkariSweep();
- viewYM=_latestDataYM()||viewYM;recompute();saveAll();flushPush();
- var _bjfile=bijikonPending&&bijikonPending.file;bijikonPending=null;document.getElementById('csvpending').innerHTML='';
- if(_bjfile)archiveImport(_bjfile,'ビジコン',date);
+ viewYM=_latestDataYM()||viewYM;if(!_importBatch){recompute();saveAll();flushPush();}
+ var _bjfile=bijikonPending&&bijikonPending.file;bijikonPending=null;var _cp=document.getElementById('csvpending');if(_cp)_cp.innerHTML='';
+ if(_bjfile&&!_importBatch)archiveImport(_bjfile,'ビジコンCSV',date);
  log('ビジコン取込：'+date+'分。更新'+matched+'件／新規'+created+'件／掲載終了'+ended+'件'+(PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length?'／代表候補なしアラート'+PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length+'件':'')+(_bik?'／IKARI自動'+_bik+'件':'')+(_bff?'／新着即上げ'+_bff+'件':'')+'。物件掲載○で掲載中／○なし・物件名なしは掲載終了。代表候補○なしはアラート（Jiro連携）。','ok');
 }
 function log(msg,kind){
