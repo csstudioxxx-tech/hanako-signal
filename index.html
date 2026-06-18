@@ -648,6 +648,25 @@ header{padding-left:54px}
 .ratable td b{font-weight:700}
 .ramini{font-size:10.5px;color:var(--text3);margin-top:1px}
 .ratan{font-size:11px;font-weight:700;color:var(--accent2);background:var(--accent-soft);border-radius:6px;padding:2px 8px;white-space:nowrap}
+.per{font-size:10px;color:var(--accent2);font-weight:700;margin-top:1px}
+.bdwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.bdtbl{min-width:480px}
+.repseg{display:inline-flex;background:var(--gray-bg);border-radius:9px;padding:2px;gap:2px;margin:4px 2px 10px;align-items:center;flex-wrap:wrap}
+.repseg button{appearance:none;border:none;background:transparent;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--text2);padding:6px 13px;border-radius:7px;cursor:pointer}
+.repseg button.on{background:#fff;color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.repseg-d{font-size:11.5px;font-weight:700;color:var(--text2);padding:0 10px}
+.pcard .rng{color:var(--text2)!important;font-weight:700}
+.pcard .perline{color:var(--accent2);font-weight:600}
+.wkfbar{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.wkfhd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.wkfl{font-size:12px;font-weight:700;color:var(--text2)}
+.wkfquick{display:inline-flex;gap:5px}
+.wkfquick button{appearance:none;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:11px;font-weight:700;color:var(--text2);padding:5px 11px;border-radius:8px;cursor:pointer}
+.wkfquick button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.wkfchips{display:flex;gap:6px;flex-wrap:wrap}
+.wkchip{appearance:none;border:1.5px solid var(--border);background:#fff;font-family:inherit;font-size:12px;font-weight:700;color:var(--text2);padding:6px 13px;border-radius:999px;cursor:pointer;opacity:.5;transition:opacity .12s,box-shadow .12s}
+.wkchip.on{opacity:1;box-shadow:inset 0 0 0 1.5px currentColor}
+.wkchip.p-dm.on{color:#1e6fe0;border-color:#1e6fe0}.wkchip.p-op.on{color:#c0392b;border-color:#c0392b}.wkchip.p-is.on{color:#1f9d57;border-color:#1f9d57}.wkchip.p-hh.on{color:#c77700;border-color:#c77700}.wkchip.p-ik.on{color:#7a4dd6;border-color:#7a4dd6}.wkchip.p-ot.on{color:var(--text2);border-color:var(--text3)}
 </style></head><body>
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <div class="navsc" id="navsc" onclick="navClose()"></div>
@@ -833,7 +852,7 @@ async function load(){
   if(p.mgmt===undefined||p.mgmt===null){p.mgmt=(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):'');}
   if(p.driveId===undefined)p.driveId='';if(p.driveUrl===undefined)p.driveUrl='';if(p.suumoUrl===undefined)p.suumoUrl='';
  });
- viewYM=curYM();
+ viewYM=(viewYM&&_ymHasData(viewYM))?viewYM:(_latestDataYM()||curYM());
 }
 var _editing=false,_pendingRefresh=false,_autoPaused=false;
 function isEditing(){if(_editing)return true;var a=document.activeElement;if(!a)return false;if(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return true;if(a.isContentEditable)return true;return false;}
@@ -857,9 +876,11 @@ function toggleAuto(){_autoPaused=!_autoPaused;try{localStorage.setItem('ibt_aut
 async function saveAll(){if(API){schedulePush();return;}await gset(SK,PROPS);await gset(HK,HIST);await gset(EK,EVENTS);}
 async function save(){if(API){schedulePush();return;}await gset(SK,PROPS);}
 function updateDbDiag(){var el=document.getElementById('dbdiag');if(!el)return;var url=API||'';var tail=url?('…'+url.slice(-14)):'(URL未設定)';var histD=0,evN=0;try{histD=Object.keys(HIST).length;}catch(e){}try{evN=Object.keys(EVENTS).filter(function(k){return k.indexOf('X|')===0;}).length;}catch(e){}el.textContent='DB '+tail+' ・ PV履歴 '+histD+'日 ・ 反響 '+evN+'件';}
-function showDbDiag(){var url=API||'(未設定)';var ov=(localStorage.getItem('ibt_api')||'').trim();var src=ov?'共有設定で上書き中':'内蔵URL';var histD=0,pv=0;try{Object.keys(HIST).forEach(function(d){histD++;var o=HIST[d];Object.keys(o).forEach(function(pid){if(o[pid]&&o[pid].pv!=null)pv++;});});}catch(e){}var evN=0;try{evN=Object.keys(EVENTS).filter(function(k){return k.indexOf('X|')===0;}).length;}catch(e){}var ok=url.indexOf('UimUgbi4hKOQ')>=0;alert('接続中の共有DB（'+src+'）\n'+url+'\n\n'+(ok?'✓ 正しいURLに接続しています':'⚠ URLが想定と違います（末尾 …UimUgbi4hKOQ/exec が正）。「共有設定」で直してください')+'\n\n物件 '+PROPS.length+'件 ／ PV履歴 '+histD+'日（PV記録 '+pv+'件）／ 反響(JDS) '+evN+'件\n\nPV履歴が0日なら、ビジコン/反響報告書がこのDBに未取込です。');}
+function showDbDiag(){var url=API||'(未設定)';var ov=(localStorage.getItem('ibt_api')||'').trim();var src=ov?'共有設定で上書き中':'内蔵URL';var histD=0,pv=0;try{Object.keys(HIST).forEach(function(d){histD++;var o=HIST[d];Object.keys(o).forEach(function(pid){if(o[pid]&&o[pid].pv!=null)pv++;});});}catch(e){}var evN=0;try{evN=Object.keys(EVENTS).filter(function(k){return k.indexOf('X|')===0;}).length;}catch(e){}var ok=url.indexOf('UimUgbi4hKOQ')>=0;var biDates=[];try{Object.keys(HIST).forEach(function(d){if(_hasBijikon(d))biDates.push(d);});}catch(e){}biDates.sort().reverse();var hkDates=[];try{Object.keys(HIST).forEach(function(d){if(_hasHankyo(d))hkDates.push(d);});Object.keys(EVENTS).forEach(function(k){if(k.indexOf('X|')===0){var dt=k.split('|')[1];if(dt&&hkDates.indexOf(dt)<0)hkDates.push(dt);}});}catch(e){}hkDates.sort().reverse();var fmt=function(a){return a.length?a.slice(0,16).map(function(d){return d.slice(5).replace('-','/');}).join('・')+(a.length>16?' …他'+(a.length-16)+'日':''):'なし';};alert('接続中の共有DB（'+src+'）\n'+url+'\n\n'+(ok?'\u2713 正しいURLに接続しています':'\u26a0 URLが想定と違います（末尾 …UimUgbi4hKOQ/exec が正）')+'\n\n物件 '+PROPS.length+'件 ／ PV履歴 '+histD+'日（PV記録 '+pv+'件）／ 反響(JDS) '+evN+'件\n\n■ビジコンのある日付（'+biDates.length+'日）\n'+fmt(biDates)+'\n\n■反響のある日付（'+hkDates.length+'日）\n'+fmt(hkDates)+'\n\nここに日付が並べば取込済み。日付が「なし」ならDBにデータが届いていません（取込時の対象日 or 保存失敗）。カレンダーが赤でも日付が出るなら表示不具合です。');}
 
 // ---------- recompute month-to-date metrics from HIST + EVENTS ----------
+function _ymHasData(m){if(!m)return false;var f=false;Object.keys(HIST).forEach(function(d){if(ym(d)===m)f=true;});if(f)return true;Object.keys(EVENTS).forEach(function(k){var e=EVENTS[k];if(e&&e.date&&ym(e.date)===m)f=true;});return f;}
+function _latestDataYM(){var best='';Object.keys(HIST).forEach(function(d){var o=HIST[d];var has=false;Object.keys(o).forEach(function(pid){if(o[pid]&&(o[pid].pv!=null||o[pid].inqB!=null||o[pid].listv!=null))has=true;});if(has){var m=ym(d);if(m>best)best=m;}});Object.keys(EVENTS).forEach(function(k){var e=EVENTS[k];if(e&&e.date){var m=ym(e.date);if(m>best)best=m;}});return best;}
 function recompute(){
  const m=viewYM;
  const pvm={},inqBm={};
@@ -1422,8 +1443,8 @@ function monthOptions(){
 function _ymd(d){var z=function(n){return ('0'+n).slice(-2);};return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
 function _addDays(base,n){var d=new Date(base);d.setDate(base.getDate()+n);return d;}
 function _last30(){var base=new Date();var a=[];for(var k=0;k<30;k++)a.push(_ymd(_addDays(base,-k)));return a;}
-function _hasBijikon(dt){var o=HIST[dt];if(!o)return false;return Object.keys(o).some(function(pid){return o[pid]&&o[pid].pv!=null;});}
-function _hasHankyo(dt){if(Object.keys(EVENTS).some(function(k){return k.indexOf('X|'+dt+'|')===0;}))return true;var o=HIST[dt];if(!o)return false;return Object.keys(o).some(function(pid){return o[pid]&&o[pid].pcpv!=null;});}
+function _hasBijikon(dt){var o=HIST[dt];if(!o)return false;return Object.keys(o).some(function(pid){var e=o[pid];return e&&(e.pv!=null||e.listv!=null||e.score!=null||e.comp!=null);});}
+function _hasHankyo(dt){if(Object.keys(EVENTS).some(function(k){return k.indexOf('X|'+dt+'|')===0;}))return true;var o=HIST[dt];if(!o)return false;return Object.keys(o).some(function(pid){var e=o[pid];return e&&(e.pcpv!=null||e.inqB!=null);});}
 function pvCompareCard(){
  var days=_last30();var total=0,pc=0;
  days.forEach(function(dt){var o=HIST[dt];if(!o)return;Object.keys(o).forEach(function(pid){var e=o[pid]||{};if(e.pv!=null)total+=(+e.pv||0);if(e.pcpv!=null)pc+=(+e.pcpv||0);});});
@@ -1645,30 +1666,33 @@ function uploadGapCard(){
 function renderDash(){
  recompute();
  const ct={dm:0,op:0,is:0,hh:0,ik:0,ot:0,uc:0};
- PROPS.forEach(p=>{const w=WK_MAP[p.waku]||'is';ct[w]=(ct[w]||0)+1;});
+ const pvw={dm:0,op:0,is:0,hh:0,ik:0,ot:0,uc:0};
+ PROPS.forEach(p=>{const w=WK_MAP[p.waku]||'is';ct[w]=(ct[w]||0)+1;if(p.status==='掲載中')pvw[w]=(pvw[w]||0)+(+(p.csvPV||0));});
  var iq;
  if(WAKU_MODE==='event'){iq=eventInqByWaku(viewYM);}else{iq={dm:0,op:0,is:0,hh:0,ik:0,ot:0,uc:0};PROPS.forEach(p=>{const w=WK_MAP[p.waku]||'is';iq[w]=(iq[w]||0)+(+(p.csvInq||0));});}
  const doInq=(iq.dm||0)+(iq.op||0),isInq=(iq.is||0),total=doInq+isInq+(iq.hh||0)+(iq.ik||0);
  const opts=monthOptions().map(m=>'<option'+(m===viewYM?' selected':'')+'>'+m+'</option>').join('');
  let h='';
 
- h+='<div class="spread" style="margin-bottom:10px"><div class="muted" style="font-size:12px">対象月</div><select style="width:auto;padding:7px 10px" onchange="viewYM=this.value;renderDash()">'+opts+'</select></div>';
+ h+='<div class="spread" style="margin-bottom:10px"><div class="muted" style="font-size:12px">対象月'+(viewYM!==curYM()?'（データのある月を表示中）':'')+'</div><select style="width:auto;padding:7px 10px" onchange="viewYM=this.value;renderDash()">'+opts+'</select></div>';
  h+='<div class="wkmode fade"><span class="wkmode-l">反響の集計</span><div class="wkmode-tg">'+'<button class="'+(WAKU_MODE==="current"?"on":"")+'" onclick="WAKU_MODE=\'current\';renderDash()">現在枠ベース</button>'+'<button class="'+(WAKU_MODE==="event"?"on":"")+'" onclick="WAKU_MODE=\'event\';renderDash()">発生時枠ベース</button>'+'</div></div>';
  h+='<div class="hero fade"><div class="t">'+viewYM+' 反響目標</div><div class="n">'+total+' <small>/ '+TARGETS.total+'</small></div>'
   +'<div class="bar" style="height:6px;margin-top:9px"><div class="fill" style="width:'+Math.min(total/TARGETS.total*100,100)+'%;background:var(--accent)"></div></div>'
   +'<div class="s">D+O '+doInq+'/'+TARGETS.do_inq+' ・ Insight(YOKOYAMA) '+isInq+'/'+TARGETS.is_inq+' ・ High-Hold '+(iq.hh||0)+' ・ IKARI '+(iq.ik||0)+'</div></div>';
  var _sc=statusCounts();h+='<div class="stsum fade">'+'<div class="stsum-c st-pre"><div class="stsum-n">'+_sc['要入稿']+'</div><div class="stsum-l">要入稿</div></div>'+'<div class="stsum-c st-live"><div class="stsum-n">'+_sc['掲載中']+'</div><div class="stsum-l">掲載中</div></div>'+'<div class="stsum-c st-hold"><div class="stsum-n">'+_sc['保留']+'</div><div class="stsum-l">保留</div></div>'+'<div class="stsum-c st-drop"><div class="stsum-n">'+_sc['落とし済み']+'</div><div class="stsum-l">落とし</div></div>'+'</div>';h+=todayOutCard();h+=uploadGapCard();h+=pvCompareCard();h+=dashStaffCard();h+='<div class="stat-grid fade">';
  [['dm','Demand','反響ランキング','var(--accent)'],['op','Opportunity','オポゾーン','var(--red)'],['is','Insight','経験・知見','var(--green)'],['hh','High-Hold','高額キープ','var(--amber)'],['ik','IKARI','30日経過','var(--purple)']].forEach(a=>{
-  h+='<div class="stat '+a[0]+'"><div class="t">'+a[1]+'</div><div class="n">'+ct[a[0]]+'<small>/'+TARGETS[a[0]]+'</small></div><div class="s">'+a[2]+'</div><div class="statiq">反響 <b>'+(iq[a[0]]||0)+'</b></div><div class="bar"><div class="fill" style="width:'+Math.min(ct[a[0]]/TARGETS[a[0]]*100,100)+'%;background:'+a[3]+'"></div></div></div>';});
+  h+='<div class="stat '+a[0]+'"><div class="t">'+a[1]+'</div><div class="n">'+ct[a[0]]+'<small>/'+TARGETS[a[0]]+'</small></div><div class="s">'+a[2]+'</div><div class="statiq">反響 <b>'+(iq[a[0]]||0)+'</b> ・ 詳細PV <b>'+(pvw[a[0]]||0).toLocaleString()+'</b></div><div class="bar"><div class="fill" style="width:'+Math.min(ct[a[0]]/TARGETS[a[0]]*100,100)+'%;background:'+a[3]+'"></div></div></div>';});
  h+='</div>';
  h+='<div class="stat-grid" style="grid-template-columns:1fr 1fr">';
  h+='<div class="hero" style="margin:0"><div class="t">D+O 合算反響</div><div class="n">'+doInq+' <small>/ '+TARGETS.do_inq+'</small></div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.min(doInq/TARGETS.do_inq*100,100)+'%;background:var(--accent)"></div></div></div>';
  h+='<div class="hero" style="margin:0"><div class="t">Insight(YOKOYAMA) 反響</div><div class="n">'+isInq+' <small>/ '+TARGETS.is_inq+'</small></div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.min(isInq/TARGETS.is_inq*100,100)+'%;background:var(--green)"></div></div></div>';
  h+='</div>';
  // performance table
+ h+=wakuFilterBar();
  var allP=liveG();
  var sk=window._perfSort||'csvInq';
  allP.sort((a,b)=>{
+  if(sk==='ikari'){var ia=a.waku==='IKARI'?0:1,ib=b.waku==='IKARI'?0:1;if(ia!==ib)return ia-ib;return(+(b.csvInq||0))-(+(a.csvInq||0));}
   if(sk==='csvInq')return(+(b.csvInq||0))-(+(a.csvInq||0));
   if(sk==='csvPV')return(+(b.csvPV||0))-(+(a.csvPV||0));
   if(sk==='pvLow')return(+(a.csvPV||0))-(+(b.csvPV||0));
@@ -1678,7 +1702,7 @@ function renderDash(){
  if(allP.length){
   var si=0,sp=0;allP.forEach(p=>{si+=+(p.csvInq||0);sp+=+(p.csvPV||0);});
   h+='<div class="note" style="margin:0 2px 8px">合計 反響 '+si+' ・ 詳細PV '+sp+' ・ 平均遷移率 '+(sp>0?(si/sp*100).toFixed(1):'0')+'%</div>';
-  h+='<div class="filt">'+[['csvInq','反響多い順'],['csvPV','PV多い順'],['pvLow','PV少ない順'],['rate','遷移率順']].map(o=>'<button class="'+(sk===o[0]?'on':'')+'" onclick="window._perfSort=\''+o[0]+'\';renderDash()">'+o[1]+'</button>').join('')+'</div>';
+  h+='<div class="filt">'+[['csvInq','反響多い順'],['csvPV','PV多い順'],['pvLow','PV少ない順'],['rate','遷移率順'],['ikari','IKARI順']].map(o=>'<button class="'+(sk===o[0]?'on':'')+'" onclick="window._perfSort=\''+o[0]+'\';renderDash()">'+o[1]+'</button>').join('')+'</div>';
   h+='<div class="tblwrap"><table class="tbl"><tr><th>枠</th><th>物件</th><th>駅</th><th>賃料</th><th>詳細PV</th><th>反響</th><th>遷移率</th><th>掲載開始</th><th>状況</th><th></th></tr>';
   allP.forEach(p=>{
    var pv=+(p.csvPV||0),inq=+(p.csvInq||0),rate=pv>0?(inq/pv*100).toFixed(1)+'%':'-';
@@ -2091,9 +2115,17 @@ function reviewInfo(p){var tr=totalRent(p);return '<div style="margin-top:8px;fo
 function wkLabel(w){return w==='Insight'?'Insight(YOKOYAMA)':(w==='その他'?'その他(仮説検証群)':w);}
 function wakuSelEl(id,val){var opts=['Demand','Opportunity','Insight','High-Hold','その他'];return '<select class="ined" onchange="editProp(\''+id+'\',\'waku\',this.value)">'+opts.map(function(o){return '<option value="'+o+'"'+(String(val)===o?' selected':'')+'>'+wkLabel(o)+'</option>';}).join('')+'</select>';}
 function inGroup(p){if(GROUP==='ALL')return true;if(GROUP==='DO')return p.waku==='Demand'||p.waku==='Opportunity';return p.waku===GROUP;}
-function liveG(){return PROPS.filter(function(p){return p.status==='掲載中'&&inGroup(p);});}
+function liveG(){return PROPS.filter(function(p){return p.status==='掲載中'&&inGroup(p)&&wkSelMatch(p);});}
 function groupBar(){var opts=[['ALL','ALL（全体）'],['Demand','Demand'],['Opportunity','Opportunity'],['DO','Demand＋Opportunity'],['High-Hold','High-Hold'],['Insight','Insight(YOKOYAMA)'],['その他','その他(仮説検証群)']];var tot=0;PROPS.forEach(function(p){if(p.status==='掲載中')tot+=(+(p.csvInq||0)||0);});return '<div class="gbar">'+opts.map(function(o){return '<button class="gbtn'+(GROUP===o[0]?' on':'')+'" onclick="setGroup(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'<span class="gtot">全体の反響合計 '+tot+'</span></div>';}
 function setGroup(g){GROUP=g;tab(CURTAB);}
+var WSEL={Demand:true,Opportunity:true,Insight:true,'High-Hold':true,IKARI:true,'その他':true};
+function _wkOf(p){var w=p.waku||'その他';return WSEL.hasOwnProperty(w)?w:'その他';}
+function wkSelMatch(p){return !!WSEL[_wkOf(p)];}
+function wkToggle(w){WSEL[w]=!WSEL[w];tab(CURTAB);}
+function wkSelAll(){for(var k in WSEL)WSEL[k]=true;tab(CURTAB);}
+function wkNoIkari(){for(var k in WSEL)WSEL[k]=true;WSEL.IKARI=false;tab(CURTAB);}
+function wkOnlyIkari(){for(var k in WSEL)WSEL[k]=false;WSEL.IKARI=true;tab(CURTAB);}
+function wakuFilterBar(){var ws=['Demand','Opportunity','Insight','High-Hold','IKARI','その他'];var anyOff=ws.some(function(w){return !WSEL[w];});var onlyIk=WSEL.IKARI&&ws.every(function(w){return w==='IKARI'?WSEL[w]:!WSEL[w];});return '<div class="wkfbar fade"><div class="wkfhd"><span class="wkfl">枠で絞り込み（複数選択可）</span><div class="wkfquick"><button class="'+(!anyOff?'on':'')+'" onclick="wkSelAll()">全て</button><button class="'+(!WSEL.IKARI&&!ws.filter(function(w){return w!=="IKARI";}).some(function(w){return !WSEL[w];})?'on':'')+'" onclick="wkNoIkari()">IKARI除外</button><button class="'+(onlyIk?'on':'')+'" onclick="wkOnlyIkari()">IKARIだけ</button></div></div><div class="wkfchips">'+ws.map(function(w){return '<button class="wkchip '+(WK_PILL[WK_MAP[w]||'ot'])+(WSEL[w]?' on':'')+'" onclick="wkToggle(\''+w+'\')">'+esc(w)+'</button>';}).join('')+'</div></div>';}
 let CURREV=null,RVLISTOPEN=true;
 var RVF=[['name','物件名'],['room','部屋番号'],['madori','間取り'],['rent','家賃(万)'],['mgmt','管理費(円)'],['area','面積'],['deposit','敷金'],['keyMoney','礼金'],['age','築年'],['structure','構造'],['floor','階'],['address','住所'],['mgmtCo','管理会社名'],['phone','管理会社TEL'],['fax','管理会社FAX'],['propNo','物件番号'],['infoDate','情報公開日'],['rtMedia','R.T.確認媒体']];
 var REVSRC='all';var REVSORT='default';
@@ -2356,6 +2388,9 @@ function _repAddDays(iso,n){var t=new Date(String(iso).replace(/-/g,'/'));t.setD
 function _repLatestDate(){var ds=Object.keys(HIST).filter(function(d){var o=HIST[d];return Object.keys(o).some(function(p){return (+o[p].pv||0)>0;});}).sort();if(ds.length)return ds[ds.length-1];return _repAddDays(today(),-1);}
 function _repRange(a,b){var pv=0,lv=0,inq=0;Object.keys(HIST).forEach(function(d){if(d>=a&&d<=b){var o=HIST[d];Object.keys(o).forEach(function(pid){pv+=+o[pid].pv||0;lv+=+o[pid].listv||0;});}});Object.keys(EVENTS).forEach(function(k){var e=EVENTS[k];if(e.date&&e.date>=a&&e.date<=b)inq++;});return{pv:pv,lv:lv,inq:inq,rate:pv?inq/pv*100:0,trans:lv?pv/lv*100:0};}
 function _repStations(a,b){var m={};Object.keys(HIST).forEach(function(d){if(d>=a&&d<=b){var o=HIST[d];Object.keys(o).forEach(function(pid){var p=PROPS.find(function(x){return x.id===pid;});if(!p)return;var s=p.station||'(駅未設定)';m[s]=m[s]||{pv:0,inq:0};m[s].pv+=+o[pid].pv||0;});}});Object.keys(EVENTS).forEach(function(k){var e=EVENTS[k];if(e.date&&e.date>=a&&e.date<=b&&e.propId){var p=PROPS.find(function(x){return x.id===e.propId;});if(p){var s=p.station||'(駅未設定)';m[s]=m[s]||{pv:0,inq:0};m[s].inq++;}}});return Object.keys(m).map(function(s){return{s:s,pv:m[s].pv,inq:m[s].inq,rate:m[s].pv?m[s].inq/m[s].pv*100:0};}).filter(function(x){return x.pv>0;}).sort(function(x,y){return y.rate-x.rate;});}
+var REP_RANGE='week';
+function repRange(v){REP_RANGE=v;renderReport();}
+function _md(iso){return String(iso||'').slice(5).replace('-','/');}
 function _repCtx(){
  var latest=_repLatestDate();
  var w0=_repAddDays(latest,-6), m0=latest.slice(0,7)+'-01', d30=_repAddDays(latest,-29);
@@ -2373,7 +2408,7 @@ function _repCtx(){
 function _f0(n){return Math.round(n).toLocaleString();}
 function _f2(n){return (Math.round(n*100)/100).toFixed(2);}
 function _f1(n){return (Math.round(n*10)/10).toFixed(1);}
-function _pcard(lab,rng,c){return '<div class="pcard"><div class="lab">'+lab+'</div><div class="rng">'+rng+'</div><div class="big">'+_f0(c.pv)+'<span style="font-size:12px;color:#9a9a9a"> 詳細PV</span></div><div class="sm">反響 '+c.inq+' ・ <b>反響率 '+_f2(c.rate)+'%</b></div><div class="kpiline">一覧PV '+_f0(c.lv)+' ・ 遷移率 '+_f1(c.trans)+'%</div></div>';}
+function _pcard(lab,rng,c,n){return '<div class="pcard"><div class="lab">'+lab+'</div><div class="rng">'+rng+'</div><div class="big">'+_f0(c.pv)+'<span style="font-size:12px;color:#9a9a9a"> 詳細PV</span></div><div class="sm">反響 '+c.inq+' ・ <b>反響率 '+_f2(c.rate)+'%</b></div><div class="kpiline">一覧PV '+_f0(c.lv)+' ・ 遷移率 '+_f1(c.trans)+'%</div>'+(n?'<div class="kpiline perline">1掲載あたり：詳細PV '+_f1(c.pv/n)+' ・ 一覧PV '+_f1(c.lv/n)+' ・ 反響 '+_f2(c.inq/n)+'</div>':'')+'</div>';}
 function localInsight(ctx){
  var trend=ctx.pW.rate-ctx.p30.rate;
  var trendTxt=trend<=-0.1?('過去30日平均'+_f2(ctx.p30.rate)+'%から直近1週間'+_f2(ctx.pW.rate)+'%へ約'+_f2(Math.abs(trend))+'pt低下'):trend>=0.1?('過去30日平均'+_f2(ctx.p30.rate)+'%から直近1週間'+_f2(ctx.pW.rate)+'%へ改善'):('直近1週間'+_f2(ctx.pW.rate)+'%で過去30日平均並み');
@@ -2435,9 +2470,9 @@ function _repBreakdown(a,b,keyfn){
  return Object.keys(keys).map(function(k){return {k:k,pv:pv[k]||0,lv:lv[k]||0,inq:inq[k]||0,n:n[k]||0,rate:(pv[k]?inq[k]/pv[k]*100:0),trans:(lv[k]?pv[k]/lv[k]*100:0)};});
 }
 function _bdTable(title,rows){
- var h='<div class="card"><div class="h3">'+title+'</div><table><tr><th>区分</th><th class="r">掲載</th><th class="r">詳細PV</th><th class="r">反響</th><th class="r">反響率</th><th class="r">遷移率</th></tr>';
- rows.forEach(function(x){h+='<tr><td>'+esc(x.k)+'</td><td class="r">'+x.n+'</td><td class="r">'+_f0(x.pv)+'</td><td class="r">'+x.inq+'</td><td class="r">'+_f2(x.rate)+'%</td><td class="r">'+_f1(x.trans)+'%</td></tr>';});
- return h+'</table></div>';
+ var h='<div class="card"><div class="h3">'+title+'</div><div class="bdwrap"><table class="bdtbl"><tr><th>区分</th><th class="r">掲載</th><th class="r">一覧PV<br><small>／掲載</small></th><th class="r">詳細PV<br><small>／掲載</small></th><th class="r">反響<br><small>／掲載</small></th><th class="r">反響率</th></tr>';
+ rows.forEach(function(x){var n=x.n||0;var lvp=n?x.lv/n:0,pvp=n?x.pv/n:0,iqp=n?x.inq/n:0;h+='<tr><td>'+esc(x.k)+'</td><td class="r">'+n+'</td><td class="r">'+_f0(x.lv)+'<div class="per">'+_f1(lvp)+'</div></td><td class="r">'+_f0(x.pv)+'<div class="per">'+_f1(pvp)+'</div></td><td class="r">'+x.inq+'<div class="per">'+_f2(iqp)+'</div></td><td class="r">'+_f2(x.rate)+'%</td></tr>';});
+ return h+'</table></div></div>';
 }
 function toggleJdsList(){var el=document.getElementById('jdslist'),tg=document.getElementById('jdstog');if(!el)return;var open=el.style.display==='none';el.style.display=open?'block':'none';if(tg){if(open)tg.classList.add('open');else tg.classList.remove('open');}}
 function _optBadges(p){function b(on,t){return '<span class="ob'+(on?' on':'')+'">'+t+'</span>';}return '<span class="obs">'+b(p&&p.storePick,'店')+b(p&&p.specArea,'得')+b(p&&p.video,'CM')+'</span>';}
@@ -2664,7 +2699,7 @@ function renderReport(){
  h+='<div class="note" style="margin-top:8px">PV・各種分析はビジコン（前々日まで）。反響速報はJDS（リアルタイム）。物件名をタップすると掲載ページが開きます（反響データにURLがある場合）。新規入稿はビジコン反映まで2日ほどかかるため、詳細PVが「—」になることがあります。</div></div>';
 
  // 期間カード
- h+='<div class="grid4" style="margin-bottom:14px">'+_pcard('昨日（最新日）',latest.slice(5),ctx.pY)+_pcard('直近1週間',w0.slice(5)+'〜'+latest.slice(5),ctx.pW)+_pcard('今月',latest.slice(0,7)+'〜',ctx.pM)+_pcard('直近1ヶ月',_repAddDays(latest,-29).slice(5)+'〜',ctx.p30)+'</div>';
+ h+='<div class="grid4" style="margin-bottom:14px">'+_pcard('最新日',_md(latest),ctx.pY,ctx.live)+_pcard('直近1週間',_md(w0)+'〜'+_md(latest),ctx.pW,ctx.live)+_pcard('今月',latest.slice(0,7)+'〜'+_md(latest),ctx.pM,ctx.live)+_pcard('直近1ヶ月',_md(_repAddDays(latest,-29))+'〜'+_md(latest),ctx.p30,ctx.live)+'</div>';
 
  // PV推移
  var mx=Math.max.apply(null,ctx.series.map(function(s){return s.pv;}).concat([1]));
@@ -2672,17 +2707,16 @@ function renderReport(){
  ctx.series.forEach(function(s){var ht=Math.round(s.pv/mx*100);h+='<div class="rbar"><div class="rbv">'+(s.pv?_f0(s.pv):'')+'</div><div class="rbc" style="height:'+ht+'%"></div><div class="rbd">'+s.d.slice(5)+'<br>反'+s.iq+'</div></div>';});
  h+='</div></div>';
 
- // エリア（掲載数つき）
- var g=ctx.stW.slice(0,6), b=ctx.stW.slice(-6).reverse();
- function areaTbl(rows,cls){var x='<table><tr><th>駅</th><th class="r">掲載</th><th class="r">詳細PV</th><th class="r">反響</th><th class="r">反響率</th></tr>';rows.forEach(function(r){x+='<tr><td>'+esc(r.s)+'</td><td class="r">'+(LBS[r.s]||0)+'</td><td class="r">'+_f0(r.pv)+'</td><td class="r">'+r.inq+'</td><td class="r"><span class="pill '+cls+'">'+_f2(r.rate)+'%</span></td></tr>';});return x+'</table>';}
- h+='<div class="two"><div class="card"><div class="h3">'+ic('dotg')+'好調エリア（直近1週間）</div>'+areaTbl(g,'pg')+'</div><div class="card"><div class="h3">'+ic('dotr')+'不調エリア（直近1週間）</div>'+areaTbl(b,'pr')+'</div></div>';
-
- // 各種分析（間取り/賃料帯/枠）
- var bdMad=_repBreakdown(w0,latest,function(p){return madoriCat(p.madori);});bdMad.sort(function(a,b){return b.rate-a.rate;});
- var bdRent=_repBreakdown(w0,latest,_rentBand);bdRent.sort(function(a,b){return _rentOrder(a.k)-_rentOrder(b.k);});
- var bdWaku=_repBreakdown(w0,latest,function(p){return WKLABEL[p.waku]||p.waku||'未分類';});bdWaku.sort(function(a,b){return b.rate-a.rate;});
- h+='<div class="two">'+_bdTable(ic('grid')+'間取り別（直近1週間）',bdMad)+_bdTable(ic('yen')+'賃料帯別（直近1週間）',bdRent)+'</div>';
- h+=_bdTable(ic('layers')+'枠別（直近1週間）',bdWaku);
+ // 種類別の内訳（期間トグル：最新日／直近1週間／直近1ヶ月）
+ var _rr=REP_RANGE||'week';
+ var _rA=_rr==='latest'?latest:(_rr==='month'?_repAddDays(latest,-29):w0);
+ var _rL=_rr==='latest'?('最新日 '+_md(latest)):(_rr==='month'?('直近1ヶ月 '+_md(_rA)+'〜'+_md(latest)):('直近1週間 '+_md(w0)+'〜'+_md(latest)));
+ h+='<div class="repseg">'+[['latest','最新日'],['week','直近1週間'],['month','直近1ヶ月']].map(function(o){return '<button class="'+(_rr===o[0]?'on':'')+'" onclick="repRange(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'<span class="repseg-d">期間：'+_rL+'</span></div>';
+ var bdMad=_repBreakdown(_rA,latest,function(p){return madoriCat(p.madori);});bdMad.sort(function(a,b){return b.pv-a.pv;});
+ var bdRent=_repBreakdown(_rA,latest,_rentBand);bdRent.sort(function(a,b){return _rentOrder(a.k)-_rentOrder(b.k);});
+ var bdWaku=_repBreakdown(_rA,latest,function(p){return WKLABEL[p.waku]||p.waku||'未分類';});bdWaku.sort(function(a,b){return b.pv-a.pv;});
+ h+='<div class="two">'+_bdTable(ic('grid')+'間取り別（'+_rL+'）',bdMad)+_bdTable(ic('yen')+'賃料帯別（'+_rL+'）',bdRent)+'</div>';
+ h+=_bdTable(ic('layers')+'枠別（デマンド/オポ/IKARI等で比較・'+_rL+'）',bdWaku);
 
  // 落とし候補
  h+='<div class="card"><div class="h3">'+ic('trash')+'落とし候補サマリー</div><div class="kpiline" style="font-size:13px"><b style="color:#dc2626;font-size:16px">'+ctx.d60+'件</b> 強く推奨（SCORE -60以下）／ <b style="color:#b45309">'+ctx.d20+'件</b> 要検討（-20以下）</div>';
@@ -3367,7 +3401,7 @@ async function processHankyo(file){
    if(!p.madori&&mad)p.madori=mad;if((p.rent===''||p.rent==null)&&rent!=='')p.rent=rent;if(!p.station&&station)p.station=station;if(!p.line&&line)p.line=line;if(!p.walkMin&&wm)p.walkMin=wm;if((p.mgmt===''||p.mgmt==null)&&mgmtV!=='')p.mgmt=mgmtV;if((p.waku==='その他'||!p.waku)&&p.station&&p.madori)p.waku=autoWakuImport(p.station,p.madori,String(totFromParts(p.rent,p.mgmt)||'0'));
   }
  }
- var _ff=freshFastSweep();var _ik=autoIkariSweep();recompute();saveAll();flushPush();
+ var _ff=freshFastSweep();var _ik=autoIkariSweep();viewYM=_latestDataYM()||viewYM;recompute();saveAll();flushPush();
  archiveImport(file,'反響報告書',repDate);
  log('反響報告書取込：'+repDate+'分 '+total+'行（更新'+matched+'件／新規'+created+'件'+(_ik?'／IKARI自動'+_ik+'件':'')+'）。反響・オプション・名寄点数・競合数・掲載開始日を反映（PVはPC閲覧のみのため取り込まず、PVはビジコンから取得します）。','ok');
 }
@@ -3393,7 +3427,7 @@ function processJDS(hdr,rows){
   total++;
  });
  added=Object.keys(EVENTS).length;
- recompute();saveAll();flushPush();
+ viewYM=_latestDataYM()||viewYM;recompute();saveAll();flushPush();
  const mc=Object.keys(seenProps).length;
  log('JDS取込：'+total+'行を処理（蓄積イベント '+added+'件）。'+mc+'物件にマッチ。同じファイルを再投入しても二重計上しません。','ok');
 }
@@ -3491,7 +3525,7 @@ function applyBijikon(forceDate){
  let ended=0;
  PROPS.forEach(p=>{if(p.status==='掲載中'&&!seen[p.id]){p.status='落とし済み';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン未掲載のため掲載終了',ts:nowTS()});ended++;}});
  var _bff=freshFastSweep();var _bik=autoIkariSweep();
- recompute();saveAll();flushPush();
+ viewYM=_latestDataYM()||viewYM;recompute();saveAll();flushPush();
  var _bjfile=bijikonPending&&bijikonPending.file;bijikonPending=null;document.getElementById('csvpending').innerHTML='';
  if(_bjfile)archiveImport(_bjfile,'ビジコン',date);
  log('ビジコン取込：'+date+'分。更新'+matched+'件／新規'+created+'件／掲載終了'+ended+'件'+(PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length?'／代表候補なしアラート'+PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length+'件':'')+(_bik?'／IKARI自動'+_bik+'件':'')+(_bff?'／新着即上げ'+_bff+'件':'')+'。物件掲載○で掲載中／○なし・物件名なしは掲載終了。代表候補○なしはアラート（Jiro連携）。','ok');
@@ -3593,23 +3627,22 @@ function bandLabel(r){if(isNaN(r))return'不明';for(const b of ANA_BANDS){if(r>
 function setAna(kind,v){if(kind==='w')anaWaku=v;else if(kind==='m')anaMad=v;else anaBand=v;renderAna();}
 function anaChips(kind,cur,opts){return '<div class="chips">'+opts.map(o=>'<button type="button" class="chip'+(cur===o?' on':'')+'" onclick="setAna(\''+kind+'\',\''+o+'\')">'+o+'</button>').join('')+'</div>';}
 function anaFilter(s){
- if(anaWaku!=='全'&&WKLABEL[s.p.waku]!==anaWaku)return false;
  if(anaMad!=='全'&&madoriCat(s.p.madori)!==anaMad)return false;
  if(anaBand!=='全'&&bandLabel(s.rent)!==anaBand)return false;
  return true;
 }
-function segStats(arr){const d=arr.filter(s=>s.hasData);const sp=arr.reduce((x,s)=>x+s.pv,0),si=arr.reduce((x,s)=>x+s.inq,0);return{n:arr.length,pvDay:d.length?amean(d.map(s=>s.avg)):0,inq:arr.length?si/arr.length:0,rate:sp>0?si/sp*100:0,sp:sp,si:si};}
+function segStats(arr){const d=arr.filter(s=>s.hasData);const sp=arr.reduce((x,s)=>x+s.pv,0),si=arr.reduce((x,s)=>x+s.inq,0),sl=arr.reduce((x,s)=>x+(s.lv||0),0);return{n:arr.length,pvDay:d.length?amean(d.map(s=>s.avg)):0,inq:arr.length?si/arr.length:0,rate:sp>0?si/sp*100:0,sp:sp,si:si,sl:sl};}
 function segTable(title,groups){
- let h='<div class="sec-h" style="margin-top:12px">'+title+'</div><div class="tblwrap"><table class="tbl"><tr><th>区分</th><th>件数</th><th>PV/日</th><th>平均反響</th><th>反響率</th></tr>';
- groups.forEach(g=>{const st=segStats(g.arr);const low=st.n>=3&&st.sp>0&&st.rate<2;const hi=st.n>=3&&st.rate>=4;
-  h+='<tr><td>'+g.label+'</td><td>'+st.n+'</td><td>'+st.pvDay.toFixed(1)+'</td><td>'+st.inq.toFixed(2)+'</td><td style="font-weight:700'+(low?';color:var(--red)':(hi?';color:var(--green)':''))+'">'+(st.sp>0?st.rate.toFixed(2)+'%':'-')+'</td></tr>';});
+ let h='<div class="sec-h" style="margin-top:12px">'+title+'</div><div class="tblwrap"><table class="tbl"><tr><th>区分</th><th>件数</th><th>一覧PV<br><small>／件</small></th><th>詳細PV<br><small>／件</small></th><th>反響<br><small>／件</small></th><th>反響率</th></tr>';
+ groups.forEach(g=>{const st=segStats(g.arr);const low=st.n>=3&&st.sp>0&&st.rate<2;const hi=st.n>=3&&st.rate>=4;var n=st.n||0;
+  h+='<tr><td>'+g.label+'</td><td>'+n+'</td><td>'+_f0(st.sl)+'<div class="per">'+_f1(n?st.sl/n:0)+'</div></td><td>'+_f0(st.sp)+'<div class="per">'+_f1(n?st.sp/n:0)+'</div></td><td>'+st.si+'<div class="per">'+_f2(n?st.si/n:0)+'</div></td><td style="font-weight:700'+(low?';color:var(--red)':(hi?';color:var(--green)':''))+'">'+(st.sp>0?st.rate.toFixed(2)+'%':'-')+'</td></tr>';});
  h+='</table></div>';return h;
 }
 function renderAna(){
  const a=anaAgg();
  const all=liveG().map(p=>pstat(p,a));
  let h='';
- h+='<div class="qlabel">枠で絞り込み</div>'+anaChips('w',anaWaku,['全','デマンド','オポ','ハイ','その他']);
+ h+=wakuFilterBar();
  h+='<div class="qlabel">間取りで絞り込み</div>'+anaChips('m',anaMad,['全','シングル','カップル','ファミリー']);
  h+='<div class="qlabel">金額帯で絞り込み</div>'+anaChips('b',anaBand,['全'].concat(ANA_BANDS.map(b=>b[0])));
  const L=all.filter(anaFilter);
@@ -3619,7 +3652,7 @@ function renderAna(){
  // セグメント別サマリー
  h+='<div class="sec-h" style="margin-top:6px">セグメント別サマリー（反響率）</div>';
  h+='<div class="note" style="margin:0 2px 6px">高額帯・ファミリーは低額・シングルより反響率が下がりやすいため、枠・間取り・金額帯ごとに分けて評価します。緑＝反響率高/赤＝低（3件以上で判定）。</div>';
- h+=segTable('枠別',[['デマンド','Demand'],['オポ','Opportunity'],['ハイ','High-Hold'],['その他','Insight']].map(o=>({label:o[0],arr:L.filter(s=>s.p.waku===o[1])})));
+ h+=segTable('枠別（デマンド/オポ/IKARI等で比較）',[['デマンド','Demand'],['オポ','Opportunity'],['ハイ','High-Hold'],['その他','Insight'],['IKARI','IKARI']].map(o=>({label:o[0],arr:L.filter(s=>s.p.waku===o[1])})));
  h+=segTable('間取り別',['シングル','カップル','ファミリー'].map(c=>({label:c,arr:L.filter(s=>madoriCat(s.p.madori)===c)})));
  h+=segTable('金額帯別',ANA_BANDS.map(b=>({label:b[0],arr:L.filter(s=>!isNaN(s.rent)&&s.rent>=b[1]&&s.rent<b[2])})));
  // 物件スコアランキング
@@ -4136,7 +4169,7 @@ function betaSimHtml(){ try{ return decodeURIComponent(escape(window.atob(BETA_S
 function _betaSalToSim(){ var o={}; PLAN_NAMES.forEach(function(n){ var s=salOf(n); o[n]={base:+s.base||0, plan:+s.plan||0, tiers:(s.tiers||[]).map(function(t){return {from:+t.from||0,rate:+t.rate||0};}), rth:+s.rthr||0, rrate:+s.rrate||0}; }); return o; }
 function _betaState(){ var c=EVENTS['BETA__cfg']; var sc=EVENTS['BETA__scn']; var cfg=(c&&c.sim)?JSON.parse(JSON.stringify(c.sim)):null; var ok=okadaOf(); if(ok){ if(!cfg)cfg={}; cfg.okSales=ok.sales; cfg.okBudget=ok.budget; cfg.okSalesMemo=ok.salesMemo; cfg.okBudgetMemo=ok.budgetMemo; } return { cfg:cfg, salary:_betaSalToSim(), scn:(sc&&sc.store&&typeof sc.store==='object')?sc.store:{} }; }
 function sendBetaInit(){ var fr=document.getElementById('betaFrame'); if(fr&&fr.contentWindow){ fr.contentWindow.postMessage({type:'hanako-beta-init', state:_betaState()}, '*'); } }
-function applyBetaSave(state){ if(!state)return; if(state.cfg){EVENTS['BETA__cfg']={kind:'beta', sim:state.cfg}; EVENTS['OKD__cfg']={kind:'okada', sales:(state.cfg.okSales||[]).map(function(x){return {n:(x&&x.n)||'',a:+(x&&x.a)||0};}), budget:(state.cfg.okBudget||[]).map(function(x){return {n:(x&&x.n)||'',a:+(x&&x.a)||0};}), salesMemo:state.cfg.okSalesMemo||'', budgetMemo:state.cfg.okBudgetMemo||''};} if(state.scn)EVENTS['BETA__scn']={kind:'scn', store:state.scn}; if(state.salary){ PLAN_NAMES.forEach(function(n){ var s=state.salary[n]; if(!s)return; EVENTS['SAL__'+n]={kind:'sal', plan:+s.plan||0, base:+s.base||0, tiers:(s.tiers||[]).map(function(t){return {from:+t.from||0,rate:+t.rate||0};}), rthr:+s.rth||0, rrate:+s.rrate||0}; }); } if(typeof _saveDB==='function')_saveDB(); }
+function applyBetaSave(state){ if(!state)return; if(state.cfg){EVENTS['BETA__cfg']={kind:'beta', sim:state.cfg}; EVENTS['OKD__cfg']={kind:'okada', sales:(state.cfg.okSales||[]).map(function(x){return {n:(x&&x.n)||'',a:+(x&&x.a)||0};}), budget:(state.cfg.okBudget||[]).map(function(x){return {n:(x&&x.n)||'',a:+(x&&x.a)||0};}), salesMemo:state.cfg.okSalesMemo||'', budgetMemo:state.cfg.okBudgetMemo||''};} if(state.scn)EVENTS['BETA__scn']={kind:'scn', store:state.scn}; if(state.salary){ PLAN_NAMES.forEach(function(n){ var s=state.salary[n]; if(!s)return; EVENTS['SAL__'+n]={kind:'sal', plan:+s.plan||0, base:+s.base||0, tiers:(s.tiers||[]).map(function(t){return {from:+t.from||0,rate:+t.rate||0};}), rthr:+s.rth||0, rrate:+s.rrate||0}; }); } if(typeof _saveDB==='function')_saveDB(); if(typeof flushPush==='function'){try{flushPush();}catch(e){}} }
 if(typeof window!=='undefined' && !window.__hanakoBetaBridge){ window.__hanakoBetaBridge=true; window.addEventListener('message', function(e){ var d=e.data; if(!d||typeof d!=='object')return; if(d.type==='hanako-beta-ready'){ sendBetaInit(); } else if(d.type==='hanako-beta-save'){ applyBetaSave(d.state); } else if(d.type==='hanako-beta-height'){ var fr=document.getElementById('betaFrame'); if(fr&&d.h){ fr.style.height=(d.h+24)+'px'; } } }); }
 
 
