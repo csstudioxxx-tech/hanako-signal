@@ -683,7 +683,36 @@ header{padding-left:54px}
 .rsff{display:flex;flex-direction:column;gap:3px}.rsff label{font-size:10.5px;color:var(--text3);font-weight:600}
 .rsff input{padding:8px 9px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit}
 .rvtsel{min-width:170px;padding:9px 11px;border-radius:9px;font-size:14px;font-family:inherit;border:1px solid var(--border)}
-</style></head><body>
+</style><style>
+.rsprog{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff5e6;border:1px solid #f3d9a8;border-radius:11px;padding:10px 14px;margin:0 0 12px}
+.rsprog.ok{background:#e8f7ee;border-color:#bfe6cd}
+.rsprog-n{font-size:24px;font-weight:800;color:#E8920A;line-height:1;min-width:26px;text-align:center}
+.rsprog.ok .rsprog-n{color:#1f9d57}
+.rsprog-t{font-size:13px;font-weight:700;color:#5b6675}
+.rsprog-note{margin-left:auto;font-size:11px;color:#9aa3b0;font-weight:600}
+.rsff.empty input{border-color:#E8920A !important;background:#fff5e6 !important}
+.rsreq{font-size:9px;font-weight:800;color:#fff;background:#2a6df5;padding:1px 6px;border-radius:99px;vertical-align:1px}
+.rsopttag{font-size:9px;font-weight:700;color:#9aa3b0;background:#eef1f5;padding:1px 6px;border-radius:99px;vertical-align:1px}
+.rsact{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.rsact .btn{flex:1;min-width:130px}
+.rsact .btn-pri:disabled{background:#c2c8d0;border-color:#c2c8d0;cursor:not-allowed}
+.rschip.need{border-color:#E8920A;color:#E8920A}
+.rschip.done{border-color:#1f9d57;color:#1f9d57}
+.trcard .sec-h2{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.trcard .sec-h2 .t{font-size:15px;font-weight:800}
+.trcard .cntp{font-size:11px;font-weight:800;color:#2a6df5;background:#eef3fe;padding:3px 11px;border-radius:99px}
+.trwrap{overflow-x:auto}
+.trtbl{width:100%;border-collapse:collapse;font-size:13px}
+.trtbl th{font-size:10.5px;font-weight:800;color:#9aa3b0;text-align:left;padding:7px 9px;border-bottom:2px solid #eef1f5}
+.trtbl td{padding:9px 9px;border-bottom:1px solid #eef1f5;vertical-align:middle}
+.trtbl tr:last-child td{border-bottom:none}
+.trtm{font-variant-numeric:tabular-nums;color:#5b6675;font-weight:600;font-size:12px;white-space:nowrap}
+.trnm{font-weight:700}.trme{color:#5b6675;font-size:12px}.trrent{font-weight:800;color:#1A3D6B;white-space:nowrap}
+.trpdf{font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.trpdf.ok{color:#1f9d57;background:#e8f7ee}.trpdf.ng{color:#d8443a;background:#fdeceb}
+@media(max-width:680px){.trtbl .hcol{display:none}}
+</style>
+</head><body>
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <div class="navsc" id="navsc" onclick="navClose()"></div>
 <aside class="snav" id="snav">
@@ -736,7 +765,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-g</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-reg</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -827,11 +856,16 @@ let API=(()=>{try{const s=(localStorage.getItem('ibt_api')||'').trim();return s|
 function setAPI(){const u=prompt('GoogleスプレッドシートのGAS Web App URL（/exec）を貼り付けてください。全PCで同じURLを設定すればデータが共有されます。空欄でローカル保存に戻ります。',API);if(u===null)return;API=(u||'').trim();try{localStorage.setItem('ibt_api',API);}catch(e){}location.reload();}
 async function apiGet(){var u=API+(API.indexOf('?')>=0?'&':'?')+'action=all&_='+Date.now();var r=await fetch(u,{method:'GET',cache:'no-store',redirect:'follow'});if(!r||r.ok===false)throw new Error('HTTP '+(r&&r.status));var t=await r.text();return JSON.parse(t);}
 let _pushT=null,_pushing=false,_again=false,LOADED=false,_dirty=false,_saveErr=false,_lastSaveTs=0;
+var _BASE={props:{},hist:{},events:{},mgmt:{},guar:{}};var _needBase=false;var _lastSig='';
+function _snapBase(){var b={props:{},hist:{},events:{},mgmt:{},guar:{}};(PROPS||[]).forEach(function(p){if(p&&p.id!=null)b.props[p.id]=JSON.stringify(p);});(MGMT||[]).forEach(function(m){if(m&&m.id!=null)b.mgmt[m.id]=JSON.stringify(m);});(GUAR||[]).forEach(function(g){if(g&&g.id!=null)b.guar[g.id]=JSON.stringify(g);});Object.keys(HIST||{}).forEach(function(k){b.hist[k]=JSON.stringify(HIST[k]);});Object.keys(EVENTS||{}).forEach(function(k){b.events[k]=JSON.stringify(EVENTS[k]);});_BASE=b;}
+function _deltaPayload(){var now=Date.now();var o={action:'upsert',props:[],delProps:[],mgmt:[],delMgmt:[],guar:[],delGuar:[],hist:{},delHist:[],events:{},delEvents:[]};var cP={};(PROPS||[]).forEach(function(pp){if(!pp||pp.id==null)return;cP[pp.id]=1;if(_BASE.props[pp.id]!==JSON.stringify(pp)){pp.updatedAt=now;o.props.push(pp);}});Object.keys(_BASE.props).forEach(function(id){if(!cP[id])o.delProps.push(id);});var cM={};(MGMT||[]).forEach(function(m){if(!m||m.id==null)return;cM[m.id]=1;if(_BASE.mgmt[m.id]!==JSON.stringify(m)){m.updatedAt=now;o.mgmt.push(m);}});Object.keys(_BASE.mgmt).forEach(function(id){if(!cM[id])o.delMgmt.push(id);});var cG={};(GUAR||[]).forEach(function(g){if(!g||g.id==null)return;cG[g.id]=1;if(_BASE.guar[g.id]!==JSON.stringify(g)){g.updatedAt=now;o.guar.push(g);}});Object.keys(_BASE.guar).forEach(function(id){if(!cG[id])o.delGuar.push(id);});Object.keys(HIST||{}).forEach(function(k){if(_BASE.hist[k]!==JSON.stringify(HIST[k]))o.hist[k]=HIST[k];});Object.keys(_BASE.hist).forEach(function(k){if(!(k in HIST))o.delHist.push(k);});Object.keys(EVENTS||{}).forEach(function(k){if(_BASE.events[k]!==JSON.stringify(EVENTS[k]))o.events[k]=EVENTS[k];});Object.keys(_BASE.events).forEach(function(k){if(!(k in EVENTS))o.delEvents.push(k);});return o;}
+function _deltaEmpty(d){return !d.props.length&&!d.delProps.length&&!d.mgmt.length&&!d.delMgmt.length&&!d.guar.length&&!d.delGuar.length&&!Object.keys(d.hist).length&&!d.delHist.length&&!Object.keys(d.events).length&&!d.delEvents.length;}
+function _baseAdvance(d){d.props.forEach(function(pp){_BASE.props[pp.id]=JSON.stringify(pp);});d.delProps.forEach(function(id){delete _BASE.props[id];});d.mgmt.forEach(function(m){_BASE.mgmt[m.id]=JSON.stringify(m);});d.delMgmt.forEach(function(id){delete _BASE.mgmt[id];});d.guar.forEach(function(g){_BASE.guar[g.id]=JSON.stringify(g);});d.delGuar.forEach(function(id){delete _BASE.guar[id];});Object.keys(d.hist).forEach(function(k){_BASE.hist[k]=JSON.stringify(d.hist[k]);});d.delHist.forEach(function(k){delete _BASE.hist[k];});Object.keys(d.events).forEach(function(k){_BASE.events[k]=JSON.stringify(d.events[k]);});d.delEvents.forEach(function(k){delete _BASE.events[k];});}
 function _payload(){return JSON.stringify({props:PROPS,hist:HIST,events:EVENTS,mgmt:MGMT,guar:GUAR});}
 function updateSaveState(force){var el=document.getElementById('savestate');if(!el)return;var s=force||(_pushing?'saving':(_saveErr?'error':(_dirty?'pending':(_lastSaveTs?'saved':''))));if(s==='saving'){el.textContent='● 保存中…';el.style.color='#c77700';}else if(s==='error'){el.textContent='⚠ 保存エラー（タップで再保存）';el.style.color='#c0392b';}else if(s==='pending'){el.textContent='● 未保存…';el.style.color='#c77700';}else if(s==='saved'){el.textContent='✓ 保存済み '+new Date(_lastSaveTs).toLocaleTimeString().slice(0,5);el.style.color='var(--green)';}else{el.textContent='';}}
 function schedulePush(){if(!API)return;_dirty=true;updateSaveState('pending');clearTimeout(_pushT);_pushT=setTimeout(doPush,500);}
-async function doPush(){if(!API)return;if(!LOADED){return;}/* ★読込が一度も成功していない間は絶対に送信しない（空データでのDB誤消去を防止） */if(_pushing){_again=true;return;}_pushing=true;_saveErr=false;updateSaveState('saving');try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:_payload()});if(r&&r.ok===false)throw new Error('HTTP '+(r.status||''));_dirty=false;_lastSaveTs=Date.now();_saveErr=false;}catch(e){_saveErr=true;}_pushing=false;updateSaveState();if(_again){_again=false;schedulePush();}else if(_saveErr){clearTimeout(_pushT);_pushT=setTimeout(doPush,4000);/* 失敗時は自動リトライ */}}
-function _beaconSave(){try{if(!API||!LOADED||!_dirty)return;if(navigator.sendBeacon){navigator.sendBeacon(API,new Blob([_payload()],{type:'text/plain;charset=utf-8'}));}}catch(e){}}
+async function doPush(){if(!API)return;if(!LOADED){return;}/* 読込未成功の間は送信しない（空データでのDB誤消去を防止） */if(_pushing){_again=true;return;}_pushing=true;_saveErr=false;updateSaveState('saving');try{var delta=_deltaPayload();if(_deltaEmpty(delta)){_dirty=false;_lastSaveTs=Date.now();}else{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(delta)});var d=null;try{d=await r.json();}catch(e){}if(!r||r.ok===false||!d||d.ok!==true)throw new Error('save_failed'+(d&&d.error?(':'+d.error):''));_baseAdvance(delta);_dirty=false;_lastSaveTs=Date.now();}_saveErr=false;}catch(e){_saveErr=true;}_pushing=false;updateSaveState();if(_again){_again=false;schedulePush();}else if(_saveErr){clearTimeout(_pushT);_pushT=setTimeout(doPush,4000);/* 失敗時は自動リトライ */}}
+function _beaconSave(){try{if(!API||!LOADED||!_dirty)return;var d=_deltaPayload();if(_deltaEmpty(d))return;if(navigator.sendBeacon){navigator.sendBeacon(API,new Blob([JSON.stringify(d)],{type:'text/plain;charset=utf-8'}));}}catch(e){}}
 var _IDBp=null;
 function idbOpen(){if(_IDBp)return _IDBp;_IDBp=new Promise(function(res,rej){try{var r=indexedDB.open('hanako_pdf',1);r.onupgradeneeded=function(){r.result.createObjectStore('pdfs');};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};}catch(e){rej(e);}});return _IDBp;}
 function idbSet(k,v){return idbOpen().then(function(db){return new Promise(function(res,rej){var tx=db.transaction('pdfs','readwrite');tx.objectStore('pdfs').put(v,k);tx.oncomplete=function(){res(true);};tx.onerror=function(){rej(tx.error);};});});}
@@ -869,24 +903,40 @@ async function load(){
   if(p.driveId===undefined)p.driveId='';if(p.driveUrl===undefined)p.driveUrl='';if(p.suumoUrl===undefined)p.suumoUrl='';
  });
  viewYM=(viewYM&&_ymHasData(viewYM))?viewYM:(_latestDataYM()||curYM());
+ _needBase=true;
 }
 var _editing=false,_pendingRefresh=false,_autoPaused=false;
 function isEditing(){if(_editing)return true;var a=document.activeElement;if(!a)return false;if(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return true;if(a.isContentEditable)return true;return false;}
 function updateAutoBtn(){var b=document.getElementById('autobtn');if(b){b.textContent='自動更新：'+(_autoPaused?'OFF':'ON');b.classList.toggle('autooff',_autoPaused);}}
 function updatePendingHint(){var b=document.getElementById('refbtn');if(b)b.classList.toggle('haspend',!!_pendingRefresh);}
 async function flushPush(){if(!API)return;try{clearTimeout(_pushT);}catch(e){}for(var i=0;i<20&&_pushing;i++){await new Promise(function(r){setTimeout(r,80);});}await doPush();for(var j=0;j<20&&_pushing;j++){await new Promise(function(r){setTimeout(r,80);});}}
-async function doRefreshNow(){if(!API)return;await flushPush();await load();recompute();tab(CURTAB||'dash');_pendingRefresh=false;updatePendingHint();_lastRefresh=Date.now();toast('最新の共有データを反映しました');}
+async function doRefreshNow(){if(!API)return;await flushPush();await load();recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}_pendingRefresh=false;updatePendingHint();_lastRefresh=Date.now();toast('最新の共有データを反映しました');}
 async function refreshData(){
  if(!API){toast('現在はローカル保存モードです（共有設定で共有化できます）');return;}
  if(isEditing()){_pendingRefresh=true;updatePendingHint();toast('入力中のため保留しました。欄の外をタップで確定後、反映します');return;}
- await flushPush();await load();recompute();tab(CURTAB||'dash');_lastRefresh=Date.now();toast('最新の共有データを取得しました');
+ await flushPush();await load();recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}_lastRefresh=Date.now();toast('最新の共有データを取得しました');
 }
 function maybeAutoRefresh(){
  if(!API||_autoPaused||_pushing)return;
  if(Date.now()-_lastRefresh<=4000)return;
  if(isEditing()){_pendingRefresh=true;updatePendingHint();return;}
  _lastRefresh=Date.now();
- flushPush().then(function(){return load();}).then(function(){recompute();tab(CURTAB||'dash');});
+ flushPush().then(function(){return load();}).then(function(){recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}});
+}
+function _hashStr(s){var h=5381;for(var i=0;i<s.length;i++){h=((h*33)^s.charCodeAt(i))>>>0;}return h;}
+function _dataSig(){var s='';for(var i=0;i<PROPS.length;i++){var p=PROPS[i];s+=(p.id||'')+'~'+(p.status||'')+'~'+(p.tantou||'')+'~'+(p.stars||0)+'~'+(p.confirmed?1:0)+'~'+(p.revStatus||'')+'~'+(p.waku||'')+'~'+(p.csvPV||0)+'~'+(p.csvInq||0)+'~'+(p.name||'')+'|';}s+='#'+PROPS.length+'#'+Object.keys(HIST).length+'#'+Object.keys(EVENTS).length+'#'+((MGMT&&MGMT.length)||0)+'#'+((GUAR&&GUAR.length)||0);return _hashStr(s);}
+function _modalOpen(){try{return !!document.querySelector('.ovl,#_dbdov,.pl-popov,.pl-ov');}catch(e){return false;}}
+async function quietRefresh(){
+ if(!API||_autoPaused||_pushing)return;
+ if(isEditing()||_modalOpen()||document.hidden)return;
+ if(Date.now()-_lastRefresh<=4000)return;
+ _lastRefresh=Date.now();
+ try{
+  await flushPush();await load();recompute();
+  var sig=_dataSig();
+  if(_lastSig!==''&&sig!==_lastSig){var y=window.scrollY||window.pageYOffset||0;tab(CURTAB||'dash');try{window.scrollTo(0,y);}catch(e){}}
+  _lastSig=sig;
+ }catch(e){}
 }
 function toggleAuto(){_autoPaused=!_autoPaused;try{localStorage.setItem('ibt_autopause',_autoPaused?'1':'0');}catch(e){}updateAutoBtn();toast(_autoPaused?'自動更新を一時停止しました（再読込は手動でできます）':'自動更新を再開しました');if(!_autoPaused&&_pendingRefresh&&!isEditing())doRefreshNow();}
 async function saveAll(){if(API){schedulePush();return;}await gset(SK,PROPS);await gset(HK,HIST);await gset(EK,EVENTS);}
@@ -914,6 +964,7 @@ function recompute(){
  const jds={};
  Object.keys(EVENTS).forEach(k=>{const e=EVENTS[k];if(!e.propId)return;if(ym(e.date)!==m)return;jds[e.propId]=(jds[e.propId]||0)+1;});
  PROPS.forEach(p=>{p.csvPV=pvm[p.id]||0;p.csvInqB=inqBm[p.id]||0;p.csvInq=jds[p.id]||0;});
+ if(_needBase){try{_snapBase();}catch(e){}_needBase=false;}
 }
 
 // ---------- pdf ----------
@@ -1705,7 +1756,7 @@ function renderDash(){
  h+='<div class="hero fade"><div class="t">'+viewYM+' 反響目標</div><div class="n">'+total+' <small>/ '+TARGETS.total+'</small></div>'
   +'<div class="bar" style="height:6px;margin-top:9px"><div class="fill" style="width:'+Math.min(total/TARGETS.total*100,100)+'%;background:var(--accent)"></div></div>'
   +'<div class="s">D+O '+doInq+'/'+TARGETS.do_inq+' ・ High-Hold '+(iq.hh||0)+' ・ その他 '+(iq.ot||0)+' ・ IKARI '+(iq.ik||0)+'</div></div>';
- var _sc=statusCounts();h+='<div class="stsum fade">'+'<div class="stsum-c st-pre"><div class="stsum-n">'+_sc['要入稿']+'</div><div class="stsum-l">要入稿</div></div>'+'<div class="stsum-c st-live"><div class="stsum-n">'+_sc['掲載中']+'</div><div class="stsum-l">掲載中</div></div>'+'<div class="stsum-c st-hold"><div class="stsum-n">'+_sc['保留']+'</div><div class="stsum-l">保留</div></div>'+'<div class="stsum-c st-drop"><div class="stsum-n">'+_sc['落とし済み']+'</div><div class="stsum-l">落とし</div></div>'+'</div>';h+=todayOutCard();h+=uploadGapCard();h+=pvCompareCard();h+=dashStaffCard();h+='<div class="stat-grid fade">';
+ var _sc=statusCounts();h+='<div class="stsum fade">'+'<div class="stsum-c st-pre"><div class="stsum-n">'+_sc['要入稿']+'</div><div class="stsum-l">要入稿</div></div>'+'<div class="stsum-c st-live"><div class="stsum-n">'+_sc['掲載中']+'</div><div class="stsum-l">掲載中</div></div>'+'<div class="stsum-c st-hold"><div class="stsum-n">'+_sc['保留']+'</div><div class="stsum-l">保留</div></div>'+'<div class="stsum-c st-drop"><div class="stsum-n">'+_sc['落とし済み']+'</div><div class="stsum-l">落とし</div></div>'+'</div>';h+=todayOutCard();h+=todayRegCard();h+=uploadGapCard();h+=pvCompareCard();h+=dashStaffCard();h+='<div class="stat-grid fade">';
  [['dm','Demand','反響ランキング','var(--accent)'],['op','Opportunity','オポゾーン','var(--red)'],['ot','その他','仮説検証群','var(--green)'],['hh','High-Hold','高額キープ','var(--amber)'],['ik','IKARI','30日経過','var(--purple)']].forEach(a=>{
   h+='<div class="stat '+a[0]+'"><div class="t">'+a[1]+'</div><div class="n">'+ct[a[0]]+'<small>/'+TARGETS[a[0]]+'</small></div><div class="s">'+a[2]+'</div><div class="statiq">反響 <b>'+(iq[a[0]]||0)+'</b> ・ 詳細PV <b>'+(pvw[a[0]]||0).toLocaleString()+'</b></div><div class="bar"><div class="fill" style="width:'+Math.min(ct[a[0]]/TARGETS[a[0]]*100,100)+'%;background:'+a[3]+'"></div></div></div>';});
  h+='</div>';
@@ -1893,17 +1944,30 @@ function regMemoTpl(i){var p=PEND[i];if(!p)return;var sel=document.getElementByI
 function regFeatAdd(i,f){var p=PEND[i];if(!p)return;if(!p.memos)p.memos=[];if(p.memos.some(function(m){return m.label==='特徴'&&m.text===f;})){p.memos=p.memos.filter(function(m){return !(m.label==='特徴'&&m.text===f);});}else{p.memos.push({label:'特徴',text:f});}renderRegStep();}
 function regTplNew(i){var name=(prompt('テンプレ名を入力（例：初期費用格安）','')||'').trim();if(!name)return;var body=(prompt('テンプレ本文を入力','')||'').trim();if(!body)return;var list=cmtTpls().slice();list.push({name:name,body:body});EVENTS['CMTTPL__list']=JSON.stringify(list);save();toast('テンプレ「'+name+'」を追加（全員で共有）');renderRegStep();}
 function viewPendPdf(i){var p=PEND[i];if(!p||!p.pdfData){toast('PDFがありません');return;}try{var bin=atob(p.pdfData);var u8=new Uint8Array(bin.length);for(var k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));var w=window.open(url,'_blank');if(!w){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}setTimeout(function(){URL.revokeObjectURL(url);},60000);}catch(e){toast('PDFを開けませんでした');}}
+/* ===== 物件ごと登録・必須チェック（データ確認画面 C+A案） ===== */
+function _pendReqKeys(){return ['name','room','madori','area','structure','age','line','station','walkMin','address','rent','mgmtFee','deposit','keyMoney','mgmtCo'];}
+function _pendReqTotal(){return _pendReqKeys().length+2;}
+function pendFieldEmpty(p,k){return !String(p&&p[k]!=null?p[k]:'').trim();}
+function pendRemain(p){if(!p)return _pendReqTotal();var n=0;_pendReqKeys().forEach(function(k){if(pendFieldEmpty(p,k))n++;});if(!p.tantou)n++;if(!(+p.stars>0))n++;return n;}
+function pendReqOk(p){return !!p&&p.auto!=='読取中…'&&pendRemain(p)===0;}
+function pendFieldInput(i,k,v){if(PEND[i])PEND[i][k]=v;_pendProgRefresh();}
+function _pendProgRefresh(){var p=PEND[REGSTEP_I];if(!p)return;var rem=pendRemain(p);var rn=document.getElementById('rsRemN');if(rn)rn.textContent=rem;var pr=document.getElementById('rsProg');if(pr){pr.classList.toggle('ok',!rem);var t=pr.querySelector('.rsprog-t');if(t)t.textContent=rem?'残り必須項目':'必須すべて入力済み ✓';}_pendReqKeys().forEach(function(k){var w=document.querySelector('.rsff[data-rk="'+k+'"]');if(w)w.classList.toggle('empty',pendFieldEmpty(p,k));});var og=document.getElementById('rsOneGo');if(og){og.disabled=!pendReqOk(p);og.textContent=pendReqOk(p)?'この物件を要入稿へ ✓':'この物件を要入稿へ（残'+rem+'）';}var bk=document.getElementById('rsBulk');if(bk){var rdy=PEND.filter(pendReqOk).length;bk.disabled=!rdy;bk.textContent=rdy+'件の登録物件を要入稿へ';}}
+function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toString(36).slice(2,5);var log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});return {id:id,status:'要入稿',confirmed:(confirmed!==false),regTs:nowTS(),bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:true,waku:p.waku||'その他',suumoCode:'',pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,statusLog:log,regDate:today(),tantou:(p.tantou||''),shokan:(p.shokan||''),memos:(p.memos||[]),stars:(+p.stars||0),comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''};}
+async function regOnePend(i){var p=PEND[i];if(!p)return;if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}if(pendExactDup(p)){toast('同名・同号室の物件が既にあります');return;}var prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。通信を確認して再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要入稿へ登録しました');if(!PEND.length)tab('staff');}
+async function pendToReview(i){var p=PEND[i];if(!p)return;if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}if(pendExactDup(p)){toast('同名・同号室の物件が既にあります');return;}var prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');if(!PEND.length)tab('review');}
+function _tsTime(ts){return (ts&&ts.length>=16)?ts.slice(11,16):'';}
+function todayRegCard(){var td=today();var rows=PROPS.filter(function(p){return p.confirmed!==false&&p.regTs&&p.regTs.slice(0,10)===td;});if(!rows.length)return '';rows.sort(function(a,b){return (a.regTs||'').localeCompare(b.regTs||'');});var h='<div class="card fade trcard"><div class="sec-h2"><span class="t">今日 要入稿に入れた物件</span><span class="cntp">'+rows.length+'件</span></div><div class="trwrap"><table class="trtbl"><tr><th>登録</th><th>担当</th><th>物件名</th><th class="hcol">間取り×エリア</th><th>賃料</th><th>PDF</th></tr>';rows.forEach(function(p){var pdfOk=!!(p.driveUrl||p.driveId);h+='<tr><td class="trtm">'+(_tsTime(p.regTs)||esc(p.regDate||''))+'</td><td>'+esc(p.tantou||'\u2014')+'</td><td class="trnm">'+lkName(p.id,esc(p.name||'').slice(0,18))+'</td><td class="hcol trme">'+esc((p.madori||'')+(p.station?(' \u00d7 '+p.station):''))+'</td><td class="trrent">'+esc(rentMan(p)||'\u2014')+'</td><td>'+(pdfOk?'<span class="trpdf ok">\u2713\u4fdd\u5b58</span>':'<span class="trpdf ng">\u2717\u672a</span>')+'</td></tr>';});h+='</table></div></div>';return h;}
 function renderRegStep(){
  var host=document.getElementById('regstepbody');if(!host)return;
  var n=PEND.length;
  if(!n){host.innerHTML='<div class="empty" style="padding:20px">読み込み中の物件はありません。<br>「物件登録」でマイソクを取り込むと、ここで所感を書きながら順番に確認できます。</div>';return;}
  if(REGSTEP_I>=n)REGSTEP_I=n-1;if(REGSTEP_I<0)REGSTEP_I=0;
- var doneN=PEND.filter(function(p){return p.auto!=='読取中…';}).length;
- var h='<div class="rsbar"><span class="rst">読み込み＆所感・コメント指示</span><span class="rssub">読込完了 '+doneN+' / '+n+'</span><button class="btn btn-sec rsadd" onclick="document.getElementById(\'pdf\').click()">＋ 物件を追加</button><button class="btn btn-pri rsgo" '+(doneN?'':'disabled')+' onclick="savePend()">'+doneN+'件を要入稿へ登録</button></div>';
- h+='<div class="rschips">'+PEND.map(function(p,i){var rd=p.auto!=='読取中…';var ic=rd?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10.5"/></svg>':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>';return '<button class="rschip'+(i===REGSTEP_I?' on':'')+(rd?' done':' load')+'" onclick="regStepGo('+i+')">'+ic+'<span>'+(i+1)+'</span></button>';}).join('')+'</div>';
- var p=PEND[REGSTEP_I];var rd=p.auto!=='読取中…';
+ var doneN=PEND.filter(function(p){return p.auto!=='読取中…';}).length;var _rdyN=PEND.filter(pendReqOk).length;
+ var h='<div class="rsbar"><span class="rst">読み込み＆所感・コメント指示</span><span class="rssub">読込完了 '+doneN+' / '+n+'</span><button class="btn btn-sec rsadd" onclick="document.getElementById(\'pdf\').click()">＋ 物件を追加</button><button class="btn btn-pri rsgo" id="rsBulk" '+(_rdyN?'':'disabled')+' onclick="savePend()">'+_rdyN+'件の登録物件を要入稿へ</button></div>';
+ h+='<div class="rschips">'+PEND.map(function(p,i){var rd=p.auto!=='読取中…';var ic=rd?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10.5"/></svg>':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>';return '<button class="rschip'+(i===REGSTEP_I?' on':'')+(rd?(pendReqOk(p)?' done':' need'):' load')+'" onclick="regStepGo('+i+')">'+ic+'<span>'+(i+1)+'</span></button>';}).join('')+'</div>';
+ var p=PEND[REGSTEP_I];var rd=p.auto!=='読取中…';var rem=pendRemain(p);
  var dup=rd?pendDup(p):null;
- h+='<div class="rscard">';
+ h+='<div class="rscard">';h+='<div class="rsprog'+(rem?'':' ok')+'" id="rsProg"><span class="rsprog-n" id="rsRemN">'+rem+'</span><span class="rsprog-t">'+(rem?'残り必須項目':'必須すべて入力済み ✓')+'</span><span class="rsprog-note">所感・コメント・TELは任意</span></div>';
  if(dup)h+='<div class="rsdup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div style="flex:1"><b>重複の可能性</b>同名または酷似の物件「'+esc(dup.name||'')+'」が既にあります（号室は無視 ・ 担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+' ・ 登録 '+esc(dup.regDate||'未登録')+'）。重複ならこの読み込みを削除してください。</div><button class="btn-sm btn-danger" style="flex:none;align-self:center" onclick="regStepDel()">この物件を削除</button></div>';
  h+='<div class="rsprev"'+(p.pdfData?' onclick="viewPendPdf('+REGSTEP_I+')" style="cursor:pointer"':'')+'><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><span>'+(p.pdfData?'マイソクを開く':'PDFなし')+'</span></div>';
  h+='<div class="rsname">'+(rd?esc(p.name||p.pdfName||'(名称未設定)'):'<span class="rsloading"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>読込中… '+esc(p.pdfName)+'</span>')+'</div>';
@@ -1914,12 +1978,12 @@ function renderRegStep(){
  var _ed=(REGMEMO_EDIT>=0&&p.memos&&p.memos[REGMEMO_EDIT]);var _et=_ed?esc(p.memos[REGMEMO_EDIT].text):'';var _el=_ed?p.memos[REGMEMO_EDIT].label:'指示';h+='<div class="rmadd2">'+(_ed?'<div class="rmediting">編集中… 内容を直して「更新」を押してください</div>':'')+'<select id="rmlbl"><option'+(_el==='指示'?' selected':'')+'>指示</option><option'+(_el==='実コメント'?' selected':'')+'>実コメント</option></select><textarea id="rmtext" class="rmta" rows="3" placeholder="指示内容や実コメントを入力（改行OK ／ 「追加」を押すまで登録されません）">'+_et+'</textarea><div class="rmadd2b"><button class="btn-sm btn-pri" onclick="regMemoAdd('+REGSTEP_I+')">'+(_ed?'更新':'＋ 追加')+'</button>'+(_ed?'<button class="btn-sm" onclick="regMemoCancelEdit()">キャンセル</button>':'')+'</div></div>';
  h+='<div class="rmtpl"><select id="rmtpl">'+cmtTpls().map(function(t,ti){return '<option value="'+ti+'">'+esc(t.name)+'</option>';}).join('')+'</select><button class="btn-sm" onclick="regMemoTpl('+REGSTEP_I+')">テンプレを実コメントに追加</button><button class="btn-sm" onclick="regTplNew('+REGSTEP_I+')">＋新規テンプレ</button></div>';
  h+='<div class="rmfeat">'+['敷礼0','AD付き','独立系','ペット可','駅近','築浅','即入居','フリーレント'].map(function(f){var on=(p.memos||[]).some(function(m){return m.label==='特徴'&&m.text===f;});return '<button class="rmfc'+(on?' on':'')+'" onclick="regFeatAdd('+REGSTEP_I+',\''+f+'\')">'+f+'</button>';}).join('')+'</div>';
- h+='<div class="rsreqhd">登録に必須：担当者・物件評価・所感・コメント指示（1件以上）</div>';
+ h+='<div class="rsreqhd">担当者・物件評価は必須（所感・コメントは任意）</div>';
  h+='<div class="rslab" style="margin-top:8px">担当者（必須）</div><select class="rvtsel" onchange="setPendTantou('+REGSTEP_I+',this.value)"><option value="">担当者を選択…</option>'+STAFF.map(function(t){return '<option'+(p.tantou===t?' selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select>';
  h+='<div class="rslab" style="margin-top:12px">物件評価（必須）</div>'+pendStars(REGSTEP_I);
  h+='<div class="rslab" style="margin-top:12px">設備</div><div class="ckrow">'+[['btSep','バストイレ別'],['washStand','独立洗面台'],['petOk','ペット相談可'],['dep0','敷金0'],['key0','礼金0'],['autoLock','オートロック'],['delivBox','宅配ボックス'],['twoBurner','2口コンロ']].map(function(e){return '<label class="inck"><input type="checkbox" '+(p[e[0]]?'checked':'')+' onchange="setPendEquip('+REGSTEP_I+',\''+e[0]+'\',this.checked)">'+e[1]+'</label>';}).join('')+'</div>';
- h+='<details class="rsdet"><summary>物件情報の詳細・編集 ▾</summary><div class="rsdetbody">'+['name|物件名','room|部屋番号','madori|間取り','line|沿線','station|駅','walkMin|徒歩','rent|家賃(万)','mgmtFee|管理費(円)','area|面積','structure|構造','age|築年数','address|住所','deposit|敷金','keyMoney|礼金','mgmtCo|管理会社','phone|TEL'].map(function(ff){var a=ff.split('|');return '<div class="rsff"><label>'+a[1]+'</label><input value="'+esc(p[a[0]]||'')+'" oninput="PEND['+REGSTEP_I+'].'+a[0]+'=this.value"></div>';}).join('')+'</div></details>';
- h+='<div class="rsnav"><button class="btn btn-sec" '+(REGSTEP_I<=0?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I-1)+')">‹ 前へ</button><span class="rspos">'+(REGSTEP_I+1)+' / '+n+'</span><button class="btn btn-sec" '+(REGSTEP_I>=n-1?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I+1)+')">次へ ›</button></div>';
+ h+='<details class="rsdet" open><summary>物件情報（必須・抜けている箇所を埋めてください）</summary><div class="rsdetbody">'+[['name','物件名',1],['room','号室',1],['madori','間取り',1],['area','面積(㎡)',1],['structure','構造',1],['age','築年数',1],['line','沿線',1],['station','駅',1],['walkMin','徒歩(分)',1],['address','住所',1],['rent','家賃(万)',1],['mgmtFee','管理費(円)',1],['deposit','敷金',1],['keyMoney','礼金',1],['mgmtCo','管理会社',1],['phone','管理会社TEL',0]].map(function(a){var em=a[2]&&pendFieldEmpty(p,a[0]);return '<div class="rsff'+(em?' empty':'')+'" data-rk="'+a[0]+'"><label>'+a[1]+(a[2]?' <span class="rsreq">必須</span>':' <span class="rsopttag">任意</span>')+'</label><input value="'+esc(p[a[0]]||'')+'" oninput="pendFieldInput('+REGSTEP_I+',\''+a[0]+'\',this.value)"></div>';}).join('')+'</div></details>';
+ h+='<div class="rsact"><button class="btn btn-pri" id="rsOneGo" '+(pendReqOk(p)?'':'disabled')+' onclick="regOnePend('+REGSTEP_I+')">'+(pendReqOk(p)?'この物件を要入稿へ ✓':'この物件を要入稿へ（残'+rem+'）')+'</button><button class="btn btn-sec" onclick="pendToReview('+REGSTEP_I+')">要データ確認に回す</button><button class="btn btn-danger" onclick="regStepDel()">削除</button></div>';h+='<div class="rsnav"><button class="btn btn-sec" '+(REGSTEP_I<=0?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I-1)+')">‹ 前へ</button><span class="rspos">'+(REGSTEP_I+1)+' / '+n+'</span><button class="btn btn-sec" '+(REGSTEP_I>=n-1?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I+1)+')">次へ ›</button></div>';
  h+='</div>';
  host.innerHTML=h;
 }
@@ -1978,7 +2042,7 @@ function renderPend(){
   +'</div></div>';}).join('');
 }
 async function testDrive(){if(!API){alert('共有設定（GASのURL）が未設定です。物件追加→共有設定で設定してください。');return;}toast('ドライブ保存をテスト中…');try{var body=JSON.stringify({action:'savePdf',name:'_接続テスト_'+Date.now()+'.pdf',date:today(),data:btoa('%PDF-1.4\n% hanako test\n')});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var t=await r.text();var ok=false,url='';try{var d=JSON.parse(t);ok=d&&d.ok;url=d&&d.url||'';}catch(e){}alert((ok?'成功：ドライブに保存できました。\n日付フォルダ（'+today()+'）の中を確認してください。\n'+url:'失敗：GASからの応答↓\n'+t.slice(0,600))+'\n\n（成功なのにDBが消えた場合はdoPostの分岐位置を確認）');}catch(e){alert('通信エラー：'+e.message+'\n→ GASを「新バージョン」で再デプロイしたか、URLが正しいか、Drive権限を承認したかを確認してください。');}}
-async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var _dt=(prop.uploadDate||today());var _base=(prop.name?((prop.name+'')+(prop.room?('-'+prop.room):'')):(prop.pdfName||'maisoku'));var _fname=(_dt+'_'+_base).replace(/\.pdf$/i,'').replace(/[\\/:*?"<>|]/g,'_').slice(0,90)+'.pdf';var body=JSON.stringify({action:'savePdf',date:'登録物件',sub:_dt,name:_fname,data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
+async function uploadPdfToDrive(prop,b64){if(!API||!b64)return false;try{var _dt=(prop.uploadDate||today());var _tt=(prop.tantou?('【'+prop.tantou+'】'):'');var _base=_tt+_dt+'_'+(prop.name?((prop.name+'')+(prop.room?('_'+prop.room):'')):(prop.pdfName||'maisoku'));var _fname=(_base).replace(/\.pdf$/i,'').replace(/[\\/:*?"<>|]/g,'_').slice(0,90)+'.pdf';var body=JSON.stringify({action:'savePdf',date:'登録物件',sub:_dt,name:_fname,data:b64});var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});var d=await r.json();if(d&&d.ok&&d.url){prop.driveId=d.fileId||'';prop.driveUrl=d.url;return true;}}catch(e){}return false;}
 function _nkey(s){return normName(s||'').toLowerCase().replace(/[（）()【】\[\]『』「」・･,，、。\.\-―ー－_\/／\s]/g,'');}
 function _lev(a,b){var m=a.length,n=b.length;if(!m)return n;if(!n)return m;var dp=[],i,j;for(i=0;i<=n;i++)dp[i]=i;for(i=1;i<=m;i++){var prev=dp[0];dp[0]=i;for(j=1;j<=n;j++){var t=dp[j];dp[j]=Math.min(dp[j]+1,dp[j-1]+1,prev+(a.charAt(i-1)===b.charAt(j-1)?0:1));prev=t;}}return dp[n];}
 function nameSimilar(a,b){if(!a||!b)return false;if(a===b)return true;var lo=a.length<=b.length?a:b,hi=a.length<=b.length?b:a;if(lo.length>=4&&hi.indexOf(lo)>=0)return true;var ml=Math.max(a.length,b.length);if(ml<4)return false;return (1-_lev(a,b)/ml)>=0.8;}
@@ -1991,19 +2055,10 @@ async function savePend(){
   if(p.auto==='読取中…'){remain.push(p);return;}
   if(pendExactDup(p)){skipped.push(p.name||p.pdfName);return;}
   var _memN=(p.memos||[]).filter(function(m){return m.label==='指示'||m.label==='実コメント'||m.tpl;}).length;
-  if(!(p.tantou&&p.stars&&p.shokan&&String(p.shokan).trim()&&_memN>0)){incomplete.push(p.name||p.pdfName);remain.push(p);return;}
-  const id='PR'+Date.now()+Math.random().toString(36).slice(2,5);
-  const log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});
-  PROPS.push({id:id,status:'要入稿',confirmed:true,bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:true,waku:p.waku||'その他',suumoCode:'',
-   pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),
-   structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,
-   propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',
-   uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,
-   statusLog:log,regDate:today(),tantou:(p.tantou||''),shokan:(p.shokan||''),memos:(p.memos||[]),stars:(+p.stars||0),comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',
-   csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''});
-  _newIds.push(id);if(p.pdfData)_uploads.push({id:id,b64:p.pdfData});});
+  if(!pendReqOk(p)){incomplete.push(p.name||p.pdfName);remain.push(p);return;}
+  var _np=_buildPendProp(p,true);PROPS.push(_np);_newIds.push(_np.id);if(p.pdfData)_uploads.push({id:_np.id,b64:p.pdfData});});
   var _dn=0;for(var _u=0;_u<_uploads.length;_u++){var _pp=PROPS.find(function(x){return x.id===_uploads[_u].id;});var _ok=false;if(_pp){_ok=await uploadPdfToDrive(_pp,_uploads[_u].b64);}if(_ok)_dn++;else{try{await gset('pdf_'+_uploads[_u].id,_uploads[_u].b64);}catch(e){}}}
-  await save();var _added=_newIds.length;PEND=remain;renderPend();recompute();updateBadges();toast(_added?(_added+'件を要入稿へ登録しました'+(incomplete.length?'／未入力 '+incomplete.length+'件は読み込み画面に残しました':'')+(skipped.length?'（重複'+skipped.length+'件スキップ）':'')+(_uploads.length?'／PDF保存 '+_dn+'/'+_uploads.length:'')):(incomplete.length?'担当・評価★・所感・コメント指示を入れると要入稿へ登録できます（未入力 '+incomplete.length+'件）':'登録できる物件がありません'));if(_newIds.length){tab('staff');}else{renderRegStep();}
+  await save();await flushPush();var _added=_newIds.length;PEND=remain;renderPend();recompute();updateBadges();if(_added&&_saveErr){toast('\u26a0 '+_added+'件を要入稿にしましたが共有DBへの保存に失敗しました。通信を確認し、上部の保存表示をタップして再保存してください（データは手元に残っています）。');tab('staff');return;}toast(_added?(_added+'件を要入稿へ登録しました'+(incomplete.length?'／未入力 '+incomplete.length+'件は読み込み画面に残しました':'')+(skipped.length?'（重複'+skipped.length+'件スキップ）':'')+(_uploads.length?'／PDF保存 '+_dn+'/'+_uploads.length:'')):(incomplete.length?'必須項目をすべて入力すると要入稿へ登録できます（未完了 '+incomplete.length+'件）':'登録できる物件がありません'));if(_newIds.length){tab('staff');}else{renderRegStep();}
  };
   doSave();
 }
@@ -2190,7 +2245,7 @@ function revMarkOk(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)re
 function revToggleMg(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.revStatus=(p.revStatus==='mg')?'un':'mg';save();renderReview();updateBadges();if(p.revStatus==='mg'){var t=document.getElementById('rv_mgmemo');if(t)t.focus();toast('マネージャー要確認にしました（このページに残ります）');}}
 function revMgMemo(id,v){var p=PROPS.find(function(x){return x.id===id;});if(p){p.mgMemo=v;save();}}
 function revEquip(id,ck){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.equipOk=ck;save();var g=document.getElementById('rv_gate');if(g)g.classList.toggle('done',ck);document.querySelectorAll('[data-chipkey="__equip"]').forEach(function(c){c.classList.toggle('done',ck);});}
-function revRegister(){var all=revItems().filter(function(p){return (p.revStatus||'un')==='ok';});var ok=all.filter(function(p){return !!p.tantou&&!!p.stars;});var noT=all.length-ok.length;if(!ok.length){toast(noT?'担当者・物件評価★が未入力の物件があります':'確認済みの物件がありません');return;}ok.forEach(function(p){p.confirmed=true;p.revStatus='un';});recompute();save();updateBadges();CURREV=null;renderReview();toast(ok.length+'件を入稿ページへ登録しました'+(noT?'（担当者/★未入力 '+noT+'件は保留）':'（確認済みのみ移動）'));}
+function revRegister(){var all=revItems().filter(function(p){return (p.revStatus||'un')==='ok';});var ok=all.filter(function(p){return !!p.tantou&&!!p.stars;});var noT=all.length-ok.length;if(!ok.length){toast(noT?'担当者・物件評価★が未入力の物件があります':'確認済みの物件がありません');return;}ok.forEach(function(p){p.confirmed=true;p.revStatus='un';p.regTs=p.regTs||nowTS();if(!p.regDate)p.regDate=today();});recompute();save();updateBadges();CURREV=null;renderReview();toast(ok.length+'件を入稿ページへ登録しました'+(noT?'（担当者/★未入力 '+noT+'件は保留）':'（確認済みのみ移動）'));}
 var STAFF=['弘中','横山','宮本','田邊','生沼'];
 function tantouTag(p){return p.tantou?('<span class="ttag">'+esc(p.tantou)+'</span>'):'';}
 var STAR_COL={5:['#a07a08','#fff4cf','#E8B30A'],4:['#b5610c','#ffe6c7','#F08A24'],3:['#2d6cb5','#e4eefb','#3B82C4'],2:['#6f7884','#eef0f3','#9AA3AE'],1:['#8b929c','#f3f5f7','#C7CCD3']};
@@ -2295,10 +2350,10 @@ function renderTantou(){
  else{h+=ps.map(function(p){var pv=+(p.csvPV||0),inq=+(p.csvInq||0),rate=pv>0?(inq/pv*100).toFixed(1)+'%':'-';var sc=p.status==='要入稿'?'p-pre':p.status==='掲載中'?'p-act':'p-done';return '<div class="card"><div class="hd">'+nmLink(p)+csBadge(p)+'<span class="pill '+sc+'">'+p.status+'</span></div><div class="info">'+[p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ ')+'</div><div class="trow"><span>PV <b>'+pv.toLocaleString()+'</b></span><span>反響 <b>'+inq+'</b></span><span>反響率 <b>'+rate+'</b></span><span>登録 '+(p.regDate||'—')+'</span><span class="treassign">担当変更 <select onchange="tantouSet(\''+p.id+'\',this.value)"><option value="">未割当</option>'+STAFF.map(function(nm){return '<option value="'+nm+'"'+(p.tantou===nm?' selected':'')+'>'+nm+'</option>';}).join('')+'</select></span></div></div>';}).join('');}
  host.innerHTML=h;
 }
-function regConfirmDone(){
- var okN=0;PROPS.forEach(function(p){if(p.confirmed===false&&REG_SCOPE&&REG_SCOPE.indexOf(p.id)>=0&&(p.revStatus||'un')==='ok'&&p.tantou&&p.stars){p.confirmed=true;p.revStatus='un';okN++;}});
+async function regConfirmDone(){
+ var okN=0;PROPS.forEach(function(p){if(p.confirmed===false&&REG_SCOPE&&REG_SCOPE.indexOf(p.id)>=0&&(p.revStatus||'un')==='ok'&&p.tantou&&p.stars){p.confirmed=true;p.revStatus='un';p.regTs=p.regTs||nowTS();if(!p.regDate)p.regDate=today();okN++;}});
  var leftover=PROPS.filter(function(p){return p.confirmed===false&&REG_SCOPE&&REG_SCOPE.indexOf(p.id)>=0;}).length;
- recompute();save();updateBadges();REG_SCOPE=null;CURREV=null;
+ recompute();await save();await flushPush();updateBadges();REG_SCOPE=null;CURREV=null;if(_saveErr){toast('\u26a0 共有DBへの保存に失敗しました。通信を確認して再保存してください（データは手元に残っています）。');return;}
  if(okN){toast(okN+'件を要入稿へ登録しました'+(leftover?('／'+leftover+'件は要データ確認に残ります'):''));tab('staff');}
  else if(leftover){toast(leftover+'件は要データ確認に残ります（確認済みなし）');tab('review');}
  else{tab('staff');}
@@ -4111,9 +4166,10 @@ async function importJ(ev){const f=ev.target.files[0];if(!f)return;try{const o=J
 
 // ---------- init ----------
 (async function(){try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}catch(e){}
- await load();navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}try{updateSaveState();}catch(e){}})();
+ await load();navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}try{updateSaveState();}catch(e){}try{_lastSig=_dataSig();}catch(e){}})();
 let _lastRefresh=Date.now();
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')maybeAutoRefresh();else _beaconSave();});
+setInterval(function(){try{quietRefresh();}catch(e){}},30000);
 window.addEventListener('pagehide',_beaconSave);
 window.addEventListener('beforeunload',_beaconSave);
 document.addEventListener('focusin',function(e){var t=e.target;if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))_editing=true;});
