@@ -1891,7 +1891,7 @@ function renderRegStep(){
  var p=PEND[REGSTEP_I];var rd=p.auto!=='読取中…';
  var dup=rd?pendDup(p):null;
  h+='<div class="rscard">';
- if(dup)h+='<div class="rsdup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div style="flex:1"><b>重複の可能性</b>同名または酷似の物件「'+esc(dup.name||'')+'」が既にあります（号室は無視 ・ 担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+'）。重複ならこの読み込みを削除してください。</div><button class="btn-sm btn-danger" style="flex:none;align-self:center" onclick="regStepDel()">この物件を削除</button></div>';
+ if(dup)h+='<div class="rsdup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div style="flex:1"><b>重複の可能性</b>同名または酷似の物件「'+esc(dup.name||'')+'」が既にあります（号室は無視 ・ 担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+' ・ 登録 '+esc(dup.regDate||'未登録')+'）。重複ならこの読み込みを削除してください。</div><button class="btn-sm btn-danger" style="flex:none;align-self:center" onclick="regStepDel()">この物件を削除</button></div>';
  h+='<div class="rsprev"'+(p.pdfData?' onclick="viewPendPdf('+REGSTEP_I+')" style="cursor:pointer"':'')+'><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><span>'+(p.pdfData?'マイソクを開く':'PDFなし')+'</span></div>';
  h+='<div class="rsname">'+(rd?esc(p.name||p.pdfName||'(名称未設定)'):'<span class="rsloading"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>読込中… '+esc(p.pdfName)+'</span>')+'</div>';
  h+='<div class="rsinfo">'+(([p.station,p.walkMin?'徒歩'+p.walkMin:'',p.madori,rentMan(p)].filter(Boolean).join(' ・ '))||(rd?'情報なし':'解析中…'))+'</div>';
@@ -1928,7 +1928,7 @@ function renderPend(){
   return '<div class="card'+(fix?' needfix':'')+'">'
   +'<div class="spread"><span class="nm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'+esc(p.pdfName)+'</span><div class="row" style="gap:6px">'+(dup?'<span class="pill pr" style="align-self:center">重複</span>':'')+autoPill(p.auto)+'<button class="btn-sm btn-danger" onclick="PEND.splice('+i+',1);renderPend()">削除</button></div></div>'
   +'<div class="info">'+[p.station,p.walkMin?'徒歩'+p.walkMin:'',p.madori,rentMan(p)].filter(Boolean).join(' ・ ')+'</div>'
-  +(dup?'<div class="warnbox">'+ic('warn')+'同名または酷似の物件「'+esc(dup.name||'')+'」が既にあります（号室は無視 ・ 担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+'）。重複なら右上の「削除」で取り除いてください。</div>':'')
+  +(dup?'<div class="warnbox">'+ic('warn')+'同名または酷似の物件「'+esc(dup.name||'')+'」が既にあります（号室は無視 ・ 担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+' ・ 登録 '+esc(dup.regDate||'未登録')+'）。重複なら右上の「削除」で取り除いてください。</div>':'')
   +(fix?'<div class="warnbox">'+ic('warn')+'自動読取が不確実です'+(p.auto.indexOf('：')>=0?'（'+esc(p.auto.split('：')[1])+'）':'')+'。下の詳細で駅・条件をご確認のうえ手修正してください。</div>':'')
   +'<div class="qlabel">枠の振り分け（必須・タップで選択）</div>'+wakuChips(i)
   +'<div class="qlabel">I.S. Memo（空き状況・申込方・内見開始日など）</div><textarea oninput="PEND['+i+'].isMemo=this.value" placeholder="例：先行契約のみ可能 ・ 退去6/20">'+esc(p.isMemo||'')+'</textarea>'
@@ -3358,7 +3358,7 @@ async function routeImportMany(files){
   var lines=txt.split(/\r?\n/).filter(function(l){return l.trim();});
   var hdr=lines.length?parseCSVRow(lines[0]).map(function(h){return h.trim();}):[];
   if(colFind(hdr,['受信日時'])>=0){jds.push({f:f,txt:txt});}
-  else if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){biji.push({f:f,txt:txt,date:detectBijikonDate(txt)});}
+  else if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){biji.push({f:f,txt:txt,date:detectBijikonDate(txt)||_dateFromName(f.name)});}
   else {jds.push({f:f,txt:txt});}
  }
  for(var a=0;a<xls.length;a++){try{await processHankyo(xls[a]);}catch(e){}}
