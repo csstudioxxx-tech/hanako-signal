@@ -683,6 +683,26 @@ header{padding-left:54px}
 .rsff{display:flex;flex-direction:column;gap:3px}.rsff label{font-size:10.5px;color:var(--text3);font-weight:600}
 .rsff input{padding:8px 9px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit}
 .rvtsel{min-width:170px;padding:9px 11px;border-radius:9px;font-size:14px;font-family:inherit;border:1px solid var(--border)}
+.bjmis{border:1px solid #F0D9A8;background:#FFFCF5;border-radius:12px;margin:10px 2px 12px;overflow:hidden}
+.bjmis>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;background:#FCF3DD;user-select:none}
+.bjmis>summary::-webkit-details-marker{display:none}
+.bjmis-t{font-weight:700;font-size:13.5px;color:#8A6D1A;display:flex;align-items:center;gap:6px}
+.bjmis-t b{color:#B8860B;font-size:15px}
+.bjok-all{border:none;background:#1A3D6B;color:#fff;font-weight:700;font-size:12px;padding:7px 14px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.bjok-all:hover{background:#15325a}
+.bjmis-note{font-size:11.5px;color:#7a7a7a;line-height:1.6;padding:9px 14px 4px}
+.bjmis-list{padding:4px 10px 12px;display:flex;flex-direction:column;gap:7px}
+.bjrow{border:1px solid #ECECEC;background:#fff;border-radius:9px;padding:9px 11px}
+.bjrow-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px}
+.bjrow-nm{font-weight:600;font-size:13px;color:#1d2433}
+.bjok-one{border:1px solid #1A3D6B;background:#fff;color:#1A3D6B;font-weight:600;font-size:11px;padding:5px 12px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.bjok-one:hover{background:#1A3D6B;color:#fff}
+.bjrow-d{display:flex;flex-wrap:wrap;gap:6px}
+.bjd{font-size:11px;background:#F7F8FA;border:1px solid #EDEFF2;border-radius:6px;padding:3px 8px;color:#444}
+.bjd b{color:#1A3D6B;margin-right:5px}
+.bjd-cur{color:#c0392b}
+.bjd-arr{color:#999;margin:0 3px}
+.bjd-bj{color:#1f8a4c;font-weight:600}
 </style><style>
 .rsprog{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff5e6;border:1px solid #f3d9a8;border-radius:11px;padding:10px 14px;margin:0 0 12px}
 .rsprog.ok{background:#e8f7ee;border-color:#bfe6cd}
@@ -765,7 +785,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-reg</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-bjdate</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -910,18 +930,18 @@ function isEditing(){if(_editing)return true;var a=document.activeElement;if(!a)
 function updateAutoBtn(){var b=document.getElementById('autobtn');if(b){b.textContent='自動更新：'+(_autoPaused?'OFF':'ON');b.classList.toggle('autooff',_autoPaused);}}
 function updatePendingHint(){var b=document.getElementById('refbtn');if(b)b.classList.toggle('haspend',!!_pendingRefresh);}
 async function flushPush(){if(!API)return;try{clearTimeout(_pushT);}catch(e){}for(var i=0;i<20&&_pushing;i++){await new Promise(function(r){setTimeout(r,80);});}await doPush();for(var j=0;j<20&&_pushing;j++){await new Promise(function(r){setTimeout(r,80);});}}
-async function doRefreshNow(){if(!API)return;await flushPush();await load();recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}_pendingRefresh=false;updatePendingHint();_lastRefresh=Date.now();toast('最新の共有データを反映しました');}
+async function doRefreshNow(){if(!API)return;await flushPush();if(_saveErr){toast('未保存の変更が保存できていません。通信を確認してから再読込してください（上書き防止のため取得を中止）');_pendingRefresh=false;updatePendingHint();return;}await load();recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}_pendingRefresh=false;updatePendingHint();_lastRefresh=Date.now();toast('最新の共有データを反映しました');}
 async function refreshData(){
  if(!API){toast('現在はローカル保存モードです（共有設定で共有化できます）');return;}
  if(isEditing()){_pendingRefresh=true;updatePendingHint();toast('入力中のため保留しました。欄の外をタップで確定後、反映します');return;}
- await flushPush();await load();recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}_lastRefresh=Date.now();toast('最新の共有データを取得しました');
+ await flushPush();if(_saveErr){toast('未保存の変更が保存できていません。通信を確認してから再読込してください（上書き防止のため取得を中止）');return;}await load();recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}_lastRefresh=Date.now();toast('最新の共有データを取得しました');
 }
 function maybeAutoRefresh(){
  if(!API||_autoPaused||_pushing)return;
  if(Date.now()-_lastRefresh<=4000)return;
  if(isEditing()){_pendingRefresh=true;updatePendingHint();return;}
  _lastRefresh=Date.now();
- flushPush().then(function(){return load();}).then(function(){recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}});
+ flushPush().then(function(){if(_saveErr)return null;return load().then(function(){recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}});});
 }
 function _hashStr(s){var h=5381;for(var i=0;i<s.length;i++){h=((h*33)^s.charCodeAt(i))>>>0;}return h;}
 function _dataSig(){var s='';for(var i=0;i<PROPS.length;i++){var p=PROPS[i];s+=(p.id||'')+'~'+(p.status||'')+'~'+(p.tantou||'')+'~'+(p.stars||0)+'~'+(p.confirmed?1:0)+'~'+(p.revStatus||'')+'~'+(p.waku||'')+'~'+(p.csvPV||0)+'~'+(p.csvInq||0)+'~'+(p.name||'')+'|';}s+='#'+PROPS.length+'#'+Object.keys(HIST).length+'#'+Object.keys(EVENTS).length+'#'+((MGMT&&MGMT.length)||0)+'#'+((GUAR&&GUAR.length)||0);return _hashStr(s);}
@@ -932,7 +952,7 @@ async function quietRefresh(){
  if(Date.now()-_lastRefresh<=4000)return;
  _lastRefresh=Date.now();
  try{
-  await flushPush();await load();recompute();
+  await flushPush();if(_saveErr)return;await load();recompute();
   var sig=_dataSig();
   if(_lastSig!==''&&sig!==_lastSig){var y=window.scrollY||window.pageYOffset||0;tab(CURTAB||'dash');try{window.scrollTo(0,y);}catch(e){}}
   _lastSig=sig;
@@ -2154,7 +2174,10 @@ function inEd(id,field,val,ph,typ){return '<input class="ined" type="'+(typ||'te
 function inSel(id,field,val,opts){return '<select class="ined" onchange="editProp(\''+id+'\',\''+field+'\',this.value)">'+opts.map(function(o){return '<option'+(String(val)===String(o)?' selected':'')+'>'+o+'</option>';}).join('')+'</select>';}
 function editProp(id,field,val){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p[field]=val;recompute();save();updateBadges();}
 function confirmReview(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(!p.tantou){toast('担当者をプルダウンで選択してください');return;}if(!p.stars){toast('物件評価（★1〜5）を入れてください');return;}p.confirmed=true;recompute();save();renderReview();toast('確認済みにしました');}
-function bjResolve(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.bjOkAt=nowTS();save();renderReview();toast('修正済みにしました');}
+function bjResolve(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.bjOkAt=nowTS();save();renderReview();toast('問題なしにしました');}
+function bjMisList(){return PROPS.filter(bjMismatch);}
+function bjResolveAll(){var its=bjMisList();if(!its.length){toast('ビジコンのズレはありません');return;}if(!confirm('ビジコンとのズレ '+its.length+'件を、すべて「問題なし（確認済み）」にします。\nこの一覧から消えます。よろしいですか？'))return;var now=nowTS();its.forEach(function(x){x.bjOkAt=now;});recompute();save();updateBadges();renderReview();toast(its.length+'件を問題なしにしました');}
+function _bjMisSection(){var its=bjMisList();if(!its.length)return '';var rows=its.map(function(p){var dd=bjDiff(p).map(function(d){return '<span class="bjd"><b>'+esc(d.label)+'</b><span class="bjd-cur">'+esc(String(d.cur||'(空)'))+'</span><span class="bjd-arr">→ビジコン</span><span class="bjd-bj">'+esc(String(d.bj||'(空)'))+'</span></span>';}).join('');return '<div class="bjrow"><div class="bjrow-h"><span class="bjrow-nm">'+esc(p.name||'(名称未設定)')+'</span><button class="bjok-one" onclick="bjResolve(\''+p.id+'\')">問題なし</button></div><div class="bjrow-d">'+dd+'</div></div>';}).join('');return '<details class="bjmis"'+(its.length<=8?' open':'')+'><summary><span class="bjmis-t">\u26a0 ビジコンとのズレ <b>'+its.length+'</b>件</span><button class="bjok-all" onclick="event.stopPropagation();event.preventDefault();bjResolveAll()">まとめて問題なしにする</button></summary><div class="bjmis-note">物件データとビジコン（最新の掲載状況）で、物件名・部屋番号・名寄せ点数・店ピク・得エリ・CM動画・写真数のいずれかが食い違っています。内容を確認し、問題なければ「問題なし」を押すと一覧から消えます。</div><div class="bjmis-list">'+rows+'</div></details>';}
 function bjApply(id,field,raw){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(field==='storePick'||field==='specArea'||field==='video')p[field]=(raw==='○'||raw===true||raw==='true');else p[field]=raw;recompute();save();renderReview();updateBadges();}
 function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
  if(r.name&&p.name&&r.name!==p.name)d.push({f:'name',label:'物件名',cur:p.name,bj:r.name});
@@ -2420,6 +2443,7 @@ function renderReview(){
   h+='<div class="rvsrc">'+[['all','全て'],['csv','CSV読み取り'],['pdf','PDFアップロード']].map(function(o){return '<button class="'+(REVSRC===o[0]?'on':'')+'" onclick="revSrc(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
  }
  h+='<div class="rvsrc" style="margin-left:8px">'+[['default','標準順'],['points','確認ポイント数順']].map(function(o){return '<button class="'+(REVSORT===o[0]?'on':'')+'" onclick="revSortSet(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
+ if(!REG_SCOPE)h+=_bjMisSection();
 if(!items.length){h+='<div class="rvempty">'+(REG_SCOPE?'登録した物件はすべて確認できました。<br><button class="btn btn-pri" style="margin-top:10px" onclick="regConfirmDone()">要入稿へ進む</button>':(REVSRC==='all'?'未確認の物件はありません。物件登録でPDFを取り込むとここに表示されます。':'この条件（'+(REVSRC==='csv'?'CSV読み取り':'PDFアップロード')+'）の未確認物件はありません。'))+'</div>';document.getElementById('reviewbody').innerHTML=h;updateBadges();return;}
  var _csvN=PROPS.filter(function(p){return p.confirmed===false&&p.fromCsv;}).length;
  if(_csvN)h+='<div class="rvcsvbar"><div class="rvcsv-t">CSV取込分 '+_csvN+'件（過去掲載・PDFなし等）。情報不備でもまとめて確定。ステータスは<b>ビジコンの掲載状況</b>（掲載中／掲載終了＝落とし）のまま、要入稿には送りません。</div><button class="btn-sm btn-pri" onclick="revConfirmAllCsv()">CSVを全選択して確定</button></div>';
@@ -3430,18 +3454,22 @@ async function routeImportMany(files){
   var lines=txt.split(/\r?\n/).filter(function(l){return l.trim();});
   var hdr=lines.length?parseCSVRow(lines[0]).map(function(h){return h.trim();}):[];
   if(colFind(hdr,['受信日時'])>=0){jds.push({f:f,txt:txt});}
-  else if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){biji.push({f:f,txt:txt,date:detectBijikonDate(txt)||_dateFromName(f.name)});}
+  else if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){biji.push({f:f,txt:txt,date:_dateFromName(f.name)||detectBijikonDate(txt)});}
   else {jds.push({f:f,txt:txt});}
  }
  for(var a=0;a<xls.length;a++){try{await processHankyo(xls[a]);}catch(e){}}
  for(var b=0;b<jds.length;b++){try{processCSVText(jds[b].txt,jds[b].f);}catch(e){}}
  biji.sort(function(x,y){var dx=x.date||'',dy=y.date||'';return dx<dy?-1:(dx>dy?1:0);});
- for(var c=0;c<biji.length;c++){try{
-   if(biji[c].date){var L=biji[c].txt.split(/\r?\n/).filter(function(l){return l.trim();});var hd=parseCSVRow(L[0]).map(function(h){return h.trim();});var rw=L.slice(1).map(parseCSVRow);bijikonPending={hdr:hd,rows:rw,file:biji[c].f};applyBijikon(biji[c].date);}
-   else {processCSVText(biji[c].txt,biji[c].f);}
-  }catch(e){}}
+ if(biji.length===1){
+   try{var _bj=biji[0];var L=_bj.txt.split(/\r?\n/).filter(function(l){return l.trim();});var hd=parseCSVRow(L[0]).map(function(h){return h.trim();});var rw=L.slice(1).map(parseCSVRow);bijikonPending={hdr:hd,rows:rw,file:_bj.f,defDate:(_bj.date||'')};tab('csv');renderBijikonPrompt();}catch(e){}
+ } else {
+   for(var c=0;c<biji.length;c++){try{
+     if(biji[c].date){var L2=biji[c].txt.split(/\r?\n/).filter(function(l){return l.trim();});var hd2=parseCSVRow(L2[0]).map(function(h){return h.trim();});var rw2=L2.slice(1).map(parseCSVRow);bijikonPending={hdr:hd2,rows:rw2,file:biji[c].f};applyBijikon(biji[c].date);}
+     else {processCSVText(biji[c].txt,biji[c].f);}
+    }catch(e){}}
+ }
  var tot=xls.length+jds.length+biji.length;
- if(tot>1)toast(tot+'件のファイルを取り込みました（ビジコンは日付自動判定）');
+ if(tot>1&&biji.length!==1)toast(tot+'件のファイルを取り込みました（ビジコンは日付自動判定）');
 }
 async function routeImport(file){const n=(file.name||'').toLowerCase();if(n.endsWith('.xls')||n.endsWith('.xlsx')){await processHankyo(file);}else{await processCSV(file);}}
 function readCSVText(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{
@@ -3591,10 +3619,10 @@ function promptBijikon(hdr,rows,file,autoDate){
 }
 function renderBijikonPrompt(){
  if(!bijikonPending){document.getElementById('csvpending').innerHTML='';return;}
- var cur=bijikonCursor();
+ var cur=(bijikonPending&&bijikonPending.defDate)?bijikonPending.defDate:bijikonCursor();
  document.getElementById('csvpending').innerHTML=
   '<div class="card fade"><div style="font-size:13px;font-weight:650">ビジコン（PV詳細）を検出</div>'
-  +'<div class="note" style="margin-top:4px">ビジコンCSVには日付が入っていないため、<b>連続取込モード</b>で進めます。下の対象日で取り込むと、次回は自動で翌日に進みます。古い日付から順に上げてください。</div>'
+  +((bijikonPending&&bijikonPending.defDate)?'<div class="note" style="margin-top:4px">ファイル名から<b>対象日（'+bijikonPending.defDate.replace(/-/g,'/')+'）</b>を読み取りました。違う場合は下のカレンダーで変更してから取り込んでください。</div>':'<div class="note" style="margin-top:4px">ビジコンCSVには日付が入っていないため、<b>連続取込モード</b>で進めます。下の対象日で取り込むと、次回は自動で翌日に進みます。古い日付から順に上げてください。</div>')
   +'<label>対象日（この日付で取り込みます）</label><input type="date" id="bjdate" value="'+cur+'" onchange="setBijikonCursor(this.value)">'
   +'<div class="note" style="margin-top:6px;font-size:11px">取り込み後、対象日は自動で翌日へ。同じ日付を入れ直すと上書きされ二重になりません。</div>'
   +'<div class="row" style="gap:7px;margin-top:10px"><button class="btn btn-pri" style="width:auto;flex:1" onclick="applyBijikonCursor()">この日付で取り込む（→翌日へ）</button><button class="btn btn-sec" style="width:auto" onclick="bijikonPending=null;document.getElementById(\'csvpending\').innerHTML=\'\'">キャンセル</button></div>'
