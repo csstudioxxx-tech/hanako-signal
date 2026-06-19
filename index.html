@@ -736,7 +736,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-biji</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-e</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -764,7 +764,7 @@ header{padding-left:54px}
 <div id="v-cost" style="display:none"><div id="costbody"></div></div>
 <div id="v-csv" style="display:none">
  <div class="drop" id="csvdrop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M4 20V10M10 20V4M16 20v-7M20 20H3"/></svg>CSV / Excelをドロップ</div><div class="ds">ビジコン(CSV)＝詳細PV ／ 反響報告書(Excel・入稿分析システム)＝反響・オプション ／ JDS(CSV)＝反響速報</div></div>
- <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-pri" id="drvimpbtn" onclick="driveBatchImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Driveから一括取込</button><button class="btn btn-sec" onclick="testDrive()">ドライブ保存テスト</button></div>
+ <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-pri" id="drvimpbtn" onclick="driveBatchImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Driveから一括取込</button><button class="btn btn-sec" id="drvimpallbtn" onclick="driveBatchImport(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Drive全件再取込</button><button class="btn btn-sec" onclick="testDrive()">ドライブ保存テスト</button></div>
  <input type="file" id="csvin" accept=".csv,.xls,.xlsx" multiple style="display:none">
  <div id="csvpending"></div>
  <div id="csvlog"></div>
@@ -3301,9 +3301,9 @@ function _markImp(id,meta){var f=_impDone();f[id]=Object.assign({at:nowTS()},met
 function _b64ToU8(b64){var bin=atob(b64);var u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u;}
 function _decodeCsvBytes(u){try{if(u[0]===0xEF&&u[1]===0xBB&&u[2]===0xBF){return new TextDecoder('utf-8').decode(u);}var sj=new TextDecoder('shift_jis').decode(u);if((sj.match(/\uFFFD/g)||[]).length>5){return new TextDecoder('utf-8').decode(u);}return sj;}catch(e){try{return new TextDecoder('utf-8').decode(u);}catch(e2){return '';}}}
 function _dateFromName(n){var m=(n||'').match(/(\d{4})(\d{2})(\d{2})/);return m?(m[1]+'-'+m[2]+'-'+m[3]):'';}
-async function driveBatchImport(){
+async function driveBatchImport(force){
  if(!API){alert('共有設定（GASのURL）が未設定です。物件追加→共有設定で設定してください。');return;}
- if(!confirm('Driveの「ビジコンCSV」「反響報告書」フォルダから、まだ取り込んでいないファイルを一括取込します。\nよろしいですか？'))return;
+ if(!confirm(force?'Driveの「ビジコンCSV」「反響報告書」フォルダの【全ファイル】を再取込します（取込済みも含めて上書き）。\nよろしいですか？':'Driveの「ビジコンCSV」「反響報告書」フォルダから、まだ取り込んでいないファイルを一括取込します。\nよろしいですか？'))return;
  var btn=document.getElementById('drvimpbtn');if(btn){btn.disabled=true;btn.textContent='取込中…';}
  toast('Driveを確認中…');
  var done=_impDone();
@@ -3311,7 +3311,7 @@ async function driveBatchImport(){
  var all=[];
  for(var fI=0;fI<folders.length;fI++){try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'listFolder',folder:folders[fI].name})});var d=await r.json();if(d&&d.ok&&Array.isArray(d.files)){d.files.forEach(function(x){x._type=folders[fI].type;all.push(x);});}}catch(e){}}
  if(all.length===0){if(btn){btn.disabled=false;btn.textContent='Driveから一括取込';}alert('Driveのフォルダにファイルが見つかりませんでした。\n（各CSVを一度手動で取り込むとDriveに保存され、次回から一括取込できます）');return;}
- var todo=all.filter(function(x){return !done[x.id];});
+ var todo=force?all.slice():all.filter(function(x){return !done[x.id];});
  var skip=all.length-todo.length;
  if(todo.length===0){if(btn){btn.disabled=false;btn.textContent='Driveから一括取込';}alert('新しいファイルはありません。\n対象 '+all.length+'件はすべて取込済みです。');return;}
  todo.sort(function(a,b){return (a.name||'')<(b.name||'')?-1:1;});
