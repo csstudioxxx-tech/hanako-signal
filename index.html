@@ -785,7 +785,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-bjdate</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-dash</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -1776,7 +1776,7 @@ function renderDash(){
  h+='<div class="hero fade"><div class="t">'+viewYM+' 反響目標</div><div class="n">'+total+' <small>/ '+TARGETS.total+'</small></div>'
   +'<div class="bar" style="height:6px;margin-top:9px"><div class="fill" style="width:'+Math.min(total/TARGETS.total*100,100)+'%;background:var(--accent)"></div></div>'
   +'<div class="s">D+O '+doInq+'/'+TARGETS.do_inq+' ・ High-Hold '+(iq.hh||0)+' ・ その他 '+(iq.ot||0)+' ・ IKARI '+(iq.ik||0)+'</div></div>';
- var _sc=statusCounts();h+='<div class="stsum fade">'+'<div class="stsum-c st-pre"><div class="stsum-n">'+_sc['要入稿']+'</div><div class="stsum-l">要入稿</div></div>'+'<div class="stsum-c st-live"><div class="stsum-n">'+_sc['掲載中']+'</div><div class="stsum-l">掲載中</div></div>'+'<div class="stsum-c st-hold"><div class="stsum-n">'+_sc['保留']+'</div><div class="stsum-l">保留</div></div>'+'<div class="stsum-c st-drop"><div class="stsum-n">'+_sc['落とし済み']+'</div><div class="stsum-l">落とし</div></div>'+'</div>';h+=todayOutCard();h+=todayRegCard();h+=uploadGapCard();h+=pvCompareCard();h+=dashStaffCard();h+='<div class="stat-grid fade">';
+ var _sc=statusCounts();h+='<div class="stsum fade">'+'<div class="stsum-c st-pre"><div class="stsum-n">'+_sc['要入稿']+'</div><div class="stsum-l">要入稿</div></div>'+'<div class="stsum-c st-live"><div class="stsum-n">'+_sc['掲載中']+'</div><div class="stsum-l">掲載中</div></div>'+'<div class="stsum-c st-hold"><div class="stsum-n">'+_sc['保留']+'</div><div class="stsum-l">保留</div></div>'+'<div class="stsum-c st-drop"><div class="stsum-n">'+_sc['落とし済み']+'</div><div class="stsum-l">落とし</div></div>'+'</div>';h+=todayOutCard();h+=uploadGapCard();h+=pvCompareCard();h+=dashStaffCard();h+='<div class="stat-grid fade">';
  [['dm','Demand','反響ランキング','var(--accent)'],['op','Opportunity','オポゾーン','var(--red)'],['ot','その他','仮説検証群','var(--green)'],['hh','High-Hold','高額キープ','var(--amber)'],['ik','IKARI','30日経過','var(--purple)']].forEach(a=>{
   h+='<div class="stat '+a[0]+'"><div class="t">'+a[1]+'</div><div class="n">'+ct[a[0]]+'<small>/'+TARGETS[a[0]]+'</small></div><div class="s">'+a[2]+'</div><div class="statiq">反響 <b>'+(iq[a[0]]||0)+'</b> ・ 詳細PV <b>'+(pvw[a[0]]||0).toLocaleString()+'</b></div><div class="bar"><div class="fill" style="width:'+Math.min(ct[a[0]]/TARGETS[a[0]]*100,100)+'%;background:'+a[3]+'"></div></div></div>';});
  h+='</div>';
@@ -1925,7 +1925,7 @@ async function extractInto(file,rec){
  if(API&&rec.pdfData){try{
   var gj=await geminiExtract(rec.pdfData,'application/pdf');
   if(_needPng(gj)){var png=await pdfToPng(file);if(png){var gj2=await geminiExtract(png,'image/png');if(gj2&&gj2.bukken_mei)gj=gj2;}}
-  if(gj&&gj.bukken_mei){mapGemini(gj,rec);try{var _rawc=await pdfText(file);fillContacts(rec,_rawc);}catch(e){}if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');renderPend();if(CURTAB==='regstep')renderRegStep();return;}
+  if(gj&&gj.bukken_mei){mapGemini(gj,rec);try{var _rawc=await pdfText(file);fillContacts(rec,_rawc);}catch(e){}if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');renderPend();if(CURTAB==='regstep')renderRegStep();pendDupDialog(rec);return;}
  }catch(e){}}
  try{const raw=await pdfText(file);const f=extractFields(raw,file.name);
   const okread=f._readable,manual=f._manual,mr=f._manualReason||'';
@@ -1937,7 +1937,7 @@ async function extractInto(file,rec){
   if(rec.station&&rec.madori)rec.waku=autoWaku(rec.station,rec.madori,String(totFromParts(rec.rent,rec.mgmtFee)||'0'));
   rec.rawText=raw.normalize('NFKC').replace(/\u2ec4/g,'\u897f').slice(0,2000);
  }catch(e){rec.auto='読取不可（手入力）';}
- renderPend();if(CURTAB==='regstep')renderRegStep();}
+ renderPend();if(CURTAB==='regstep')renderRegStep();pendDupDialog(rec);}
 function addBlank(){const r=mkRec();r.pdfName='手動入力';r.auto='手動';PEND.push(r);renderPend();tab('add');}
 var REGSTEP_I=0;
 function regStepGo(i){var n=PEND.length;if(!n)return;REGSTEP_I=Math.max(0,Math.min(n-1,i));renderRegStep();}
@@ -1973,8 +1973,8 @@ function pendReqOk(p){return !!p&&p.auto!=='読取中…'&&pendRemain(p)===0;}
 function pendFieldInput(i,k,v){if(PEND[i])PEND[i][k]=v;_pendProgRefresh();}
 function _pendProgRefresh(){var p=PEND[REGSTEP_I];if(!p)return;var rem=pendRemain(p);var rn=document.getElementById('rsRemN');if(rn)rn.textContent=rem;var pr=document.getElementById('rsProg');if(pr){pr.classList.toggle('ok',!rem);var t=pr.querySelector('.rsprog-t');if(t)t.textContent=rem?'残り必須項目':'必須すべて入力済み ✓';}_pendReqKeys().forEach(function(k){var w=document.querySelector('.rsff[data-rk="'+k+'"]');if(w)w.classList.toggle('empty',pendFieldEmpty(p,k));});var og=document.getElementById('rsOneGo');if(og){og.disabled=!pendReqOk(p);og.textContent=pendReqOk(p)?'この物件を要入稿へ ✓':'この物件を要入稿へ（残'+rem+'）';}var bk=document.getElementById('rsBulk');if(bk){var rdy=PEND.filter(pendReqOk).length;bk.disabled=!rdy;bk.textContent=rdy+'件の登録物件を要入稿へ';}}
 function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toString(36).slice(2,5);var log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});return {id:id,status:'要入稿',confirmed:(confirmed!==false),regTs:nowTS(),bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:true,waku:p.waku||'その他',suumoCode:'',pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,statusLog:log,regDate:today(),tantou:(p.tantou||''),shokan:(p.shokan||''),memos:(p.memos||[]),stars:(+p.stars||0),comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''};}
-async function regOnePend(i){var p=PEND[i];if(!p)return;if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}if(pendExactDup(p)){toast('同名・同号室の物件が既にあります');return;}var prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。通信を確認して再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要入稿へ登録しました');if(!PEND.length)tab('staff');}
-async function pendToReview(i){var p=PEND[i];if(!p)return;if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}if(pendExactDup(p)){toast('同名・同号室の物件が既にあります');return;}var prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');if(!PEND.length)tab('review');}
+async function regOnePend(i){var p=PEND[i];if(!p)return;if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}var prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。通信を確認して再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要入稿へ登録しました');if(!PEND.length)tab('staff');}
+async function pendToReview(i){var p=PEND[i];if(!p)return;if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}var prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');if(!PEND.length)tab('review');}
 function _tsTime(ts){return (ts&&ts.length>=16)?ts.slice(11,16):'';}
 function todayRegCard(){var td=today();var rows=PROPS.filter(function(p){return p.confirmed!==false&&p.regTs&&p.regTs.slice(0,10)===td;});if(!rows.length)return '';rows.sort(function(a,b){return (a.regTs||'').localeCompare(b.regTs||'');});var h='<div class="card fade trcard"><div class="sec-h2"><span class="t">今日 要入稿に入れた物件</span><span class="cntp">'+rows.length+'件</span></div><div class="trwrap"><table class="trtbl"><tr><th>登録</th><th>担当</th><th>物件名</th><th class="hcol">間取り×エリア</th><th>賃料</th><th>PDF</th></tr>';rows.forEach(function(p){var pdfOk=!!(p.driveUrl||p.driveId);h+='<tr><td class="trtm">'+(_tsTime(p.regTs)||esc(p.regDate||''))+'</td><td>'+esc(p.tantou||'\u2014')+'</td><td class="trnm">'+lkName(p.id,esc(p.name||'').slice(0,18))+'</td><td class="hcol trme">'+esc((p.madori||'')+(p.station?(' \u00d7 '+p.station):''))+'</td><td class="trrent">'+esc(rentMan(p)||'\u2014')+'</td><td>'+(pdfOk?'<span class="trpdf ok">\u2713\u4fdd\u5b58</span>':'<span class="trpdf ng">\u2717\u672a</span>')+'</td></tr>';});h+='</table></div></div>';return h;}
 function renderRegStep(){
@@ -2068,6 +2068,7 @@ function _lev(a,b){var m=a.length,n=b.length;if(!m)return n;if(!n)return m;var d
 function nameSimilar(a,b){if(!a||!b)return false;if(a===b)return true;var lo=a.length<=b.length?a:b,hi=a.length<=b.length?b:a;if(lo.length>=4&&hi.indexOf(lo)>=0)return true;var ml=Math.max(a.length,b.length);if(ml<4)return false;return (1-_lev(a,b)/ml)>=0.8;}
 function pendDup(p){var nn=_nkey(p.name||p.pdfName||'');if(!nn)return null;return PROPS.find(function(x){var xn=_nkey(x.name||'');return xn&&nameSimilar(nn,xn);});}
 function pendExactDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
+function pendDupDialog(rec){try{if(!rec||rec.dupAsked)return;var dup=pendDup(rec);if(!dup)return;rec.dupAsked=true;var liveTxt=(dup.status==='掲載中')?'掲載中':statusLabel(dup.status);var when=dup.regDate||dup.listDate||dup.uploadDate||'不明';var lines=[];lines.push('物件名：'+(dup.name||'(無名)')+(dup.room?(' '+dup.room):''));lines.push('状態：'+liveTxt+(dup.status==='掲載中'?'（現在掲載中）':''));lines.push('担当：'+(dup.tantou||'未割当'));lines.push('登録日：'+when+((dup.listDate&&dup.listDate!==when)?(' ／ 掲載日 '+dup.listDate):''));var info=[dup.station,dup.madori,(typeof rentMan==='function'?rentMan(dup):'')].filter(Boolean).join(' ・ ');if(info)lines.push('物件：'+info);var ov=document.createElement('div');ov.className='ovl';ov.innerHTML='<div class="modal"><div style="font-size:15px;font-weight:700;margin-bottom:6px;color:#a83a35">重複の可能性があります</div><div class="mmsg" style="text-align:left;white-space:pre-line">読み取った「'+esc(rec.name||rec.pdfName||'物件')+'」と同名／酷似の物件が既に登録されています。\n\n【既存の物件】\n'+esc(lines.join('\n'))+'\n\nこの読み込みを削除しますか？</div><div class="mbtns"><button class="btn btn-sec" id="_dno">残す</button><button class="btn btn-danger" id="_dyes">削除する</button></div></div>';document.body.appendChild(ov);ov.querySelector('#_dno').onclick=function(){ov.remove();};ov.querySelector('#_dyes').onclick=function(){ov.remove();var ix=PEND.indexOf(rec);if(ix<0)ix=PEND.findIndex(function(x){return x.fid===rec.fid;});if(ix>=0){PEND.splice(ix,1);if(typeof REGSTEP_I!=='undefined'&&REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);}renderPend();if(CURTAB==='regstep')renderRegStep();toast('重複の読み込みを削除しました');};ov.onclick=function(e){if(e.target===ov)ov.remove();};}catch(e){}}
 async function savePend(){
  const doSave=async()=>{
  var skipped=[];var _uploads=[];var _newIds=[];var remain=[];var incomplete=[];
@@ -2174,10 +2175,11 @@ function inEd(id,field,val,ph,typ){return '<input class="ined" type="'+(typ||'te
 function inSel(id,field,val,opts){return '<select class="ined" onchange="editProp(\''+id+'\',\''+field+'\',this.value)">'+opts.map(function(o){return '<option'+(String(val)===String(o)?' selected':'')+'>'+o+'</option>';}).join('')+'</select>';}
 function editProp(id,field,val){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p[field]=val;recompute();save();updateBadges();}
 function confirmReview(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(!p.tantou){toast('担当者をプルダウンで選択してください');return;}if(!p.stars){toast('物件評価（★1〜5）を入れてください');return;}p.confirmed=true;recompute();save();renderReview();toast('確認済みにしました');}
-function bjResolve(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.bjOkAt=nowTS();save();renderReview();toast('問題なしにしました');}
+function bjConform(p){if(!p||!p.bjRef)return;var r=p.bjRef;if(r.name)p.name=r.name;if(r.room!=null&&r.room!=='')p.room=r.room;if(r.score!=null&&r.score!=='')p.csvScore=r.score;if(r.sp!=null)p.storePick=!!r.sp;if(r.sa!=null)p.specArea=!!r.sa;if(r.vd!=null)p.video=!!r.vd;if(r.photo!=null&&r.photo!=='')p.photoCount=r.photo;p.bjOkAt=nowTS();}
+function bjResolve(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;bjConform(p);recompute();save();updateBadges();renderReview();toast('ビジコンに合わせて確認済みにしました');}
 function bjMisList(){return PROPS.filter(bjMismatch);}
-function bjResolveAll(){var its=bjMisList();if(!its.length){toast('ビジコンのズレはありません');return;}if(!confirm('ビジコンとのズレ '+its.length+'件を、すべて「問題なし（確認済み）」にします。\nこの一覧から消えます。よろしいですか？'))return;var now=nowTS();its.forEach(function(x){x.bjOkAt=now;});recompute();save();updateBadges();renderReview();toast(its.length+'件を問題なしにしました');}
-function _bjMisSection(){var its=bjMisList();if(!its.length)return '';var rows=its.map(function(p){var dd=bjDiff(p).map(function(d){return '<span class="bjd"><b>'+esc(d.label)+'</b><span class="bjd-cur">'+esc(String(d.cur||'(空)'))+'</span><span class="bjd-arr">→ビジコン</span><span class="bjd-bj">'+esc(String(d.bj||'(空)'))+'</span></span>';}).join('');return '<div class="bjrow"><div class="bjrow-h"><span class="bjrow-nm">'+esc(p.name||'(名称未設定)')+'</span><button class="bjok-one" onclick="bjResolve(\''+p.id+'\')">問題なし</button></div><div class="bjrow-d">'+dd+'</div></div>';}).join('');return '<details class="bjmis"'+(its.length<=8?' open':'')+'><summary><span class="bjmis-t">\u26a0 ビジコンとのズレ <b>'+its.length+'</b>件</span><button class="bjok-all" onclick="event.stopPropagation();event.preventDefault();bjResolveAll()">まとめて問題なしにする</button></summary><div class="bjmis-note">物件データとビジコン（最新の掲載状況）で、物件名・部屋番号・名寄せ点数・店ピク・得エリ・CM動画・写真数のいずれかが食い違っています。内容を確認し、問題なければ「問題なし」を押すと一覧から消えます。</div><div class="bjmis-list">'+rows+'</div></details>';}
+function bjResolveAll(){var its=bjMisList();if(!its.length){toast('修正情報はありません');return;}if(!confirm('修正情報 '+its.length+'件を、すべてビジコンの値に合わせて「データ違い確認済み」にします。\nよろしいですか？'))return;its.forEach(function(x){bjConform(x);});recompute();save();updateBadges();renderReview();toast(its.length+'件をビジコンに合わせて確認済みにしました');}
+function _bjMisSection(){var its=bjMisList();if(!its.length)return '';var rows=its.map(function(p){var dd=bjDiff(p).map(function(d){return '<span class="bjd"><b>'+esc(d.label)+'</b><span class="bjd-cur">現在「'+esc(String(d.cur||'空'))+'」</span><span class="bjd-arr">→</span><span class="bjd-bj">ビジコン「'+esc(String(d.bj||'空'))+'」</span></span>';}).join('');return '<div class="bjrow"><div class="bjrow-h"><span class="bjrow-nm">'+esc(p.name||'(名称未設定)')+'</span><button class="bjok-one" onclick="bjResolve(\''+p.id+'\')">データ違い確認済み</button></div><div class="bjrow-d">'+dd+'</div></div>';}).join('');return '<details class="bjmis"'+(its.length<=8?' open':'')+'><summary><span class="bjmis-t">ビジコン情報からの修正情報 <b>'+its.length+'</b>件</span><button class="bjok-all" onclick="event.stopPropagation();event.preventDefault();bjResolveAll()">まとめてデータ違い確認済み</button></summary><div class="bjmis-note">ビジコンを正として、以下の項目を現在の値からビジコンの値へ修正します（物件名・部屋番号・名寄せ点数・店ピク・得エリ・CM動画・写真数）。確認できたら「データ違い確認済み」を押すと、ビジコンの値に更新され一覧から消えます。通知バッジには加算されません。</div><div class="bjmis-list">'+rows+'</div></details>';}
 function bjApply(id,field,raw){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(field==='storePick'||field==='specArea'||field==='video')p[field]=(raw==='○'||raw===true||raw==='true');else p[field]=raw;recompute();save();renderReview();updateBadges();}
 function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
  if(r.name&&p.name&&r.name!==p.name)d.push({f:'name',label:'物件名',cur:p.name,bj:r.name});
@@ -2189,7 +2191,7 @@ function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
  if(r.photo!=null&&r.photo!==''&&String(p.photoCount||'')!==String(r.photo||''))d.push({f:'photoCount',label:'写真数',cur:p.photoCount||'',bj:r.photo||''});
  return d;}
 function bjMismatch(p){return !!(p.bjRef && !p.bjOkAt && bjDiff(p).length>0);}
-function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length+PROPS.filter(bjMismatch).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}var ac=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length;var ae=document.getElementById('stalert');if(ae){if(ac>0){ae.textContent=ac;ae.style.display='';}else{ae.style.display='none';}}}catch(e){}}
+function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}var ac=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length;var ae=document.getElementById('stalert');if(ae){if(ac>0){ae.textContent=ac;ae.style.display='';}else{ae.style.display='none';}}}catch(e){}}
 function rvFields(p){
  var f=function(field,label,typ){return '<div class="rvf"><label>'+label+'</label>'+inEd(p.id,field,p[field],'',typ)+'</div>';};
  var statusSel='<div class="rvf"><label>状態</label>'+inSel(p.id,'status',p.status,['掲載中','要入稿','落とし済み'])+'</div>';
@@ -2277,11 +2279,18 @@ function starPick(id,cur){cur=+cur||0;var col=cur?STAR_COL[cur][2]:'#dfe3e8';var
 function setStars(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.stars=(p.stars===v?0:v);save();if(CURTAB==='review'||CURTAB==='regconf')renderReview();}
 function todayOutCard(){
  var t=today();var items=PROPS.filter(function(p){return (p.regDate||'')===t;});
- var withT=items.filter(function(p){return p.tantou;}).length;var noT=items.length-withT;var total=items.length;var goal=8;
- var pct=Math.min(total/goal*100,100);
+ var withT=items.filter(function(p){return p.tantou;}).length;var noT=items.length-withT;var total=items.length;
+ var dow=new Date(t+'T00:00:00').getDay();
+ var goal=(dow===3)?0:((dow===2)?15:20); // 水=全員休み0／火=一人休み15／他=4名×5=20
+ var rest=(dow===3);
+ var pct=goal>0?Math.min(total/goal*100,100):0;
+ var bottom;
+ if(rest){bottom='<span class="tomut">本日は全員休み（目標なし）</span>';}
+ else if(total>=goal){bottom='<span class="tochip ok">目標達成</span>';}
+ else{bottom='<span class="tomut">担当優先で あと '+(goal-total)+' 件</span>';}
  return '<div class="card fade todayout"><div class="tohd"><span class="t">本日の物出し</span><span class="tonum"><b>'+total+'</b> / '+goal+'</span></div>'
-  +'<div class="bar" style="height:6px;margin:8px 0"><div class="fill" style="width:'+pct+'%;background:'+(total>=goal?'var(--green)':'var(--accent)')+'"></div></div>'
-  +'<div class="tobrk"><span class="tochip">担当 <b>'+withT+'</b></span><span class="tochip none">未割当 <b>'+noT+'</b></span>'+(total>=goal?'<span class="tochip ok">目標達成</span>':'<span class="tomut">担当優先で あと '+(goal-total)+' 件</span>')+'</div></div>';
+  +'<div class="bar" style="height:6px;margin:8px 0"><div class="fill" style="width:'+pct+'%;background:'+((goal>0&&total>=goal)?'var(--green)':'var(--accent)')+'"></div></div>'
+  +'<div class="tobrk"><span class="tochip">担当 <b>'+withT+'</b></span><span class="tochip none">未割当 <b>'+noT+'</b></span>'+bottom+'</div></div>';
 }
 function repAlertCard(){
  var its=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';});
@@ -3074,6 +3083,7 @@ async function deleteReviewProp(id){
  PROPS=PROPS.filter(function(x){return x.id!==id;});
  await save();renderReview();updateBadges();toast('物件を削除しました');
 }
+async function deletePropById(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;if(!confirm('「'+(p.name||p.pdfName||'物件')+(p.room?(' '+p.room):'')+'」を削除しますか？\nドライブ上のPDFも削除されます。この操作は取り消せません。'))return;if(p.driveId){toast('ドライブのPDFを削除中…');try{var d=await drivePdfDelete(p.driveId);if(!(d&&d.ok)){toast('ドライブ側の削除に失敗（物件は削除します）');}}catch(e){}}try{await idbSet('pdf_'+id,null);}catch(e){}try{localStorage.removeItem('pdf_'+id);}catch(e){}PROPS=PROPS.filter(function(x){return x.id!==id;});await save();await flushPush();recompute();updateBadges();try{var k=document.querySelector('.ovl .modal.karte');if(k){var ko=k.closest('.ovl');if(ko)ko.remove();}}catch(e){}try{refreshCurrentTab();}catch(e){}toast('物件を削除しました');}
 // ---------- I.S.（問い合わせ対応） ----------
 let ISQ={code:'',name:'',rent:'',mgmt:'',area:''},CURIS=null;
 function isSet(k,v){ISQ[k]=v;CURIS=null;renderISBody();}
@@ -3202,11 +3212,11 @@ function renderStaff(){
  var _a=anaAgg();
  var items=staffItems();
  var host=document.getElementById('sbody');
- if(!items.length){host.innerHTML=repAlertCard()+'<div class="rvempty">要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。</div>';return;}
+ if(!items.length){host.innerHTML=repAlertCard()+todayRegCard()+'<div class="rvempty">要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。</div>';return;}
  if(!CURSTAFF||!items.some(function(p){return p.id===CURSTAFF;}))CURSTAFF=items[0].id;
  var byT={};items.forEach(function(x){var t=x.tantou||'未割当';byT[t]=(byT[t]||0)+1;});
  var sumChips=STAFF.concat(['未割当']).filter(function(t){return byT[t];}).map(function(t){return '<span class="stcnt'+(t==='未割当'?' none':'')+'">'+esc(t)+' <b>'+byT[t]+'</b></span>';}).join('');
- var h=repAlertCard()+'<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>';
+ var h=repAlertCard()+todayRegCard()+'<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>';
  h+='<div class="rvwrap'+(STAFFLISTOPEN?'':' lc')+'">';
  // list
  h+='<aside class="rvlist"><div class="rvlhd"><span class="t">入稿待ちリスト（'+items.length+'）</span><button onclick="staffToggleList()">'+(STAFFLISTOPEN?'‹':'›')+'</button></div>';
@@ -3231,7 +3241,7 @@ function renderStaff(){
  h+='<label class="stck"><input type="checkbox" id="vd_'+p.id+'" '+(p.video?'checked':'')+' onchange="updFinal(\''+p.id+'\')"> 動画CM <span class="stadd">+2</span></label>';
  h+='<div class="scbox"><div class="scbox-t">最終スコア</div><div class="scbox-n" id="fs_'+p.id+'">'+fs+'</div><div class="stkj '+(kj==='基準未満'?'ng':'ok')+'" id="kj_'+p.id+'">'+(kj==='基準未満'?'基準未満（第1基準34点に未達）':kj+'基準に到達')+'</div></div>';
  h+='</div>';
- h+='<div class="rvbtns"><button class="b ok" id="postbtn_'+p.id+'" onclick="postStaff(\''+p.id+'\')">'+(mode==='hold'?'入稿完了 → 保留':'入稿完了 → 掲載中')+'</button><div class="brow"><button class="b gho" onclick="pickPdf(\''+p.id+'\')">PDF差し替え</button><button class="b gho" onclick="viewPdf(\''+p.id+'\')">PDF確認</button></div></div>';
+ h+='<div class="rvbtns"><button class="b ok" id="postbtn_'+p.id+'" onclick="postStaff(\''+p.id+'\')">'+(mode==='hold'?'入稿完了 → 保留':'入稿完了 → 掲載中')+'</button><div class="brow"><button class="b gho" onclick="pickPdf(\''+p.id+'\')">PDF差し替え</button><button class="b gho" onclick="viewPdf(\''+p.id+'\')">PDF確認</button><button class="b del" onclick="deletePropById(\''+p.id+'\')">削除</button></div></div>';
  h+='</div></div></div></div>';
  host.innerHTML=h;
  var pv=document.getElementById('staff_pdf');if(pv)loadReviewPdf(p,pv);
@@ -4139,6 +4149,7 @@ function openProp(id){
  if(p.statusLog&&p.statusLog.length){
   h+='<div class="qlabel">更新履歴（'+p.statusLog.length+'件）</div><div class="tline">'+p.statusLog.slice().reverse().map(function(e){return '<div class="te"><div class="tt">'+esc(e.memo||'')+'</div><div class="td">'+fmtTS(e.ts)+'</div></div>';}).join('')+'</div>';
  }
+ h+='<div class="row" style="margin-top:12px;border-top:1px solid var(--border2);padding-top:12px"><button class="btn-sm btn-danger" onclick="deletePropById(\''+p.id+'\')">この物件を削除（取り消せません）</button></div>';
  h+='</div></div></div>';
  ov.innerHTML=h;
  document.body.appendChild(ov);
