@@ -736,7 +736,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-f</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-g</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -784,7 +784,7 @@ const ZONES={"三軒茶屋|シングル": {"d": [3, 4, 5, 6, 7, 8, 9, 10, 11], "
 const RANK={};Object.keys(ZONES).forEach(k=>{RANK[k.split('|')[0]]=1;});
 const SK='ibt_props_v1',HK='ibt_hist_v1',EK='ibt_events_v1',MK='ibt_mgmt_v1',GK='ibt_guar_v1';
 const TARGETS={dm:20,op:120,is:30,hh:20,ik:0,ot:10,do_inq:100,is_inq:200,total:300};
-const WK_MAP={Demand:'dm',Opportunity:'op',Insight:'is','High-Hold':'hh',IKARI:'ik','その他':'ot','未分類':'uc'};
+const WK_MAP={Demand:'dm',Opportunity:'op',Insight:'ot','High-Hold':'hh',IKARI:'ik','その他':'ot','未分類':'ot'};
 const WK_PILL={dm:'p-dm',op:'p-op',is:'p-is',hh:'p-hh',ik:'p-ik',ot:'p-ot',uc:'p-uc'};
 const STATUSES=['先行申込あり','2番手','3番手以降','空き(申込なし)','申込予定','審査中','成約/入居中','募集終了'];
 let PROPS=[],PEND=[],HIST={},EVENTS={},MGMT=[],GUAR=[];
@@ -1484,7 +1484,7 @@ function pvCompareCard(){
 }
 // ====== 枠の変更履歴・集計モード ======
 var WAKU_MODE='current'; // 'current'(現在枠) | 'event'(発生時枠)
-var WAKU_OPTS=['Demand','Opportunity','Insight','High-Hold','IKARI','その他'];
+var WAKU_OPTS=['Demand','Opportunity','High-Hold','IKARI','その他'];
 async function setPropWaku(id,w){
  var p=PROPS.find(function(x){return x.id===id;});if(!p)return;
  if(p.waku===w){return;}
@@ -1693,10 +1693,10 @@ function renderDash(){
  recompute();
  const ct={dm:0,op:0,is:0,hh:0,ik:0,ot:0,uc:0};
  const pvw={dm:0,op:0,is:0,hh:0,ik:0,ot:0,uc:0};
- PROPS.forEach(p=>{const w=WK_MAP[p.waku]||'is';ct[w]=(ct[w]||0)+1;if(p.status==='掲載中')pvw[w]=(pvw[w]||0)+(+(p.csvPV||0));});
+ PROPS.forEach(p=>{const w=WK_MAP[p.waku]||'ot';ct[w]=(ct[w]||0)+1;if(p.status==='掲載中')pvw[w]=(pvw[w]||0)+(+(p.csvPV||0));});
  var iq;
- if(WAKU_MODE==='event'){iq=eventInqByWaku(viewYM);}else{iq={dm:0,op:0,is:0,hh:0,ik:0,ot:0,uc:0};PROPS.forEach(p=>{const w=WK_MAP[p.waku]||'is';iq[w]=(iq[w]||0)+(+(p.csvInq||0));});}
- const doInq=(iq.dm||0)+(iq.op||0),isInq=(iq.is||0),total=doInq+isInq+(iq.hh||0)+(iq.ik||0);
+ if(WAKU_MODE==='event'){iq=eventInqByWaku(viewYM);}else{iq={dm:0,op:0,is:0,hh:0,ik:0,ot:0,uc:0};PROPS.forEach(p=>{const w=WK_MAP[p.waku]||'ot';iq[w]=(iq[w]||0)+(+(p.csvInq||0));});}
+ const doInq=(iq.dm||0)+(iq.op||0),total=doInq+(iq.hh||0)+(iq.ik||0)+(iq.ot||0);
  const opts=monthOptions().map(m=>'<option'+(m===viewYM?' selected':'')+'>'+m+'</option>').join('');
  let h='';
 
@@ -1704,14 +1704,17 @@ function renderDash(){
  h+='<div class="wkmode fade"><span class="wkmode-l">反響の集計</span><div class="wkmode-tg">'+'<button class="'+(WAKU_MODE==="current"?"on":"")+'" onclick="WAKU_MODE=\'current\';renderDash()">現在枠ベース</button>'+'<button class="'+(WAKU_MODE==="event"?"on":"")+'" onclick="WAKU_MODE=\'event\';renderDash()">発生時枠ベース</button>'+'</div></div>';
  h+='<div class="hero fade"><div class="t">'+viewYM+' 反響目標</div><div class="n">'+total+' <small>/ '+TARGETS.total+'</small></div>'
   +'<div class="bar" style="height:6px;margin-top:9px"><div class="fill" style="width:'+Math.min(total/TARGETS.total*100,100)+'%;background:var(--accent)"></div></div>'
-  +'<div class="s">D+O '+doInq+'/'+TARGETS.do_inq+' ・ Insight(YOKOYAMA) '+isInq+'/'+TARGETS.is_inq+' ・ High-Hold '+(iq.hh||0)+' ・ IKARI '+(iq.ik||0)+'</div></div>';
+  +'<div class="s">D+O '+doInq+'/'+TARGETS.do_inq+' ・ High-Hold '+(iq.hh||0)+' ・ その他 '+(iq.ot||0)+' ・ IKARI '+(iq.ik||0)+'</div></div>';
  var _sc=statusCounts();h+='<div class="stsum fade">'+'<div class="stsum-c st-pre"><div class="stsum-n">'+_sc['要入稿']+'</div><div class="stsum-l">要入稿</div></div>'+'<div class="stsum-c st-live"><div class="stsum-n">'+_sc['掲載中']+'</div><div class="stsum-l">掲載中</div></div>'+'<div class="stsum-c st-hold"><div class="stsum-n">'+_sc['保留']+'</div><div class="stsum-l">保留</div></div>'+'<div class="stsum-c st-drop"><div class="stsum-n">'+_sc['落とし済み']+'</div><div class="stsum-l">落とし</div></div>'+'</div>';h+=todayOutCard();h+=uploadGapCard();h+=pvCompareCard();h+=dashStaffCard();h+='<div class="stat-grid fade">';
- [['dm','Demand','反響ランキング','var(--accent)'],['op','Opportunity','オポゾーン','var(--red)'],['is','Insight','経験・知見','var(--green)'],['hh','High-Hold','高額キープ','var(--amber)'],['ik','IKARI','30日経過','var(--purple)']].forEach(a=>{
+ [['dm','Demand','反響ランキング','var(--accent)'],['op','Opportunity','オポゾーン','var(--red)'],['ot','その他','仮説検証群','var(--green)'],['hh','High-Hold','高額キープ','var(--amber)'],['ik','IKARI','30日経過','var(--purple)']].forEach(a=>{
   h+='<div class="stat '+a[0]+'"><div class="t">'+a[1]+'</div><div class="n">'+ct[a[0]]+'<small>/'+TARGETS[a[0]]+'</small></div><div class="s">'+a[2]+'</div><div class="statiq">反響 <b>'+(iq[a[0]]||0)+'</b> ・ 詳細PV <b>'+(pvw[a[0]]||0).toLocaleString()+'</b></div><div class="bar"><div class="fill" style="width:'+Math.min(ct[a[0]]/TARGETS[a[0]]*100,100)+'%;background:'+a[3]+'"></div></div></div>';});
  h+='</div>';
+ var _hm=Math.max(1,doInq,(iq.hh||0),(iq.ot||0),(iq.ik||0));
  h+='<div class="stat-grid" style="grid-template-columns:1fr 1fr">';
- h+='<div class="hero" style="margin:0"><div class="t">D+O 合算反響</div><div class="n">'+doInq+' <small>/ '+TARGETS.do_inq+'</small></div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.min(doInq/TARGETS.do_inq*100,100)+'%;background:var(--accent)"></div></div></div>';
- h+='<div class="hero" style="margin:0"><div class="t">Insight(YOKOYAMA) 反響</div><div class="n">'+isInq+' <small>/ '+TARGETS.is_inq+'</small></div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.min(isInq/TARGETS.is_inq*100,100)+'%;background:var(--green)"></div></div></div>';
+ h+='<div class="hero" style="margin:0"><div class="t">D+O 合算反響</div><div class="n">'+doInq+' <small>/ '+TARGETS.do_inq+'</small></div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.round(doInq/_hm*100)+'%;background:var(--accent)"></div></div></div>';
+ h+='<div class="hero" style="margin:0"><div class="t">High-Hold 反響</div><div class="n">'+(iq.hh||0)+'</div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.round((iq.hh||0)/_hm*100)+'%;background:var(--amber)"></div></div></div>';
+ h+='<div class="hero" style="margin:0"><div class="t">その他 反響</div><div class="n">'+(iq.ot||0)+'</div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.round((iq.ot||0)/_hm*100)+'%;background:var(--green)"></div></div></div>';
+ h+='<div class="hero" style="margin:0"><div class="t">IKARI 反響</div><div class="n">'+(iq.ik||0)+'</div><div class="bar" style="margin-top:8px"><div class="fill" style="width:'+Math.round((iq.ik||0)/_hm*100)+'%;background:var(--purple)"></div></div></div>';
  h+='</div>';
  // performance table
  h+=wakuFilterBar();
@@ -1734,7 +1737,7 @@ function renderDash(){
    var pv=+(p.csvPV||0),inq=+(p.csvInq||0),rate=pv>0?(inq/pv*100).toFixed(1)+'%':'-';
    var st=curStatus(p);
    var startCell=(p.status==='落とし済み')?'<span class="pill p-done">done</span>':(p.suumoListStart?esc(p.suumoListStart):'<span class="muted">—</span>');
-   h+='<tr><td><span class="pill '+WK_PILL[WK_MAP[p.waku]||'is']+'">'+p.waku.slice(0,3)+'</span></td><td>'+lkName(p.id,esc(p.name).slice(0,16))+'</td><td>'+esc(p.station)+'</td><td>'+rentDash(p)+'</td><td style="font-weight:650">'+pv+'</td><td style="font-weight:700;color:var(--accent)">'+inq+'</td><td>'+rate+'</td><td style="font-size:11px;white-space:nowrap">'+startCell+'</td><td>'+memoChip(p)+'</td><td><button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\');renderDash()">終了</button></td></tr>';
+   h+='<tr><td><span class="pill '+WK_PILL[WK_MAP[p.waku]||'ot']+'">'+p.waku.slice(0,3)+'</span></td><td>'+lkName(p.id,esc(p.name).slice(0,16))+'</td><td>'+esc(p.station)+'</td><td>'+rentDash(p)+'</td><td style="font-weight:650">'+pv+'</td><td style="font-weight:700;color:var(--accent)">'+inq+'</td><td>'+rate+'</td><td style="font-size:11px;white-space:nowrap">'+startCell+'</td><td>'+memoChip(p)+'</td><td><button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\');renderDash()">終了</button></td></tr>';
   });
   h+='</table></div>';
  }else{h+='<div class="empty">掲載中の物件がありません</div>';}
@@ -1922,7 +1925,7 @@ function renderRegStep(){
 }
 function statusChips(idx){return STATUSES.map(s=>'<button type="button" class="chip" onclick="pendStat('+idx+',\''+s+'\',this)">'+s+'</button>').join('');}
 function pendStat(i,s,el){PEND[i].pendStatus=(PEND[i].pendStatus===s?'':s);[...el.parentNode.children].forEach(c=>c.classList.remove('on'));if(PEND[i].pendStatus)el.classList.add('on');}
-function wakuChips(i){const opts=['Demand','Opportunity','Insight','High-Hold','IKARI','その他'];return '<div class="chips">'+opts.map(w=>'<button type="button" class="chip'+(PEND[i].waku===w?' on':'')+'" onclick="setPendWaku('+i+',\''+w+'\')">'+w+'</button>').join('')+'</div>';}
+function wakuChips(i){const opts=['Demand','Opportunity','High-Hold','IKARI','その他'];return '<div class="chips">'+opts.map(w=>'<button type="button" class="chip'+(PEND[i].waku===w?' on':'')+'" onclick="setPendWaku('+i+',\''+w+'\')">'+w+'</button>').join('')+'</div>';}
 function setPendWaku(i,w){PEND[i].waku=w;renderPend();}
 function autoPill(a){const c=(a.indexOf('読取不可')>=0||a.indexOf('要手動')>=0)?'p-pre':(a==='手動'?'p-st':'p-act');return '<span class="pill '+c+'">'+esc(a)+'</span>';}
 function pendMedia(i,v){PEND[i].media=v;if(v!=='その他')PEND[i].mediaOther='';renderPend();}
@@ -2153,19 +2156,19 @@ function copyText(txt,label){try{navigator.clipboard.writeText(txt);}catch(e){va
 function copyEl(el){var t=(el&&el.getAttribute)?(el.getAttribute('data-copy')||''):'';copyText(t,'コピー');}
 function reviewInfo(p){var tr=totalRent(p);return '<div style="margin-top:8px;font-size:12px;color:var(--text2)">賃料総額 '+(!isNaN(tr)?tr.toFixed(1)+'万円':'—')+' ／ '+pdfStatusHtml(p)+'</div>';}
 function wkLabel(w){return w==='Insight'?'Insight(YOKOYAMA)':(w==='その他'?'その他(仮説検証群)':w);}
-function wakuSelEl(id,val){var opts=['Demand','Opportunity','Insight','High-Hold','その他'];return '<select class="ined" onchange="editProp(\''+id+'\',\'waku\',this.value)">'+opts.map(function(o){return '<option value="'+o+'"'+(String(val)===o?' selected':'')+'>'+wkLabel(o)+'</option>';}).join('')+'</select>';}
+function wakuSelEl(id,val){var opts=['Demand','Opportunity','High-Hold','その他'];return '<select class="ined" onchange="editProp(\''+id+'\',\'waku\',this.value)">'+opts.map(function(o){return '<option value="'+o+'"'+(String(val)===o?' selected':'')+'>'+wkLabel(o)+'</option>';}).join('')+'</select>';}
 function inGroup(p){if(GROUP==='ALL')return true;if(GROUP==='DO')return p.waku==='Demand'||p.waku==='Opportunity';return p.waku===GROUP;}
 function liveG(){return PROPS.filter(function(p){return p.status==='掲載中'&&inGroup(p)&&wkSelMatch(p);});}
-function groupBar(){var opts=[['ALL','ALL（全体）'],['Demand','Demand'],['Opportunity','Opportunity'],['DO','Demand＋Opportunity'],['High-Hold','High-Hold'],['Insight','Insight(YOKOYAMA)'],['その他','その他(仮説検証群)']];var tot=0;PROPS.forEach(function(p){if(p.status==='掲載中')tot+=(+(p.csvInq||0)||0);});return '<div class="gbar">'+opts.map(function(o){return '<button class="gbtn'+(GROUP===o[0]?' on':'')+'" onclick="setGroup(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'<span class="gtot">全体の反響合計 '+tot+'</span></div>';}
+function groupBar(){var opts=[['ALL','ALL（全体）'],['Demand','Demand'],['Opportunity','Opportunity'],['DO','Demand＋Opportunity'],['High-Hold','High-Hold'],['その他','その他(仮説検証群)']];var tot=0;PROPS.forEach(function(p){if(p.status==='掲載中')tot+=(+(p.csvInq||0)||0);});return '<div class="gbar">'+opts.map(function(o){return '<button class="gbtn'+(GROUP===o[0]?' on':'')+'" onclick="setGroup(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'<span class="gtot">全体の反響合計 '+tot+'</span></div>';}
 function setGroup(g){GROUP=g;tab(CURTAB);}
-var WSEL={Demand:true,Opportunity:true,Insight:true,'High-Hold':true,IKARI:true,'その他':true};
+var WSEL={Demand:true,Opportunity:true,'High-Hold':true,IKARI:true,'その他':true};
 function _wkOf(p){var w=p.waku||'その他';return WSEL.hasOwnProperty(w)?w:'その他';}
 function wkSelMatch(p){return !!WSEL[_wkOf(p)];}
 function wkToggle(w){WSEL[w]=!WSEL[w];tab(CURTAB);}
 function wkSelAll(){for(var k in WSEL)WSEL[k]=true;tab(CURTAB);}
 function wkNoIkari(){for(var k in WSEL)WSEL[k]=true;WSEL.IKARI=false;tab(CURTAB);}
 function wkOnlyIkari(){for(var k in WSEL)WSEL[k]=false;WSEL.IKARI=true;tab(CURTAB);}
-function wakuFilterBar(){var ws=['Demand','Opportunity','Insight','High-Hold','IKARI','その他'];var anyOff=ws.some(function(w){return !WSEL[w];});var onlyIk=WSEL.IKARI&&ws.every(function(w){return w==='IKARI'?WSEL[w]:!WSEL[w];});return '<div class="wkfbar fade"><div class="wkfhd"><span class="wkfl">枠で絞り込み（複数選択可）</span><div class="wkfquick"><button class="'+(!anyOff?'on':'')+'" onclick="wkSelAll()">全て</button><button class="'+(!WSEL.IKARI&&!ws.filter(function(w){return w!=="IKARI";}).some(function(w){return !WSEL[w];})?'on':'')+'" onclick="wkNoIkari()">IKARI除外</button><button class="'+(onlyIk?'on':'')+'" onclick="wkOnlyIkari()">IKARIだけ</button></div></div><div class="wkfchips">'+ws.map(function(w){return '<button class="wkchip '+(WK_PILL[WK_MAP[w]||'ot'])+(WSEL[w]?' on':'')+'" onclick="wkToggle(\''+w+'\')">'+esc(w)+'</button>';}).join('')+'</div></div>';}
+function wakuFilterBar(){var ws=['Demand','Opportunity','High-Hold','IKARI','その他'];var anyOff=ws.some(function(w){return !WSEL[w];});var onlyIk=WSEL.IKARI&&ws.every(function(w){return w==='IKARI'?WSEL[w]:!WSEL[w];});return '<div class="wkfbar fade"><div class="wkfhd"><span class="wkfl">枠で絞り込み（複数選択可）</span><div class="wkfquick"><button class="'+(!anyOff?'on':'')+'" onclick="wkSelAll()">全て</button><button class="'+(!WSEL.IKARI&&!ws.filter(function(w){return w!=="IKARI";}).some(function(w){return !WSEL[w];})?'on':'')+'" onclick="wkNoIkari()">IKARI除外</button><button class="'+(onlyIk?'on':'')+'" onclick="wkOnlyIkari()">IKARIだけ</button></div></div><div class="wkfchips">'+ws.map(function(w){return '<button class="wkchip '+(WK_PILL[WK_MAP[w]||'ot'])+(WSEL[w]?' on':'')+'" onclick="wkToggle(\''+w+'\')">'+esc(w)+'</button>';}).join('')+'</div></div>';}
 let CURREV=null,RVLISTOPEN=true;
 var RVF=[['name','物件名'],['room','部屋番号'],['madori','間取り'],['rent','家賃(万)'],['mgmt','管理費(円)'],['area','面積'],['deposit','敷金'],['keyMoney','礼金'],['age','築年'],['structure','構造'],['floor','階'],['address','住所'],['mgmtCo','管理会社名'],['phone','管理会社TEL'],['fax','管理会社FAX'],['propNo','物件番号'],['infoDate','情報公開日'],['rtMedia','R.T.確認媒体']];
 var REVSRC='all';var REVSORT='default';
@@ -2254,7 +2257,7 @@ function recentRegPanel(){
 }
 function dashStaffCard(){
  var arr=STAFF.map(function(nm){return staffAgg(nm);});
- if(!arr.some(function(a){return a.count>0;}))return '';
+ if(!arr.some(function(a){return a.count>0;})&&!PROPS.some(function(p){return !p.tantou;}))return '';
  var ranked=arr.slice().sort(function(x,y){return y.inq-x.inq||y.pv-x.pv;});
  var maxInq=Math.max(1,Math.max.apply(null,ranked.map(function(a){return a.inq;})));
  var h='<div class="card fade tkcard"><div class="tkhd"><span class="t">担当者ランキング（'+viewYM+'）</span><span class="tksub">反響数で競争中</span></div>';
@@ -2265,7 +2268,11 @@ function dashStaffCard(){
     +'<span class="tkmet"><b>'+a.inq+'</b><i>反響</i></span>'
     +'<span class="tkmet2">PV '+a.pv.toLocaleString()+' ・ 物件'+a.count+' ・ 今週物出し'+a.week+'</span></div>';
  });
- h+='<div class="tknote">行をタップで担当者ページへ。担当はデータ確認画面のプルダウンで設定します。</div></div>';
+ var _ua=PROPS.filter(function(p){return !p.tantou;});
+ if(_ua.length){var _ui=0,_up=0;_ua.forEach(function(p){_ui+=+(p.csvInq||0);_up+=+(p.csvPV||0);});
+  h+='<div class="tkrow tkrow-none"><span class="tkno">–</span><span class="tkname">担当なし</span><span class="tkbarwrap"><span class="tkfill" style="width:'+Math.round(_ui/maxInq*100)+'%;background:var(--text3)"></span></span><span class="tkmet"><b>'+_ui+'</b><i>反響</i></span><span class="tkmet2">PV '+_up.toLocaleString()+' ・ 物件'+_ua.length+'</span></div>';
+ }
+ h+='<div class="tknote">行をタップで担当者ページへ。担当はデータ確認画面のプルダウンで設定します。担当なしは未割当物件の合計です。</div></div>';
  return h;
 }
 var TANTOU_WHO=null;
@@ -2635,7 +2642,7 @@ function analysisReportHtml(){
  H+='</div>';
 
  // ===== 6 直近2週間 全体（枠別）=====
- var WK=[['Demand','dm'],['Opportunity','op'],['High-Hold','hh'],['Insight','is'],['IKARI','ik'],['その他','ot']];
+ var WK=[['Demand','dm'],['Opportunity','op'],['High-Hold','hh'],['IKARI','ik'],['その他','ot']];
  var win14=_ra_window(14), win7=_ra_window(7), winPrev7=_ra_window(14).slice(0,7);
  function aggWaku(wname){
   var ps=live.filter(function(p){return (p.waku||'その他')===wname;});
@@ -2694,7 +2701,7 @@ function analysisReportHtml(){
  H+='</div>';
 
  // ===== 枠別 × 期間（最新/2週間/3ヶ月）※その他＝データ化前は除外 =====
- var WK5=[['Opportunity','op'],['Demand','dm'],['Insight','is'],['High-Hold','hh'],['IKARI','ik']];
+ var WK5=[['Opportunity','op'],['Demand','dm'],['High-Hold','hh'],['IKARI','ik']];
  function _sumWaku(wname,nDays){
   var ps=live.filter(function(p){return (p.waku||'その他')===wname;});
   var ds=_ra_window(nDays);var lv=0,pv=0,iq=0;
@@ -2836,7 +2843,7 @@ function avgPvPerDay(pid,nDays,beforeDate){
  if(!cnt)return null;return {pv:sumPv/cnt,lv:sumLv/cnt,days:cnt};
 }
 function listCard(p,_a){
- const wc=WK_PILL[WK_MAP[p.waku]||'is'];
+ const wc=WK_PILL[WK_MAP[p.waku]||'ot'];
  const sc=p.status==='要入稿'?'p-pre':p.status==='掲載中'?'p-act':'p-done';
  const fs=p.scorePre?'最終'+finalScore(p)+'('+kijun(finalScore(p))+')':'';
  const ss=pstat(p,_a);const ds=daysSince(p.listDate);
@@ -2862,7 +2869,7 @@ function setPdfFilt(v){PDFFILT=v;renderList();}
 function renderList(){
  recompute();const _a=anaAgg();
  document.getElementById('lfilt').innerHTML=['全て','要入稿','掲載中','保留','落とし済み'].map(s=>'<button class="'+(listFilt===s?'on':'')+'" onclick="listFilt=\''+s+'\';renderList()">'+(s==='落とし済み'?'落とし':s)+'</button>').join('');
- document.getElementById('wfilt').innerHTML=['全枠','Demand','Opportunity','Insight','High-Hold','IKARI','その他'].map(s=>'<button class="'+(wakuFilt===s?'on':'')+'" onclick="wakuFilt=\''+s+'\';renderList()">'+s+'</button>').join('');
+ document.getElementById('wfilt').innerHTML=['全枠','Demand','Opportunity','High-Hold','IKARI','その他'].map(s=>'<button class="'+(wakuFilt===s?'on':'')+'" onclick="wakuFilt=\''+s+'\';renderList()">'+s+'</button>').join('');
  const SORTS=['スコア','反響数','PV/日','反響/日','掲載日数','賃料高い','賃料安い','新着','分析対象'];
  var names=[];var seen={};PROPS.forEach(function(p){var n=(p.name||'').trim();if(n&&!seen[n]){seen[n]=1;names.push(n);}});
  var top='';
@@ -3195,7 +3202,7 @@ function renderSub(){
  L.forEach(p=>{
   const fs=finalScore(p),kj=kijun(fs),ss=pstat(p,_a),ds=daysSince(p.listDate);
   const jPill=p.subStdJudge==='要確認'?'<span class="pill p-pre">要確認</span>':p.subStdJudge==='許容'?'<span class="pill p-done">許容</span>':'';
-  h+='<div class="card'+(p.needShoot?' needfix':'')+'"><div class="hd"><span class="pill '+(WK_PILL[WK_MAP[p.waku]||'is'])+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+(p.needShoot?'<span class="pill p-pre">要撮影</span>':'')+jPill+'</div>';
+  h+='<div class="card'+(p.needShoot?' needfix':'')+'"><div class="hd"><span class="pill '+(WK_PILL[WK_MAP[p.waku]||'ot'])+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+(p.needShoot?'<span class="pill p-pre">要撮影</span>':'')+jPill+'</div>';
   h+='<div class="info">'+[p.station,rentMan(p),(ds!=null?'掲載'+ds+'日':''),(ss.hasData?'PV '+ss.avg.toFixed(1)+'/日':'')].filter(Boolean).join(' ・ ')+'</div>';
   h+='<div style="margin-top:4px"><span class="pill p-st">素点 '+p.scorePre+'</span> <span class="pill '+(kj==='基準未満'?'p-pre':'p-st')+'">オプション込 '+fs+'（'+(kj==='基準未満'?'基準未満':kj+'基準')+'）</span></div>';
   h+='<div class="ck" style="margin-top:8px"><input type="checkbox" '+(p.needShoot?'checked':'')+' onchange="setShoot(\''+p.id+'\',this.checked)"><label>要撮影タグ</label></div>';
@@ -3283,7 +3290,7 @@ function renderOpt(){
   const opts=[p.storePick?'店ピク':'',p.specArea?'得エリ':'',p.video?'動画CM':''].filter(Boolean);
   const optBadge=opts.length?opts.map(o=>'<span class="pill p-op">'+o+'</span>').join(' '):'<span class="pill p-pre">オプションなし</span>';
   const revBadge=p.optReviewed?'<span class="pill p-act">検討済み</span>':'<span class="pill p-pre">要検討</span>';
-  h+='<div class="card'+(!p.optReviewed?' needfix':'')+'"><div class="hd"><span class="pill '+(WK_PILL[WK_MAP[p.waku]||'is'])+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+revBadge+'</div>';
+  h+='<div class="card'+(!p.optReviewed?' needfix':'')+'"><div class="hd"><span class="pill '+(WK_PILL[WK_MAP[p.waku]||'ot'])+'">'+p.waku.slice(0,3)+'</span>'+nmLink(p)+revBadge+'</div>';
   h+='<div class="info">'+[p.station,rentMan(p),(ds!=null?'掲載'+ds+'日':''),(ss.hasData?'PV '+ss.avg.toFixed(1)+'/日':'')].filter(Boolean).join(' ・ ')+'</div>';
   h+='<div style="margin-top:4px">'+optBadge+' <span class="pill '+(kj==='第3'?'p-act':kj==='基準未満'?'p-pre':'p-st')+'">最終'+fs+'（'+kj+'）'+(need?' あと+'+need+nx:'')+'</span></div>';
   h+='<div class="qlabel">他社の基準値分布'+(tot?'（計'+tot+'社）':'（データ未入力）')+(p.compDataAt?' ・ '+p.compDataAt+'時点':'')+'</div>';
@@ -4009,7 +4016,7 @@ function openProp(id){
  var ov=document.createElement('div');ov.className='ovl';
  var stc=statusCls(p.status);
  var h='<div class="modal karte">';
- h+='<div class="khd"><div class="khd-l"><span class="pill '+(WK_PILL[WK_MAP[p.waku]||'is'])+'">'+(p.waku||'').slice(0,3)+'</span><b>'+esc(p.name||'')+(p.room?' '+esc(p.room):'')+'</b><span class="pill '+stc+'">'+statusLabel(p.status)+'</span></div>'
+ h+='<div class="khd"><div class="khd-l"><span class="pill '+(WK_PILL[WK_MAP[p.waku]||'ot'])+'">'+(p.waku||'').slice(0,3)+'</span><b>'+esc(p.name||'')+(p.room?' '+esc(p.room):'')+'</b><span class="pill '+stc+'">'+statusLabel(p.status)+'</span></div>'
   +'<div class="khd-r">'+(p.suumoCode?'<span class="mono" style="font-size:12px;color:var(--accent2);font-weight:700">SUUMO '+esc(p.suumoCode)+'</span>':'')+'<button class="antgt-hd'+(p.analysisTarget?' on':'')+'" onclick="toggleAnTarget(\''+p.id+'\')" title="分析対象"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg><span>'+(p.analysisTarget?'分析対象':'分析対象に')+'</span></button>'+'<button class="x" id="_kx">×</button></div></div>';
  h+='<div class="kbody">';
  // 左：PDF
