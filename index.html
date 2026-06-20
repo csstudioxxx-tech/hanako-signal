@@ -737,6 +737,17 @@ header{padding-left:54px}
 .trtsel{font-family:inherit;font-size:11.5px;padding:3px 7px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);max-width:88px}
 .trhint{font-size:10.5px;color:var(--text3);font-weight:500;margin-left:auto}
 .treditlk{font-size:11px;white-space:nowrap}
+.bulkcard{padding:14px 16px}.bulkcard-h{font-weight:700;font-size:14.5px;margin-bottom:2px}
+.bulkrow{display:flex;align-items:center;gap:10px;margin:4px 0 10px;flex-wrap:wrap}.bulklab{font-size:12.5px;font-weight:650;color:var(--text2)}
+.bulkrow input[type=date]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:var(--text)}
+.bulkhint{font-size:11px;color:var(--text3)}
+.bpcard{margin-top:10px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:#fff}
+.bptitle{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px}
+.bprow{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12.5px}.bprow.off{opacity:.45}
+.bpdot{width:9px;height:9px;border-radius:50%;flex:none}.bpdot.bi{background:#3b82f6}.bpdot.hk{background:#22c55e}.bpdot.jd{background:#eab308}
+.bplab{font-weight:600;min-width:160px}.bpfile{color:var(--text2);font-size:11.5px;word-break:break-all}
+.bpwarn{font-size:11.5px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:7px 9px;margin-top:8px}
+.bpact{display:flex;gap:8px;margin-top:12px}.bpact .btn{width:auto;flex:1}
 </style>
 </head><body>
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
@@ -791,7 +802,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0620-bj</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0620-bulk</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -818,9 +829,8 @@ header{padding-left:54px}
 <div id="v-del" style="display:none"><div id="delbody"></div></div>
 <div id="v-cost" style="display:none"><div id="costbody"></div></div>
 <div id="v-csv" style="display:none">
- <div class="drop" id="csvdrop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M4 20V10M10 20V4M16 20v-7M20 20H3"/></svg>CSV / Excelをドロップ</div><div class="ds">ビジコン(CSV)＝詳細PV ／ 反響報告書(Excel・入稿分析システム)＝反響・オプション ／ JDS(CSV)＝反響速報</div></div>
+ <div class="card fade bulkcard"><div class="bulkcard-h">📅 この日のデータをまとめて取込</div><div class="note" style="margin:2px 0 9px;line-height:1.6">ビジコン・反響報告書・JDS（速報）を、選んだ<b>対象日</b>でまとめて取り込みます（種類は自動判定）。SUUMOは2日遅れのため通常は<b>前々日</b>。日付はビジコン・反響報告書に適用され、JDSは受信日時で記録します。</div><div class="bulkrow"><label class="bulklab">対象日</label><input type="date" id="bulkDate"><span class="bulkhint" id="bulkhint"></span></div><div class="drop" id="csvdrop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>3ファイルをまとめてドロップ／クリックで選択</div><div class="ds">ビジコン(CSV)・反響報告書(Excel)・JDS(CSV) を一度に</div></div><input type="file" id="csvin" accept=".csv,.xls,.xlsx" multiple style="display:none"><div id="bulkpend"></div></div>
  <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-pri" id="drvimpbtn" onclick="driveBatchImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Driveから一括取込</button><button class="btn btn-sec" id="drvimpallbtn" onclick="driveBatchImport(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Drive全件再取込</button><button class="btn btn-sec" onclick="testDrive()">ドライブ保存テスト</button></div>
- <input type="file" id="csvin" accept=".csv,.xls,.xlsx" multiple style="display:none">
  <div id="csvpending"></div>
  <div id="csvlog"></div>
 </div>
@@ -3459,11 +3469,13 @@ async function driveBatchImport(force){
  alert('Drive一括取込 完了\n\nビジコン '+okB+'件 ／ 反響報告書 '+okH+'件'+(skip?'\nスキップ（取込済）'+skip+'件':'')+(ng?'\n失敗 '+ng+'件：'+ngList.slice(0,6).join('、'):''));
 }
 function setupCSV(){const dz=document.getElementById('csvdrop'),inp=document.getElementById('csvin');
+ try{var _bd=document.getElementById('bulkDate');if(_bd&&!_bd.value)_bd.value=twoDaysAgo();var _bh=document.getElementById('bulkhint');if(_bh)_bh.textContent='（前々日＝最新の取得可能日）';}catch(e){}
+ if(!dz||!inp)return;
  dz.addEventListener('click',()=>inp.click());
  ['dragenter','dragover'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('over');}));
  ['dragleave','dragend'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove('over');}));
- dz.addEventListener('drop',ev=>{ev.preventDefault();dz.classList.remove('over');var fs=ev.dataTransfer.files;if(fs&&fs.length)routeImportMany(fs);});
- inp.addEventListener('change',ev=>{if(ev.target.files&&ev.target.files.length)routeImportMany(ev.target.files);inp.value='';});}
+ dz.addEventListener('drop',ev=>{ev.preventDefault();dz.classList.remove('over');var fs=ev.dataTransfer.files;if(fs&&fs.length)bulkDayDrop(fs);});
+ inp.addEventListener('change',ev=>{if(ev.target.files&&ev.target.files.length)bulkDayDrop(ev.target.files);inp.value='';});}
 async function routeImportMany(files){
  var arr=[];for(var i=0;i<files.length;i++)arr.push(files[i]);
  var xls=[],jds=[],biji=[];
@@ -3489,6 +3501,63 @@ async function routeImportMany(files){
  }
  var tot=xls.length+jds.length+biji.length;
  if(tot>1&&biji.length!==1)toast(tot+'件のファイルを取り込みました（ビジコンは日付自動判定）');
+}
+var _bulkPending=null;
+async function bulkDayDrop(fileList){
+ var arr=[];for(var i=0;i<fileList.length;i++)arr.push(fileList[i]);
+ if(!arr.length)return;
+ var hankyo=[],jds=[],biji=[],unknown=[];
+ for(var k=0;k<arr.length;k++){var f=arr[k],n=(f.name||'').toLowerCase();
+  if(n.endsWith('.xls')||n.endsWith('.xlsx')){hankyo.push({f:f});continue;}
+  var txt='';try{txt=await readCSVText(f);}catch(e){}
+  var lines=txt.split(/\r?\n/).filter(function(l){return l.trim();});
+  var hdr=lines.length?parseCSVRow(lines[0]).map(function(h){return h.trim();}):[];
+  if(colFind(hdr,['受信日時'])>=0){jds.push({f:f,txt:txt});}
+  else if(colFind(hdr,['住戸名寄せ点数'])>=0||colFind(hdr,['合計詳細PV(合計)','合計詳細PV'])>=0){biji.push({f:f,txt:txt});}
+  else{unknown.push({f:f});}
+ }
+ _bulkPending={biji:biji,hankyo:hankyo,jds:jds,unknown:unknown};
+ renderBulkPend();
+}
+function _bpRow(label,cls,files){
+ var ok=files&&files.length;
+ var fn=ok?files.map(function(x){return esc((x.f&&x.f.name)||'');}).join('、'):'';
+ return '<div class="bprow '+(ok?'on':'off')+'"><span class="bpdot '+cls+'"></span><span class="bplab">'+label+'</span><span class="bpfile">'+(ok?'\u2713 '+fn:'\u2014 未検出')+'</span></div>';
+}
+function renderBulkPend(){
+ var el=document.getElementById('bulkpend');if(!el)return;
+ var pnd=_bulkPending;if(!pnd){el.innerHTML='';return;}
+ var any=(pnd.biji.length||pnd.hankyo.length||pnd.jds.length);
+ var h='<div class="bpcard"><div class="bptitle">検出したファイル</div>';
+ h+=_bpRow('ビジコン（詳細PV）','bi',pnd.biji);
+ h+=_bpRow('反響報告書（反響・OP）','hk',pnd.hankyo);
+ h+=_bpRow('JDS（反響速報）','jd',pnd.jds);
+ if(pnd.unknown&&pnd.unknown.length){h+='<div class="bpwarn">\u26a0 種類を判定できないファイル：'+pnd.unknown.map(function(x){return esc((x.f&&x.f.name)||'');}).join('、')+'（取り込まれません）</div>';}
+ if(pnd.biji.length>1||pnd.hankyo.length>1||pnd.jds.length>1){h+='<div class="bpwarn">\u26a0 同じ種類が複数あります。すべて同じ対象日で取り込みます。</div>';}
+ if(any){h+='<div class="bpact"><button class="btn btn-pri" onclick="bulkDayCommit()">この対象日で取り込む</button><button class="btn btn-sec" onclick="bulkDayCancel()">クリア</button></div>';}
+ else{h+='<div class="bpwarn">取り込めるファイルがありません。</div><div class="bpact"><button class="btn btn-sec" onclick="bulkDayCancel()">クリア</button></div>';}
+ h+='</div>';el.innerHTML=h;
+}
+function bulkDayCancel(){_bulkPending=null;renderBulkPend();}
+async function bulkDayCommit(){
+ var pnd=_bulkPending;if(!pnd)return;
+ var dEl=document.getElementById('bulkDate');var date=dEl?(dEl.value||'').trim():'';
+ if(!date){toast('対象日を選んでください');return;}
+ var done=[];var jdsN=0;
+ _importBatch=true;
+ try{
+  for(var i=0;i<pnd.biji.length;i++){var b=pnd.biji[i];try{var L=b.txt.split(/\r?\n/).filter(function(l){return l.trim();});var hd=parseCSVRow(L[0]).map(function(h){return h.trim();});var rw=L.slice(1).map(parseCSVRow);bijikonPending={hdr:hd,rows:rw,file:b.f};applyBijikon(date);if(done.indexOf('ビジコン')<0)done.push('ビジコン');}catch(e){}}
+  for(var j=0;j<pnd.hankyo.length;j++){try{await processHankyo(pnd.hankyo[j].f,date);if(done.indexOf('反響報告書')<0)done.push('反響報告書');}catch(e){}}
+ }catch(e){}
+ _importBatch=false;
+ for(var m=0;m<pnd.jds.length;m++){try{processCSVText(pnd.jds[m].txt,pnd.jds[m].f);jdsN++;}catch(e){}}
+ if(jdsN&&done.indexOf('JDS')<0)done.push('JDS');
+ try{recompute();}catch(e){}
+ try{saveAll();}catch(e){}
+ try{flushPush();}catch(e){}
+ _bulkPending=null;renderBulkPend();
+ try{refreshCurrentTab();}catch(e){}
+ toast(date.replace(/-/g,'/')+' として取込完了：'+(done.length?done.join(' / '):'対象ファイルなし'));
 }
 async function routeImport(file){const n=(file.name||'').toLowerCase();if(n.endsWith('.xls')||n.endsWith('.xlsx')){await processHankyo(file);}else{await processCSV(file);}}
 function readCSVText(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{
@@ -3524,7 +3593,7 @@ function processCSVText(txt,file){
 function _builtToAge(s){s=String(s==null?'':s);var m=s.match(/(\d{4})\D?(\d{1,2})?/);if(!m)return '';var y=+m[1];if(!y||y<1900||y>2100)return '';var mo=m[2]?+m[2]:1;var now=new Date();var months=(now.getFullYear()-y)*12+(now.getMonth()+1-mo);var yrs=Math.floor(months/12);if(yrs<0)yrs=0;return yrs+'年';}
 function _floorFmt(s){s=String(s==null?'':s).trim();if(!s||s==='-')return '';var m=s.match(/(\d+)\s*\/\s*(\d+)/);if(m)return m[1]+'階/'+m[2]+'階建';return s;}
 function _money1(s){s=String(s==null?'':s).trim();if(!s||s==='-'||s==='0'||s==='0.0')return '';return s;}
-async function processHankyo(file){
+async function processHankyo(file,forceDate){
  if(typeof XLSX==='undefined'){log('Excel解析の準備中です。数秒おいて、もう一度ファイルを入れてください。','err');return;}
  let wb;try{const buf=await file.arrayBuffer();wb=XLSX.read(buf,{type:'array'});}catch(e){log('Excelの読込に失敗しました。','err');return;}
  const ws=wb.Sheets[wb.SheetNames[0]];if(!ws){log('シートが見つかりません。','err');return;}
@@ -3541,7 +3610,7 @@ async function processHankyo(file){
  const secRow=M[hr-1]?M[hr-1].map(norm):[];
  let dstart=-1;for(let c=0;c<secRow.length;c++){if(/\d{2}年\d{2}月\d{2}日～\d{2}年\d{2}月\d{2}日/.test(secRow[c])){dstart=c;break;}}
  I.pv=dstart>=0?dstart+3:-1;I.inq=dstart>=0?dstart+7:-1;I.lv=dstart>=0?dstart+1:-1;
- var repDate=twoDaysAgo();var _dfound=false;for(var _r=0;_r<Math.min(M.length,Math.max(hr+1,9))&&!_dfound;_r++){var _rw=M[_r]||[];for(var _c=0;_c<_rw.length;_c++){var _cv=String(_rw[_c]==null?'':_rw[_c]);var _mm=_cv.match(/(\d{2})年(\d{2})月(\d{2})日\s*[~\uff5e\u301c-]\s*(\d{2})年(\d{2})月(\d{2})日/);if(_mm){repDate='20'+_mm[4]+'-'+_mm[5]+'-'+_mm[6];_dfound=true;break;}}}if(!_dfound){for(var _r2=0;_r2<Math.min(M.length,Math.max(hr+1,9))&&!_dfound;_r2++){var _rw2=M[_r2]||[];for(var _c2=0;_c2<_rw2.length;_c2++){var _cv2=String(_rw2[_c2]==null?'':_rw2[_c2]);var _ms=_cv2.match(/(\d{2})年(\d{2})月(\d{2})日/);if(_ms){repDate='20'+_ms[1]+'-'+_ms[2]+'-'+_ms[3];_dfound=true;break;}}}}
+ var repDate=twoDaysAgo();var _dfound=false;for(var _r=0;_r<Math.min(M.length,Math.max(hr+1,9))&&!_dfound;_r++){var _rw=M[_r]||[];for(var _c=0;_c<_rw.length;_c++){var _cv=String(_rw[_c]==null?'':_rw[_c]);var _mm=_cv.match(/(\d{2})年(\d{2})月(\d{2})日\s*[~\uff5e\u301c-]\s*(\d{2})年(\d{2})月(\d{2})日/);if(_mm){repDate='20'+_mm[4]+'-'+_mm[5]+'-'+_mm[6];_dfound=true;break;}}}if(!_dfound){for(var _r2=0;_r2<Math.min(M.length,Math.max(hr+1,9))&&!_dfound;_r2++){var _rw2=M[_r2]||[];for(var _c2=0;_c2<_rw2.length;_c2++){var _cv2=String(_rw2[_c2]==null?'':_rw2[_c2]);var _ms=_cv2.match(/(\d{2})年(\d{2})月(\d{2})日/);if(_ms){repDate='20'+_ms[1]+'-'+_ms[2]+'-'+_ms[3];_dfound=true;break;}}}} if(forceDate)repDate=forceDate;
  if(I.name<0||I.pv<0){log('必要な列（物件名・当日PV）が見つかりませんでした。','err');return;}
  if(!_importBatch&&_hasHankyo(repDate)){if(!confirm('この日付（'+repDate+'）の反響報告書は既に取込済みです。\n上書きして取り込みますか？')){log('取込を中止しました。','err');return;}}
  let matched=0,created=0,total=0;
