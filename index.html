@@ -703,7 +703,7 @@ header{padding-left:54px}
 .bjd-cur{color:#c0392b}
 .bjd-arr{color:#999;margin:0 3px}
 .bjd-bj{color:#1f8a4c;font-weight:600}
-</style><style>
+.kedit{margin:8px 0 4px}.kedit>summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--accent2);padding:6px 0;list-style:none}.kedit>summary::-webkit-details-marker{display:none}.kerv{margin-top:8px}.kedrow{margin:4px 0 6px}</style><style>
 .rsprog{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff5e6;border:1px solid #f3d9a8;border-radius:11px;padding:10px 14px;margin:0 0 12px}
 .rsprog.ok{background:#e8f7ee;border-color:#bfe6cd}
 .rsprog-n{font-size:24px;font-weight:800;color:#E8920A;line-height:1;min-width:26px;text-align:center}
@@ -731,6 +731,12 @@ header{padding-left:54px}
 .trpdf{font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:99px;white-space:nowrap}
 .trpdf.ok{color:#1f9d57;background:#e8f7ee}.trpdf.ng{color:#d8443a;background:#fdeceb}
 @media(max-width:680px){.trtbl .hcol{display:none}}
+</style>
+<style>
+.trrow{cursor:pointer;transition:background .12s}.trrow:hover{background:#f3f6fb}
+.trtsel{font-family:inherit;font-size:11.5px;padding:3px 7px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);max-width:88px}
+.trhint{font-size:10.5px;color:var(--text3);font-weight:500;margin-left:auto}
+.treditlk{font-size:11px;white-space:nowrap}
 </style>
 </head><body>
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
@@ -785,7 +791,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0619-dash</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0620-ux</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -939,9 +945,9 @@ async function refreshData(){
 function maybeAutoRefresh(){
  if(!API||_autoPaused||_pushing)return;
  if(Date.now()-_lastRefresh<=4000)return;
- if(isEditing()){_pendingRefresh=true;updatePendingHint();return;}
+ if(isEditing()||_modalOpen()){_pendingRefresh=true;updatePendingHint();return;}
  _lastRefresh=Date.now();
- flushPush().then(function(){if(_saveErr)return null;return load().then(function(){recompute();tab(CURTAB||'dash');try{_lastSig=_dataSig();}catch(e){}});});
+ flushPush().then(function(){if(_saveErr)return null;return load().then(function(){recompute();if(/^(staff|review|regstep|regconf|cost)$/.test(CURTAB||'')){_pendingRefresh=true;updatePendingHint();}else{tab(CURTAB||'dash');}try{_lastSig=_dataSig();}catch(e){}});});
 }
 function _hashStr(s){var h=5381;for(var i=0;i<s.length;i++){h=((h*33)^s.charCodeAt(i))>>>0;}return h;}
 function _dataSig(){var s='';for(var i=0;i<PROPS.length;i++){var p=PROPS[i];s+=(p.id||'')+'~'+(p.status||'')+'~'+(p.tantou||'')+'~'+(p.stars||0)+'~'+(p.confirmed?1:0)+'~'+(p.revStatus||'')+'~'+(p.waku||'')+'~'+(p.csvPV||0)+'~'+(p.csvInq||0)+'~'+(p.name||'')+'|';}s+='#'+PROPS.length+'#'+Object.keys(HIST).length+'#'+Object.keys(EVENTS).length+'#'+((MGMT&&MGMT.length)||0)+'#'+((GUAR&&GUAR.length)||0);return _hashStr(s);}
@@ -954,7 +960,7 @@ async function quietRefresh(){
  try{
   await flushPush();if(_saveErr)return;await load();recompute();
   var sig=_dataSig();
-  if(_lastSig!==''&&sig!==_lastSig){var y=window.scrollY||window.pageYOffset||0;tab(CURTAB||'dash');try{window.scrollTo(0,y);}catch(e){}}
+  if(_lastSig!==''&&sig!==_lastSig){if(/^(staff|review|regstep|regconf|cost)$/.test(CURTAB||'')){_pendingRefresh=true;updatePendingHint();}else{var y=window.scrollY||window.pageYOffset||0;tab(CURTAB||'dash');try{window.scrollTo(0,y);}catch(e){}}}
   _lastSig=sig;
  }catch(e){}
 }
@@ -1898,6 +1904,7 @@ function fillContacts(rec,raw){
  if(_gblank(rec.propNo)){var p=txt.match(/(?:物件番号|物件確認番号|物件No\.?|物件ＮＯ|管理番号|物件コード)[ \t　]*[:：.]?[ \t　]*([0-9\-]{4,})/i);if(p)rec.propNo=_z2h(p[1]);}
  if(_gblank(rec.infoDate)){var d=txt.match(/(?:情報公開日|情報更新日|公開日|情報登録日|登録日|更新日)[ \t　]*[:：]?[ \t　]*([0-9]{2,4}[\/年.\-][0-9]{1,2}[\/月.\-][0-9]{1,2}日?)/);if(d){var iso=parseDate(_z2h(d[1]))||_z2h(d[1]);rec.infoDate=iso;}}
 }
+function _parseKotsuText(t){if(!t)return [];var out=[];String(t).split(/[\/\uff0f\n\u3001]+/).forEach(function(seg){seg=(seg||'').trim();if(!seg)return;var lm=seg.match(/([^\s\u3000\/\uff0f]*?\u7dda)/);var line=lm?lm[1]:'';var sm=seg.match(/([^\s\u3000\u7dda]+?)\u99c5/);var sta=sm?sm[1]:'';if(!sta){var rest=line?seg.replace(line,''):seg;var sm2=rest.match(/([^\s\u3000\d]{2,10})/);if(sm2)sta=sm2[1].replace(/\u5f92\u6b69.*$/,'').replace(/\u99c5$/,'');}var wm=seg.match(/\u5f92\u6b69\s*(\d+)/)||seg.match(/(\d+)\s*\u5206/);var walk=wm?wm[1]:'';if(sta||line)out.push({line:line,sta:sta,walk:(walk?walk+'\u5206':''),walkMin:walk});});return out;}
 function mapGemini(j,rec){if(!j)return;
  if(j.bukken_mei)rec.name=String(j.bukken_mei);
  if(j.chinryo!=null)rec.rent=String(j.chinryo/10000);
@@ -1915,6 +1922,7 @@ function mapGemini(j,rec){if(!j)return;
  if(j.joho_koukai_bi){var _id=parseDate(String(j.joho_koukai_bi))||String(j.joho_koukai_bi);rec.infoDate=_id;}
  rec.deposit=_feeFmt(j.shikikin);rec.keyMoney=_feeFmt(j.reikin);
  var ks=(j.kotsu||[]).filter(function(k){return k&&k.eki;}).map(function(k){return {line:k.ensen||'',sta:k.eki||'',walk:(k.toho_fun!=null?k.toho_fun+'分':''),walkMin:(k.toho_fun!=null?String(k.toho_fun):'')};});
+ if(!ks.length&&j.kotsu_text){ks=_parseKotsuText(String(j.kotsu_text));}
  if(ks.length){rec.stations=ks;var mi=ks.findIndex(function(x){return RANK[x.sta];});if(mi<0)mi=0;rec.station=ks[mi].sta;rec.line=ks[mi].line;rec.walkMin=ks[mi].walkMin;}
  rec.nearby=[(j.torihiki_taiyo?'取引: '+j.torihiki_taiyo:''),(j.ad?'AD: '+j.ad:''),(j.biko||'')].filter(Boolean).join(' / ');
  rec.needsReview=!!j.needs_review;rec.reviewReason=(Array.isArray(j.review_reason)?j.review_reason.join('、'):(j.review_reason||''));
@@ -1976,7 +1984,12 @@ function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toStri
 async function regOnePend(i){var p=PEND[i];if(!p)return;if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}var prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。通信を確認して再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要入稿へ登録しました');if(!PEND.length)tab('staff');}
 async function pendToReview(i){var p=PEND[i];if(!p)return;if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}var prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');if(!PEND.length)tab('review');}
 function _tsTime(ts){return (ts&&ts.length>=16)?ts.slice(11,16):'';}
-function todayRegCard(){var td=today();var rows=PROPS.filter(function(p){return p.confirmed!==false&&p.regTs&&p.regTs.slice(0,10)===td;});if(!rows.length)return '';rows.sort(function(a,b){return (a.regTs||'').localeCompare(b.regTs||'');});var h='<div class="card fade trcard"><div class="sec-h2"><span class="t">今日 要入稿に入れた物件</span><span class="cntp">'+rows.length+'件</span></div><div class="trwrap"><table class="trtbl"><tr><th>登録</th><th>担当</th><th>物件名</th><th class="hcol">間取り×エリア</th><th>賃料</th><th>PDF</th></tr>';rows.forEach(function(p){var pdfOk=!!(p.driveUrl||p.driveId);h+='<tr><td class="trtm">'+(_tsTime(p.regTs)||esc(p.regDate||''))+'</td><td>'+esc(p.tantou||'\u2014')+'</td><td class="trnm">'+lkName(p.id,esc(p.name||'').slice(0,18))+'</td><td class="hcol trme">'+esc((p.madori||'')+(p.station?(' \u00d7 '+p.station):''))+'</td><td class="trrent">'+esc(rentMan(p)||'\u2014')+'</td><td>'+(pdfOk?'<span class="trpdf ok">\u2713\u4fdd\u5b58</span>':'<span class="trpdf ng">\u2717\u672a</span>')+'</td></tr>';});h+='</table></div></div>';return h;}
+function todayRegCard(){var td=today();var rows=PROPS.filter(function(p){return p.confirmed!==false&&p.regTs&&p.regTs.slice(0,10)===td;});if(!rows.length)return '';rows.sort(function(a,b){return (b.regTs||'').localeCompare(a.regTs||'');});
+  var h='<div class="card fade trcard"><div class="sec-h2"><span class="t">今日 入稿した物件</span><span class="cntp">'+rows.length+'件</span><span class="trhint">行をタップで詳細・修正／担当はその場で変更できます</span></div><div class="trwrap"><table class="trtbl"><tr><th>登録</th><th>担当</th><th>物件名</th><th class="hcol">間取り×エリア</th><th>賃料</th><th>評価</th><th>PDF</th><th></th></tr>';
+  rows.forEach(function(p){var pdfOk=!!(p.driveUrl||p.driveId);
+    var sel='<select class="trtsel" onclick="event.stopPropagation()" onchange="event.stopPropagation();tantouSet(\''+p.id+'\',this.value)"><option value="">未割当</option>'+STAFF.map(function(nm){return '<option'+(p.tantou===nm?' selected':'')+'>'+esc(nm)+'</option>';}).join('')+'</select>';
+    h+='<tr class="trrow" onclick="openProp(\''+p.id+'\')"><td class="trtm">'+(_tsTime(p.regTs)||esc(p.regDate||''))+'</td><td>'+sel+'</td><td class="trnm">'+esc((p.name||'').slice(0,18))+(p.room?' '+esc(p.room):'')+'</td><td class="hcol trme">'+esc((p.madori||'')+(p.station?(' \u00d7 '+p.station):''))+'</td><td class="trrent">'+esc(rentMan(p)||'\u2014')+'</td><td>'+starChip(p.stars)+'</td><td>'+(pdfOk?'<span class="trpdf ok">\u2713</span>':'<span class="trpdf ng">\u2717</span>')+'</td><td><span class="lk treditlk">編集 ›</span></td></tr>';});
+  h+='</table></div></div>';return h;}
 function renderRegStep(){
  var host=document.getElementById('regstepbody');if(!host)return;
  var n=PEND.length;
@@ -2276,7 +2289,7 @@ function tantouTag(p){return p.tantou?('<span class="ttag">'+esc(p.tantou)+'</sp
 var STAR_COL={5:['#a07a08','#fff4cf','#E8B30A'],4:['#b5610c','#ffe6c7','#F08A24'],3:['#2d6cb5','#e4eefb','#3B82C4'],2:['#6f7884','#eef0f3','#9AA3AE'],1:['#8b929c','#f3f5f7','#C7CCD3']};
 function starChip(n){n=+n||0;if(!n)return '<span class="ttag-none">★未評価</span>';var c=STAR_COL[n];var s='';for(var i=0;i<5;i++)s+='<svg width="10" height="10" viewBox="0 0 24 24" fill="'+(i<n?c[2]:'#dfe3e8')+'"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg>';return '<span class="starv" style="color:'+c[0]+';background:'+c[1]+'">'+s+'<b>'+n+'</b></span>';}
 function starPick(id,cur){cur=+cur||0;var col=cur?STAR_COL[cur][2]:'#dfe3e8';var s='';for(var i=1;i<=5;i++)s+='<button type="button" class="spk" onclick="setStars(\''+id+'\','+i+')"><svg width="26" height="26" viewBox="0 0 24 24" fill="'+(cur>=i?col:'#dfe3e8')+'"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg></button>';return '<div class="starpick">'+s+'<span class="spk-lab"'+(cur?' style="color:'+STAR_COL[cur][0]+'"':'')+'>'+(cur?'★'+cur+' 評価済み':'未評価（必須）')+'</span></div>';}
-function setStars(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.stars=(p.stars===v?0:v);save();if(CURTAB==='review'||CURTAB==='regconf')renderReview();}
+function setStars(id,v){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.stars=(p.stars===v?0:v);save();if(CURTAB==='review'||CURTAB==='regconf')renderReview();var ks=document.getElementById('karteStar_'+id);if(ks)ks.innerHTML=starPick(id,p.stars||0);}
 function todayOutCard(){
  var t=today();var items=PROPS.filter(function(p){return (p.regDate||'')===t;});
  var withT=items.filter(function(p){return p.tantou;}).length;var noT=items.length-withT;var total=items.length;
@@ -2949,7 +2962,7 @@ function listCard(p,_a){
   +(p.status==='掲載中'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'落とし済み\')">落とし済み</button>':'')
   +(p.status==='落とし済み'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'掲載中\')">掲載中に戻す</button>':'')
   +(p.status==='要入稿'?'<button class="btn-sm" onclick="chgStatus(\''+p.id+'\',\'掲載中\')">掲載中にする</button>':'')
-  +'<button class="btn-sm btn-danger" onclick="delProp(\''+p.id+'\')">削除</button></div></div></div>';
+  +'<select class="ined" style="max-width:130px;margin-right:auto" onchange="tantouSet(\''+p.id+'\',this.value)"><option value="">未割当</option>'+STAFF.map(function(nm){return '<option value="'+esc(nm)+'"'+(p.tantou===nm?' selected':'')+'>'+esc(nm)+'</option>';}).join('')+'</select>'+'<button class="btn-sm btn-danger" onclick="delProp(\''+p.id+'\')">削除</button></div></div></div>';
 }
 function listHasPdf(p){return !!(p.driveId||p.driveUrl);}
 function listSearch(v){LISTQ=v;renderListBody();}
@@ -3170,8 +3183,8 @@ function renderISBody(){
 
 // ---------- STAFF ----------
 function staffItems(){return PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;});}
-function staffToggleList(){STAFFLISTOPEN=!STAFFLISTOPEN;renderStaff();}
-function staffSelect(id){CURSTAFF=id;renderStaff();}
+function staffToggleList(){var _sy=window.scrollY||window.pageYOffset||0;STAFFLISTOPEN=!STAFFLISTOPEN;renderStaff();try{window.scrollTo(0,_sy);}catch(e){}}
+function staffSelect(id){var _sy=window.scrollY||window.pageYOffset||0;CURSTAFF=id;renderStaff();try{window.scrollTo(0,_sy);}catch(e){}requestAnimationFrame(function(){try{window.scrollTo(0,_sy);}catch(e){}});}
 function staffMode(id,m){
  STAFFMODE[id]=m;
  var live=document.getElementById('sm_live_'+id),hold=document.getElementById('sm_hold_'+id),btn=document.getElementById('postbtn_'+id);
@@ -4117,7 +4130,7 @@ function openProp(id){
  // 右：分析＋情報
  h+='<div class="kside">';
  if(p.repAlert)h+='<div class="kalert"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>代表候補アラート：ビジコン「代表候補」列に○がありません（Jiro連携）</div>';
- h+='<div class="kshokan"><div class="kshokan-h">担当者所感'+(p.tantou?'（'+esc(p.tantou)+'）':'')+' '+starChip(p.stars)+'</div><textarea oninput="setShokan(\''+p.id+'\',this.value)" placeholder="この物件の所感（強み・競合・推し方・気になる点…）">'+esc(p.shokan||'')+'</textarea></div>';
+ h+='<div class="ksec">担当者・物件評価（変更可）</div>';h+='<div class="kedrow"><select class="ined" style="max-width:220px" onchange="tantouSet(\''+p.id+'\',this.value)"><option value="">（未割当）</option>'+STAFF.map(function(nm){return '<option value="'+esc(nm)+'"'+(p.tantou===nm?' selected':'')+'>'+esc(nm)+'</option>';}).join('')+'</select></div>';h+='<div id="karteStar_'+p.id+'">'+starPick(p.id,p.stars||0)+'</div>';h+='<details class="kedit"><summary>基本情報を編集（クリックで開閉）</summary><div class="rvgrid kerv">'+RVF.map(function(fl){return '<div class="rvf"><label>'+fl[1]+'</label>'+inEd(p.id,fl[0],p[fl[0]])+'</div>';}).join('')+'</div></details>';h+='<div class="kshokan"><div class="kshokan-h">担当者所感'+(p.tantou?'（'+esc(p.tantou)+'）':'')+' '+starChip(p.stars)+'</div><textarea oninput="setShokan(\''+p.id+'\',this.value)" placeholder="この物件の所感（強み・競合・推し方・気になる点…）">'+esc(p.shokan||'')+'</textarea></div>';
  h+='<div class="kmemo"><div class="kmemo-h">コメント指示メモ（入稿担当への指示・実コメント）</div>';
  if(p.memos&&p.memos.length){h+=p.memos.map(function(m,idx){return '<div class="kmrow"><span class="rmlbl '+lblCls(m.label,m.tpl)+'">'+(m.tpl?'テンプレ':esc(m.label))+'</span><span class="rmtxt">'+esc(m.text)+'</span><button class="rmdel" onclick="detMemoDel(\''+p.id+'\','+idx+')">×</button></div>';}).join('');}
  h+='<div class="rmadd"><select id="dmlbl"><option>指示</option><option>実コメント</option></select><input id="dmtext" placeholder="指示や実コメントを入力…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();detMemoAdd(\''+p.id+'\');}"><button class="btn-sm" onclick="detMemoAdd(\''+p.id+'\')">追加</button></div>';
