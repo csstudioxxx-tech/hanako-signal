@@ -737,7 +737,7 @@ header{padding-left:54px}
 .trtsel{font-family:inherit;font-size:11.5px;padding:3px 7px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);max-width:88px}
 .trhint{font-size:10.5px;color:var(--text3);font-weight:500;margin-left:auto}
 .treditlk{font-size:11px;white-space:nowrap}
-.bulkcard{padding:14px 16px}.bulkcard-h{font-weight:700;font-size:14.5px;margin-bottom:2px}
+#histmgr .hm-h{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}.hm-ttl{font-size:14px;font-weight:800;color:#1A3D6B}.hm-sub{font-size:11.5px;color:var(--text3);font-family:ui-monospace,monospace}.hm-note{font-size:11.5px;color:var(--text2);line-height:1.6;margin-bottom:10px}.hm-list{border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden}.hm-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border2)}.hm-row:last-child{border-bottom:none}.hm-d{font-family:ui-monospace,monospace;font-size:13px;font-weight:700;color:#1A3D6B;white-space:nowrap;display:flex;align-items:center;gap:6px}.hm-tag{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;background:#eef0f4;color:var(--text3)}.hm-tag.bj{background:var(--accent-soft);color:var(--accent2)}.hm-m{flex:1;font-size:12px;color:var(--text2)}.hm-del{appearance:none;border:1px solid #e0a89a;background:#fff;color:#c2410c;font-family:inherit;font-size:11.5px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;white-space:nowrap}.hm-del:hover{background:#fbecea}@media(max-width:560px){.hm-row{flex-wrap:wrap}.hm-m{flex-basis:100%;order:3}}.bulkcard{padding:14px 16px}.bulkcard-h{font-weight:700;font-size:14.5px;margin-bottom:2px}
 .bulkrow{display:flex;align-items:center;gap:10px;margin:4px 0 10px;flex-wrap:wrap}.bulklab{font-size:12.5px;font-weight:650;color:var(--text2)}
 .bulkrow input[type=date]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:var(--text)}
 .bulkhint{font-size:11px;color:var(--text3)}
@@ -802,7 +802,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0620-nowstate</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0620-histdel</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -833,6 +833,7 @@ header{padding-left:54px}
  <div class="row" style="gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btn btn-sec" onclick="driveImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>ドライブからPDF取込（日付フォルダ）</button><button class="btn btn-pri" id="drvimpbtn" onclick="driveBatchImport()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Driveから一括取込</button><button class="btn btn-sec" id="drvimpallbtn" onclick="driveBatchImport(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Drive全件再取込</button><button class="btn btn-sec" onclick="testDrive()">ドライブ保存テスト</button></div>
  <div id="csvpending"></div>
  <div id="csvlog"></div>
+ <div id="histmgr" class="card fade" style="display:none"></div>
 </div>
 <div id="v-hist" style="display:none"><div id="hbody"></div></div>
 <div id="v-ana" style="display:none"><div id="anabody"></div></div>
@@ -1540,7 +1541,7 @@ function tab(t){
  CURTAB=t;
  var ALL=['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank','del','is','plan','tantou','regstep','devlock'];
  ALL.forEach(x=>{var _sh=(x===t)||(t==='regconf'&&x==='review');var v=document.getElementById('v-'+x);if(v)v.style.display=_sh?'':'none';var b=document.getElementById('tb-'+x);if(b)b.className=_sh?'sn-it on':'sn-it';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();if(t==='csv')renderHistMgr();
  var _W=document.querySelector('.wrap');if(_W)_W.classList.toggle('wide',['review','staff','mbank','gbank','del','is','plan','regconf','tantou','regstep'].indexOf(t)>=0);
  var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}
  navClose();
@@ -3497,6 +3498,38 @@ async function driveBatchImport(force){
  try{refreshCurrentTab();}catch(e){}
  if(btn){btn.disabled=false;btn.textContent='Driveから一括取込';}
  alert('Drive一括取込 完了\n\nビジコン '+okB+'件 ／ 反響報告書 '+okH+'件'+(skip?'\nスキップ（取込済）'+skip+'件':'')+(ng?'\n失敗 '+ng+'件：'+ngList.slice(0,6).join('、'):''));
+}
+function renderHistMgr(){
+ var el=document.getElementById('histmgr');if(!el)return;
+ var days=Object.keys(HIST||{}).sort().reverse();
+ if(!days.length){el.style.display='none';el.innerHTML='';return;}
+ el.style.display='';
+ var h='<div class="hm-h"><span class="hm-ttl">\ud83d\uddc2 \u53d6\u8fbc\u307f\u6e08\u307f \u65e5\u6b21\u30c7\u30fc\u30bf\u306e\u7ba1\u7406</span><span class="hm-sub">'+days.length+'\u65e5\u5206</span></div>';
+ h+='<div class="hm-note">\u8aa4\u3063\u3066\u53d6\u308a\u8fbc\u3093\u3060\u65e5\u306e\u30c7\u30fc\u30bf\uff08PV\u30fb\u53cd\u97ff\uff09\u3092\u65e5\u5358\u4f4d\u3067\u524a\u9664\u3067\u304d\u307e\u3059\u3002<b>\u7269\u4ef6\u305d\u306e\u3082\u306e\u306f\u6d88\u3048\u307e\u305b\u3093</b>\uff08\u305d\u306e\u65e5\u306ePV/\u53cd\u97ff\u3060\u3051\u96c6\u8a08\u304b\u3089\u9664\u5916\uff09\u3002\u524a\u9664\u5f8c\u306f\u30da\u30fc\u30b8\u3092\u30ea\u30ed\u30fc\u30c9\u3057\u3066\u53cd\u6620\u3092\u3054\u78ba\u8a8d\u304f\u3060\u3055\u3044\u3002</div>';
+ h+='<div class="hm-list">';
+ days.forEach(function(d){
+  var o=HIST[d]||{};var cnt=Object.keys(o).length;var dpv=0,lpv=0,bj=_hasBijikon(d);
+  Object.keys(o).forEach(function(pid){var e=o[pid]||{};dpv+=+e.pv||0;lpv+=+e.listv||0;});
+  h+='<div class="hm-row"><div class="hm-d">'+d+(bj?'<span class="hm-tag bj">\u30d3\u30b8\u30b3\u30f3</span>':'<span class="hm-tag">\u901f\u5831\u306e\u307f</span>')+'</div>'
+   +'<div class="hm-m">'+cnt+'\u4ef6 \u30fb \u8a73\u7d30PV '+dpv.toLocaleString()+' \u30fb \u4e00\u89a7PV '+lpv.toLocaleString()+'</div>'
+   +'<button class="hm-del" onclick="delHistDay(\''+d+'\')">\u524a\u9664</button></div>';
+ });
+ h+='</div>';
+ el.innerHTML=h;
+}
+async function delHistDay(date){
+ if(!HIST[date]){toast('\u305d\u306e\u65e5\u306e\u30c7\u30fc\u30bf\u306f\u3042\u308a\u307e\u305b\u3093');return;}
+ var n=Object.keys(HIST[date]).length;
+ if(!confirm(date+' \u306e\u65e5\u6b21\u30c7\u30fc\u30bf\uff08'+n+'\u4ef6\u5206\u306ePV\u30fb\u53cd\u97ff\uff09\u3092\u524a\u9664\u3057\u307e\u3059\u3002\n\u7269\u4ef6\u81ea\u4f53\u306f\u6b8b\u308a\u307e\u3059\u304c\u3001\u3053\u306e\u65e5\u306ePV/\u53cd\u97ff\u306f\u96c6\u8a08\u304b\u3089\u9664\u5916\u3055\u308c\u307e\u3059\u3002\n\u5143\u306b\u623b\u305b\u307e\u305b\u3093\u3002\u3088\u308d\u3057\u3044\u3067\u3059\u304b\uff1f'))return;
+ delete HIST[date];
+ var first={};Object.keys(HIST).sort().forEach(function(d){var o=HIST[d];Object.keys(o).forEach(function(pid){if(!first[pid])first[pid]=d;});});
+ PROPS.forEach(function(p){if(first[p.id]){p.suumoListStart=first[p.id];p.listDate=first[p.id];}});
+ recompute();
+ try{await saveAll();}catch(e){}
+ try{await flushPush();}catch(e){}
+ renderHistMgr();
+ if(CURTAB==='dash'&&typeof renderDash==='function')renderDash();
+ toast(date+' \u306e\u65e5\u6b21\u30c7\u30fc\u30bf\u3092\u524a\u9664\u3057\u307e\u3057\u305f\u3002\u30ea\u30ed\u30fc\u30c9\u3057\u3066\u53cd\u6620\u3092\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044');
 }
 function setupCSV(){const dz=document.getElementById('csvdrop'),inp=document.getElementById('csvin');
  try{var _bd=document.getElementById('bulkDate');if(_bd&&!_bd.value)_bd.value=twoDaysAgo();var _bh=document.getElementById('bulkhint');if(_bh)_bh.textContent='（前々日＝最新の取得可能日）';}catch(e){}
