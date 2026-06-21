@@ -802,7 +802,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0620-ns2</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0621-bc</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -2428,16 +2428,252 @@ function dashStaffCard(){
 }
 var TANTOU_WHO=null;
 function setTantouWho(n){TANTOU_WHO=n;}
+/* ===== 営業マン別 物出し・入稿 日別ダッシュボード (bn-) ===== */
+var JIRO_GAS="https://script.google.com/macros/s/AKfycbxajOtyPt0cSByjkB2n3DbeFFEM6Ema0BcjbpMd7K0Jz74nFGyuSfOB3A3Iz_Ebf0d5/exec";
+var BN_STAFF=['弘中','横山','宮本','田邊','生沼'];
+var BN_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A'};
+var _bnJiro=null;
+function bnInjectCSS(){
+ if(document.getElementById('bnStyle'))return;
+ var s=document.createElement('style');s.id='bnStyle';
+ s.textContent=[
+  '.bn-wrap{margin-bottom:18px}',
+  '.bn-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}',
+  '.bn-title{font-size:15px;font-weight:700;color:#1A3D6B}',
+  '.bn-jiro{margin-left:auto;font-size:12px;font-weight:600;border-radius:8px;padding:6px 12px;display:inline-flex;align-items:center;gap:7px}',
+  '.bn-jiro.ok{background:#eaf6ec;color:#2e7d32}','.bn-jiro.ng{background:#fdeded;color:#C0392B}','.bn-jiro.wait{background:#f1f3f6;color:#6a7686}',
+  '.bn-jiro .bn-jn{font-variant-numeric:tabular-nums;font-weight:800}',
+  '.bn-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}',
+  '.bn-card{border:1px solid #eceef1;border-radius:12px;padding:11px 13px;background:#fff}',
+  '.bn-nm{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;color:#243b53}',
+  '.bn-nm .bn-dot{width:9px;height:9px;border-radius:3px;display:inline-block}',
+  '.bn-metrics{display:flex;gap:16px;margin-bottom:9px}',
+  '.bn-m{display:flex;flex-direction:column}',
+  '.bn-mn{font-size:22px;font-weight:800;line-height:1;color:#1A3D6B;font-variant-numeric:tabular-nums}','.bn-mn.gold{color:#C99A14}',
+  '.bn-ml{font-size:10px;color:#9aa2ad;margin-top:3px}',
+  '.bn-spark{display:flex;align-items:flex-end;gap:1px;height:26px}',
+  '.bn-sb{flex:1;min-width:2px;border-radius:1px 1px 0 0}',
+  '.bn-heat-scroll{overflow-x:auto;border:1px solid #eceef1;border-radius:12px;background:#fff;-webkit-overflow-scrolling:touch}',
+  '.bn-heat{border-collapse:collapse;font-size:11px;width:100%}',
+  '.bn-heat th,.bn-heat td{border-bottom:1px solid #f1f2f4;padding:3px 5px;text-align:center;white-space:nowrap}',
+  '.bn-heat thead th{font-size:9.5px;color:#9aa2ad;font-weight:600;position:sticky;top:0;background:#fafbfc;z-index:3}',
+  '.bn-heat th.dw6{color:#2f6db5}','.bn-heat th.dw0{color:#C0392B}',
+  '.bn-rn{font-weight:700;color:#1A3D6B;text-align:left;border-right:1px solid #eef0f2;background:#fff;position:sticky;left:0;z-index:2;min-width:42px}',
+  '.bn-rt{font-size:9.5px;font-weight:700;border-right:1px solid #eef0f2;background:#fff;position:sticky;left:42px;z-index:2;min-width:34px}',
+  '.bn-tb{color:#1A3D6B}','.bn-tn{color:#C99A14}',
+  '.bn-c{font-variant-numeric:tabular-nums;color:#46505c}','.bn-c.z{color:#d4d8dd}',
+  '.bn-now{box-shadow:inset 0 0 0 2px #1A3D6B}',
+  '.bn-tot{font-weight:800;background:#f7f8fa;color:#1A3D6B;border-left:1px solid #eef0f2;position:sticky;right:0;z-index:2}',
+  '.bn-allrow td{background:#eef2f7;font-weight:700}',
+  '.bn-note{font-size:10px;color:#9aa2ad;margin-top:9px;line-height:1.6}'
+ ].join('');
+ document.head.appendChild(s);
+}
+function bnData(mo){
+ var B={},N={},AB={},AN={};BN_STAFF.forEach(function(s){B[s]={};N[s]={};});
+ PROPS.forEach(function(p){
+  if(!p.fromCsv){var rd=p.regDate||'';if(rd.slice(0,7)===mo){var dy=parseInt(rd.slice(8,10),10);if(dy){AB[dy]=(AB[dy]||0)+1;if(p.tantou&&B[p.tantou])B[p.tantou][dy]=(B[p.tantou][dy]||0)+1;}}}
+  if(Array.isArray(p.statusLog))p.statusLog.forEach(function(e){if(e&&e.memo&&e.memo.indexOf('要入稿ページで入稿完了')>=0&&e.ts){var d=String(e.ts).slice(0,10);if(d.slice(0,7)===mo){var dy=parseInt(d.slice(8,10),10);if(dy){AN[dy]=(AN[dy]||0)+1;if(p.tantou&&N[p.tantou])N[p.tantou][dy]=(N[p.tantou][dy]||0)+1;}}}});
+ });
+ return {B:B,N:N,AB:AB,AN:AN};
+}
+function bnTodayButsuTotal(){var t=today();var n=0;PROPS.forEach(function(p){if(!p.fromCsv&&(p.regDate||'')===t)n++;});return n;}
+function butsuNyukoDashboard(){
+ bnInjectCSS();
+ var mo=today().slice(0,7),td=parseInt(today().slice(8,10),10);
+ var yy=parseInt(mo.slice(0,4),10),mm=parseInt(mo.slice(5,7),10);
+ var moLabel=mm+'月';
+ var D=bnData(mo),B=D.B,N=D.N,AB=D.AB,AN=D.AN;
+ var maxB=1,maxN=1;BN_STAFF.forEach(function(s){for(var d=1;d<=td;d++){if((B[s][d]||0)>maxB)maxB=B[s][d];if((N[s][d]||0)>maxN)maxN=N[s][d];}});
+ var cards='<div class="bn-cards">';
+ BN_STAFF.forEach(function(s){
+  var tb=0,tn=0,bv=[];for(var d=1;d<=td;d++){var b=B[s][d]||0,n=N[s][d]||0;tb+=b;tn+=n;bv.push(b);}
+  var sm=Math.max.apply(null,bv.concat([1]));
+  var sp='<div class="bn-spark">'+bv.map(function(v){var h=Math.max(2,Math.round(v/sm*26));return '<div class="bn-sb" style="height:'+h+'px;background:'+(v>0?(BN_COL[s]||'#1A3D6B'):'#eceef1')+'"></div>';}).join('')+'</div>';
+  cards+='<div class="bn-card"><div class="bn-nm"><span class="bn-dot" style="background:'+(BN_COL[s]||'#888')+'"></span>'+esc(s)+'</div><div class="bn-metrics"><div class="bn-m"><span class="bn-mn">'+tb+'</span><span class="bn-ml">物出し</span></div><div class="bn-m"><span class="bn-mn gold">'+tn+'</span><span class="bn-ml">入稿</span></div></div>'+sp+'</div>';
+ });
+ cards+='</div>';
+ var hd='';for(var d=1;d<=td;d++){var dw=new Date(yy,mm-1,d).getDay();var c=dw===0?'dw0':dw===6?'dw6':'';hd+='<th class="'+c+(d===td?' bn-now':'')+'">'+d+'</th>';}
+ function cell(v,isB,d){var mx=isB?maxB:maxN;var op=v>0?(0.12+0.78*Math.min(1,v/mx)):0;var bg=v>0?(isB?'rgba(26,61,107,'+op.toFixed(2)+')':'rgba(201,154,20,'+op.toFixed(2)+')'):'';var fg=(v>0&&op>0.55)?'#fff':'';return '<td class="bn-c'+(v?'':' z')+(d===td?' bn-now':'')+'" style="'+(bg?'background:'+bg+';':'')+(fg?'color:'+fg+';':'')+'">'+(v||'·')+'</td>';}
+ var rows='';
+ BN_STAFF.forEach(function(s){
+  var tb=0,tn=0;for(var d=1;d<=td;d++){tb+=B[s][d]||0;tn+=N[s][d]||0;}
+  var rB='<tr><td class="bn-rn" rowspan="2">'+esc(s)+'</td><td class="bn-rt bn-tb">物出</td>';for(var d=1;d<=td;d++)rB+=cell(B[s][d]||0,true,d);rB+='<td class="bn-tot">'+tb+'</td></tr>';
+  var rN='<tr><td class="bn-rt bn-tn">入稿</td>';for(var d=1;d<=td;d++)rN+=cell(N[s][d]||0,false,d);rN+='<td class="bn-tot" style="color:#C99A14">'+tn+'</td></tr>';
+  rows+=rB+rN;
+ });
+ var gB=0,gN=0,tB='',tN='';for(var d=1;d<=td;d++){var ab=AB[d]||0,an=AN[d]||0;gB+=ab;gN+=an;tB+='<td'+(d===td?' class="bn-now"':'')+'>'+(ab||'·')+'</td>';tN+='<td'+(d===td?' class="bn-now"':'')+'>'+(an||'·')+'</td>';}
+ rows+='<tr class="bn-allrow"><td class="bn-rn" rowspan="2">全員</td><td class="bn-rt bn-tb">物出</td>'+tB+'<td class="bn-tot">'+gB+'</td></tr>';
+ rows+='<tr class="bn-allrow"><td class="bn-rt bn-tn">入稿</td>'+tN+'<td class="bn-tot" style="color:#C99A14">'+gN+'</td></tr>';
+ var heat='<div class="bn-heat-scroll"><table class="bn-heat"><thead><tr><th class="bn-rn">担当</th><th class="bn-rt"></th>'+hd+'<th class="bn-tot">計</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+ setTimeout(bnCheckJiro,60);
+ return '<div class="bn-wrap card fade"><div class="bn-head"><div class="bn-title">営業マン別 物出し・入稿（'+moLabel+'・今日まで）</div><div class="bn-jiro wait" id="bnJiroBar">Jiro照合中…</div></div>'+cards+heat+'<div class="bn-note">物出し＝花子に登録された（要データ確認に入った）マイソク件数を登録日×担当者で集計（CSV／ビジコン取込は除外）。入稿＝要入稿ページから掲載中／保留にした件数。個人行は担当者割当済のみ・全員行は未割当も含む。Jiro照合＝本日のJiro登録合計と花子の物出し合計を比較。</div></div>';
+}
+function bnCheckJiro(){
+ var bar=document.getElementById('bnJiroBar');if(!bar)return;
+ var hanako=bnTodayButsuTotal(),t=today();
+ function paint(jiro){
+  if(jiro==null){bar.className='bn-jiro wait';bar.innerHTML='Jiro照合：取得できず（花子 物出し '+hanako+'件）';return;}
+  var diff=jiro-hanako;
+  if(diff===0){bar.className='bn-jiro ok';bar.innerHTML='✓ 本日一致：Jiro <span class="bn-jn">'+jiro+'</span> ／ 花子 <span class="bn-jn">'+hanako+'</span>';}
+  else{bar.className='bn-jiro ng';bar.innerHTML='⚠ 本日ズレ：Jiro登録 <span class="bn-jn">'+jiro+'</span> ／ 花子要データ確認 <span class="bn-jn">'+hanako+'</span>（差 '+(diff>0?'+':'')+diff+'）';}
+ }
+ if(_bnJiro&&_bnJiro.date===t){paint(_bnJiro.total);return;}
+ fetch(JIRO_GAS).then(function(r){return r.json();}).then(function(o){
+  var total=0;
+  Object.keys(o||{}).forEach(function(k){
+   if(k.indexOf('|')<0||k.indexOf('__')>=0)return;
+   try{var v=JSON.parse((o[k]&&o[k].d)||'{}');if(v&&v.log){var e=v.log[t];if(e&&!(typeof e==='object'&&e.del))total+=(typeof e==='object'?(+e.c||0):(parseInt(e,10)||0));}}catch(_e){}
+  });
+  _bnJiro={date:t,total:total};paint(total);
+ }).catch(function(){paint(null);});
+}
+/* ===== 達成カレンダー（案B 塗りマス）===== */
+var BN_QUOTA=['弘中','宮本','田邊','生沼'];
+var BN_CALP='全体';
+var BC_GB=5,BC_GN=5;
+function bcRest(s,d,yy,mm){var w=new Date(yy,mm-1,d).getDay();if(w===3)return true;if(s==='田邊'&&w===2)return true;return false;}
+function bcExempt(s){return s==='横山';}
+function bnCalInjectCSS(){
+ if(document.getElementById('bcStyle'))return;
+ var s=document.createElement('style');s.id='bcStyle';
+ s.textContent=[
+  '.bc-title{font-size:15px;font-weight:700;color:#1A3D6B;margin-bottom:12px}',
+  '.bc-sel{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}',
+  '.bc-selbtn{border:1px solid #d8dee8;background:#fff;border-radius:20px;padding:5px 14px;font-family:inherit;font-size:12.5px;font-weight:600;color:#46505c;cursor:pointer;display:inline-flex;align-items:center;gap:6px}',
+  '.bc-selbtn .bc-seldot{width:9px;height:9px;border-radius:3px;display:inline-block}',
+  '.bc-selbtn.bc-on{background:#1A3D6B;color:#fff;border-color:#1A3D6B}',
+  '.bc-selbtn.bc-on .bc-seldot{display:none}',
+  '.bc-stat-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px}',
+  '.bc-stat-big{font-size:16px;font-weight:700;color:#1A3D6B;display:flex;align-items:center;gap:8px}',
+  '.bc-tag{font-size:10px;color:#9aa2ad;background:#f1f2f4;border-radius:6px;padding:2px 8px}',
+  '.bc-cells{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap}',
+  '.bc-sc{text-align:center}',
+  '.bc-scn{font-size:23px;font-weight:800;color:#1A3D6B;font-variant-numeric:tabular-nums;line-height:1}',
+  '.bc-scn.bc-gold{color:#C99A14}','.bc-scn.bc-green{color:#2e9e4f}',
+  '.bc-scu{font-size:12px;font-weight:600;color:#9aa2ad}',
+  '.bc-scl{font-size:10px;color:#9aa2ad;margin-top:4px}',
+  '.bc-prog{margin-bottom:10px}',
+  '.bc-progbar{height:10px;background:#eef0f3;border-radius:6px;overflow:hidden}',
+  '.bc-progfill{height:100%;background:#1A3D6B;border-radius:6px}',
+  '.bc-progtxt{font-size:11.5px;color:#6a7686;margin-top:6px}',
+  '.bc-note{font-size:11px;color:#9aa2ad;margin:-2px 0 14px;line-height:1.7}',
+  '.bc-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}',
+  '.bc-ch{font-size:11px;font-weight:700;color:#9aa2ad;text-align:center;padding:4px 0}',
+  '.bc-ch.bc-w6{color:#2f6db5}','.bc-ch.bc-w0{color:#C0392B}','.bc-ch.bc-w3{color:#b5bcc4}',
+  '.bc-cc{border:1px solid #eceef1;border-radius:10px;min-height:90px;padding:6px 7px;background:#fff;display:flex;flex-direction:column;gap:2px}',
+  '.bc-cc.bc-empty{border:none;background:transparent;min-height:0}',
+  '.bc-cc.bc-future{background:#fafbfc}',
+  '.bc-cc.bc-rest{background:#f1f2f4}',
+  '.bc-cc.bc-now{box-shadow:0 0 0 2px #1A3D6B}',
+  '.bc-cc.bc-done{background:#eef8f0;border-color:#bfe3c8}',
+  '.bc-cc.bc-under{background:#fdecec;border-color:#f1c9c9}',
+  '.bc-ccd{display:flex;align-items:center;justify-content:space-between}',
+  '.bc-dn{font-size:12px;font-weight:700;color:#46505c}',
+  '.bc-dn.bc-w0{color:#C0392B}','.bc-dn.bc-w6{color:#2f6db5}',
+  '.bc-rtag,.bc-extag{font-size:9px;color:#9aa2ad;font-weight:600}',
+  '.bc-chk{color:#2e9e4f;font-weight:800;font-size:13px}',
+  '.bc-restmsg{font-size:9px;color:#aab0b9;margin-top:auto}',
+  '.bc-exvals{display:flex;gap:10px;font-size:12px;margin-top:5px}',
+  '.bc-ovr{font-size:9.5px;font-weight:800;margin-left:3px}',
+  '.bc-memln{font-size:9.5px;color:#6a7686;margin-top:3px;font-weight:600}',
+  '.bc-metric{display:flex;align-items:center;gap:5px;margin-top:4px}',
+  '.bc-mlab{font-size:9.5px;font-weight:700;width:14px;flex:none}',
+  '.bc-boxrow{display:flex;gap:2px;align-items:center}',
+  '.bc-bx{width:10px;height:10px;border-radius:2px;border:1px solid #d9dde2;background:#f3f4f6}',
+  '.bc-bxn{font-size:9px;color:#9aa2ad;margin-left:3px;font-variant-numeric:tabular-nums}',
+  '.bc-barwrap{flex:1;height:8px;background:#eef0f3;border-radius:4px;overflow:hidden;min-width:30px}',
+  '.bc-barfill{height:100%;border-radius:4px}',
+  '.bc-barn{font-size:9px;color:#9aa2ad;margin-left:4px;font-variant-numeric:tabular-nums}',
+  '.bc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#6a7686;margin-top:14px}',
+  '.bc-legend .bc-sw{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:5px;vertical-align:-2px}',
+  '.bc-legend .bc-dotc{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}'
+ ].join('');
+ document.head.appendChild(s);
+}
+function bcCellData(p,d,B,N,yy,mm){
+ if(p==='全体'){
+  var active=BN_QUOTA.filter(function(s){return !bcRest(s,d,yy,mm);});
+  var bD=0,nD=0,ok=0;active.forEach(function(s){var b=(B[s]&&B[s][d])||0,n=(N[s]&&N[s][d])||0;bD+=b;nD+=n;if(b>=BC_GB&&n>=BC_GN)ok++;});
+  return {isAll:true,bDone:bD,nDone:nD,bGoal:BC_GB*active.length,nGoal:BC_GN*active.length,activeN:active.length,staffOK:ok,rest:active.length===0,exempt:false};
+ }
+ var ex=bcExempt(p);
+ return {isAll:false,bDone:(B[p]&&B[p][d])||0,nDone:(N[p]&&N[p][d])||0,bGoal:ex?0:BC_GB,nGoal:ex?0:BC_GN,rest:bcRest(p,d,yy,mm),exempt:ex};
+}
+function bcComplete(cd){if(cd.isAll)return cd.activeN>0&&cd.staffOK===cd.activeN;return cd.bGoal>0&&cd.bDone>=cd.bGoal&&cd.nGoal>0&&cd.nDone>=cd.nGoal;}
+function bcUnder(cd){return !cd.rest&&!cd.exempt&&!bcComplete(cd);}
+function bcOver(done,goal,color){return (goal>0&&done>goal)?'<span class="bc-ovr" style="color:'+color+'">+'+(done-goal)+'</span>':'';}
+function bcBoxes(done,goal,color){
+ var n=Math.min(done,goal),ov=done-goal,s='<div class="bc-boxrow">';
+ for(var i=0;i<goal;i++)s+='<span class="bc-bx'+(i<n?'':'')+'"'+(i<n?' style="background:'+color+';border-color:'+color+'"':'')+'></span>';
+ for(var j=0;j<Math.min(ov,3);j++)s+='<span class="bc-bx" style="background:'+color+';opacity:.4;border-color:'+color+'"></span>';
+ s+='<span class="bc-bxn">'+done+'/'+goal+'</span>'+(ov>0?'<span class="bc-ovr" style="color:'+color+'">+'+ov+'</span>':'');
+ return s+'</div>';
+}
+function bcBar(done,goal,color){var r=goal>0?Math.min(1,done/goal):0;return '<div class="bc-barwrap"><div class="bc-barfill" style="width:'+(r*100).toFixed(0)+'%;background:'+color+'"></div></div><span class="bc-barn">'+done+'/'+(goal||'-')+'</span>';}
+function bcMem(cd){return '<div class="bc-memln">達成 '+cd.staffOK+'/'+cd.activeN+'人</div>';}
+function bcDnCls(d,yy,mm){var w=new Date(yy,mm-1,d).getDay();return 'bc-dn'+(w===0?' bc-w0':w===6?' bc-w6':'');}
+function bcCell(p,d,B,N,yy,mm,td){
+ var dn='<span class="'+bcDnCls(d,yy,mm)+'">'+d+'</span>';
+ if(d>td)return '<div class="bc-cc bc-future"><div class="bc-ccd">'+dn+'</div></div>';
+ var cd=bcCellData(p,d,B,N,yy,mm);
+ if(cd.rest)return '<div class="bc-cc bc-rest'+(d===td?' bc-now':'')+'"><div class="bc-ccd">'+dn+'<span class="bc-rtag">休</span></div><div class="bc-restmsg">物出し休</div></div>';
+ if(cd.exempt)return '<div class="bc-cc'+(d===td?' bc-now':'')+'"><div class="bc-ccd">'+dn+'<span class="bc-extag">対象外</span></div><div class="bc-exvals"><span style="color:#1A3D6B;font-weight:700">物 '+cd.bDone+'</span><span style="color:#C99A14;font-weight:700">入 '+cd.nDone+'</span></div></div>';
+ var comp=bcComplete(cd),u=bcUnder(cd);
+ var b1=cd.bGoal>5?bcBar(cd.bDone,cd.bGoal,'#1A3D6B'):bcBoxes(cd.bDone,cd.bGoal,'#1A3D6B');
+ var n1=cd.nGoal>5?bcBar(cd.nDone,cd.nGoal,'#C99A14'):bcBoxes(cd.nDone,cd.nGoal,'#C99A14');
+ var cls='bc-cc'+(comp?' bc-done':(u?' bc-under':''))+(d===td?' bc-now':'');
+ return '<div class="'+cls+'"><div class="bc-ccd">'+dn+(comp?'<span class="bc-chk">✓</span>':'')+'</div><div class="bc-metric"><span class="bc-mlab" style="color:#1A3D6B">物</span>'+b1+'</div><div class="bc-metric"><span class="bc-mlab" style="color:#C99A14">入</span>'+n1+'</div>'+(cd.isAll?bcMem(cd):'')+'</div>';
+}
+function bcStats(p,B,N,yy,mm,td){
+ function row(title,dotc,tag,cells){var sc='';cells.forEach(function(c){sc+='<div class="bc-sc"><div class="bc-scn'+(c[0]?' '+c[0]:'')+'">'+c[1]+'</div><div class="bc-scl">'+c[2]+'</div></div>';});return '<div class="bc-stat-row"><div class="bc-stat-big"><span style="width:11px;height:11px;border-radius:3px;background:'+dotc+';display:inline-block"></span>'+esc(title)+(tag?'<span class="bc-tag">'+tag+'</span>':'')+'</div><div class="bc-cells">'+sc+'</div></div>';}
+ if(p!=='全体'&&bcExempt(p)){
+  var xb=0,xn=0;for(var d=1;d<=td;d++){if(bcRest(p,d,yy,mm))continue;xb+=(B[p]&&B[p][d])||0;xn+=(N[p]&&N[p][d])||0;}
+  return row(p,BN_COL[p]||'#888','ノルマ対象外',[['',''+xb,'物出し合計'],['bc-gold',''+xn,'入稿合計']])+'<div class="bc-note">横山さんはノルマ対象外のため達成判定（色）は行いません。</div>';
+ }
+ var tb=0,tn=0,work=0,bA=0,nA=0,both=0;
+ for(var d=1;d<=td;d++){
+  var cd=bcCellData(p,d,B,N,yy,mm);if(cd.rest)continue;work++;tb+=cd.bDone;tn+=cd.nDone;
+  var ba,na;
+  if(p==='全体'){var active=BN_QUOTA.filter(function(s){return !bcRest(s,d,yy,mm);});ba=active.length>0&&active.every(function(s){return (((B[s]&&B[s][d])||0)>=BC_GB);});na=active.length>0&&active.every(function(s){return (((N[s]&&N[s][d])||0)>=BC_GN);});}
+  else{ba=cd.bDone>=BC_GB;na=cd.nDone>=BC_GN;}
+  if(ba)bA++;if(na)nA++;if(ba&&na)both++;
+ }
+ var rate=work?Math.round(both/work*100):0;
+ var title=p==='全体'?'全体':p,dotc=p==='全体'?'#1A3D6B':(BN_COL[p]||'#888'),tag=p==='全体'?'ノルマ対象4名':'';
+ var cells=[['',''+tb,'物出し合計'],['bc-gold',''+tn,'入稿合計'],['',bA+'<span class="bc-scu">/'+work+'</span>','物出し達成日'],['bc-gold',nA+'<span class="bc-scu">/'+work+'</span>','入稿達成日'],['bc-green',both+'<span class="bc-scu">/'+work+'</span>','両方達成日']];
+ var note=p==='全体'?'達成日＝出勤した対象者が全員ノルマ達成した日。緑＝全員達成／赤＝未達。「達成 N/M人」はその日に両方達成した人数。':'緑＝物出し・入稿の両方達成／赤＝未達。ノルマ超過は「＋N」で表示。';
+ return row(title,dotc,tag,cells)+'<div class="bc-prog"><div class="bc-progbar"><div class="bc-progfill" style="width:'+rate+'%"></div></div><div class="bc-progtxt">達成率 <b>'+rate+'%</b>（両方達成 '+both+' / '+work+'日）</div></div><div class="bc-note">'+note+'</div>';
+}
+function bnCalRender(){
+ var mo=today().slice(0,7),yy=parseInt(mo.slice(0,4),10),mm=parseInt(mo.slice(5,7),10),td=parseInt(today().slice(8,10),10);
+ var DIM=new Date(yy,mm,0).getDate();
+ var D=bnData(mo),B=D.B,N=D.N,p=BN_CALP;
+ var sel='<div class="bc-sel"><button class="bc-selbtn'+(p==='全体'?' bc-on':'')+'" onclick="bnCalSelect(\'全体\')">全体</button>';
+ BN_STAFF.forEach(function(s){sel+='<button class="bc-selbtn'+(p===s?' bc-on':'')+'" onclick="bnCalSelect(\''+s+'\')"><span class="bc-seldot" style="background:'+(BN_COL[s]||'#888')+'"></span>'+esc(s)+'</button>';});
+ sel+='</div>';
+ var stats=bcStats(p,B,N,yy,mm,td);
+ var first=new Date(yy,mm-1,1).getDay(),cells='';
+ for(var i=0;i<first;i++)cells+='<div class="bc-cc bc-empty"></div>';
+ for(var d=1;d<=DIM;d++)cells+=bcCell(p,d,B,N,yy,mm,td);
+ var wn=['日','月','火','水','木','金','土'],head='';for(var i=0;i<7;i++)head+='<div class="bc-ch '+(i===0?'bc-w0':i===6?'bc-w6':i===3?'bc-w3':'')+'">'+wn[i]+'</div>';
+ var grid='<div class="bc-cal">'+head+cells+'</div>';
+ var legend='<div class="bc-legend"><span><span class="bc-sw" style="background:#2e9e4f"></span>両方達成</span><span><span class="bc-sw" style="background:#e15b5b"></span>未達</span><span><span class="bc-sw" style="background:#f1f2f4"></span>休・対象外</span><span><span class="bc-dotc" style="background:#1A3D6B"></span>物出し</span><span><span class="bc-dotc" style="background:#C99A14"></span>入稿</span></div>';
+ return '<div class="bc-title">物出し・入稿 達成カレンダー（'+mm+'月）　ノルマ：物出し'+BC_GB+'件／入稿'+BC_GN+'件・日</div>'+sel+stats+grid+legend;
+}
+function bnCalSelect(p){BN_CALP=p;var el=document.getElementById('bnCalWrap');if(el)el.innerHTML=bnCalRender();}
+function bnCalendar(){bnCalInjectCSS();return '<div class="bn-wrap card fade"><div id="bnCalWrap">'+bnCalRender()+'</div></div>';}
+
 function renderTantou(){
  recompute();
  var host=document.getElementById('tantoubody');if(!host)return;
  if(!TANTOU_WHO||STAFF.indexOf(TANTOU_WHO)<0)TANTOU_WHO=STAFF[0];
- var h=recentRegPanel();h+='<div class="sec-h" style="margin-top:18px">担当者別の成績</div>';h+='<div class="tsel">'+STAFF.map(function(nm){var a=staffAgg(nm);return '<button class="'+(TANTOU_WHO===nm?'on':'')+'" onclick="setTantouWho(\''+nm+'\');renderTantou()">'+esc(nm)+'<small>'+a.count+'件</small></button>';}).join('')+'</div>';
+ var h=bnCalendar();h+=butsuNyukoDashboard();h+=recentRegPanel();h+='<div class="sec-h" style="margin-top:18px">担当者別の成績</div>';h+='<div class="tsel">'+STAFF.map(function(nm){var a=staffAgg(nm);return '<button class="'+(TANTOU_WHO===nm?'on':'')+'" onclick="setTantouWho(\''+nm+'\');renderTantou()">'+esc(nm)+'<small>'+a.count+'件</small></button>';}).join('')+'</div>';
  var a=staffAgg(TANTOU_WHO);
  h+='<div class="tkpi">'
    +'<div class="tk"><div class="l">担当物件</div><div class="n">'+a.count+'</div><div class="s">掲載中 '+a.live+' ／ 要入稿 '+a.pre+'</div></div>'
    +'<div class="tk"><div class="l">今月PV（'+viewYM+'）</div><div class="n">'+a.pv.toLocaleString()+'</div><div class="s">詳細PV合計</div></div>'
-   +'<div class="tk"><div class="l">今月反響</div><div class="n">'+a.inq+'</div><div class="s">JDS反響 ／ 反響(B) '+a.inqB+'</div></div>'
+   +'<div class="tk"><div class="l">今月反響</div><div class="n">'+a.inq+'</div><div class="s">反響(ビジコン) ／ 反響(B) '+a.inqB+'</div></div>'
    +'<div class="tk"><div class="l">今週の物出し</div><div class="n">'+a.week+'</div><div class="s">直近7日の登録</div></div>'
    +'</div>';
  var ps=a.props.slice().sort(function(x,y){return (+(y.csvInq||0))-(+(x.csvInq||0))||(+(y.csvPV||0))-(+(x.csvPV||0));});
@@ -2572,7 +2808,7 @@ async function driveImport(){
     suumoCode:'',pdf:'',driveId:it.driveId,driveUrl:it.viewUrl||'',pdfName:it.fileName||'',
     name:f.name||it.fileName||'(名称未設定)',room:f.room||'',line:f.line||'',station:station,walkMin:f.walkMin||'',
     madori:mad,rent:rent,structure:f.structure||'',age:f.age||'',area:f.area||'',address:f.address||'',
-    propNo:f.propNo||'',uploadDate:it.date||today(),statusLog:[{memo:'Googleドライブ('+(it.folder||it.date||'')+')から取込',ts:nowTS()}],
+    propNo:f.propNo||'',uploadDate:it.date||today(),regDate:today(),statusLog:[{memo:'Googleドライブ('+(it.folder||it.date||'')+')から取込',ts:nowTS()}],
     listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',
     storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',
     needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',analysisMemo:'',
