@@ -2532,6 +2532,7 @@ function bnCheckJiro(){
 var BN_QUOTA=['弘中','宮本','田邊','生沼'];
 var BN_CALP='全体';
 var BC_GB=5,BC_GN=5;
+var BC_START='2026-06-20';
 function bcRest(s,d,yy,mm){var w=new Date(yy,mm-1,d).getDay();if(w===3)return true;if(s==='田邊'&&w===2)return true;return false;}
 function bcExempt(s){return s==='横山';}
 function bnCalInjectCSS(){
@@ -2587,7 +2588,10 @@ function bnCalInjectCSS(){
   '.bc-barn{font-size:9px;color:#9aa2ad;margin-left:4px;font-variant-numeric:tabular-nums}',
   '.bc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#6a7686;margin-top:14px}',
   '.bc-legend .bc-sw{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:5px;vertical-align:-2px}',
-  '.bc-legend .bc-dotc{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}'
+  '.bc-legend .bc-dotc{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}',
+  '.bc-cc.bc-pre{background:#f4f5f7}','.bc-cc.bc-pre .bc-dn{color:#c2c7cf}',
+  '.bc-plan{font-size:12px;color:#46505c;background:#f7f8fa;border:1px solid #eceef1;border-radius:8px;padding:8px 12px;margin:-4px 0 14px;line-height:1.6}',
+  '.bc-plan b{color:#1A3D6B;font-variant-numeric:tabular-nums}','.bc-plan .bc-plan-sub{color:#9aa2ad;font-size:11px;margin-left:6px}'
  ].join('');
  document.head.appendChild(s);
 }
@@ -2613,8 +2617,9 @@ function bcBoxes(done,goal,color){
 function bcBar(done,goal,color){var r=goal>0?Math.min(1,done/goal):0;return '<div class="bc-barwrap"><div class="bc-barfill" style="width:'+(r*100).toFixed(0)+'%;background:'+color+'"></div></div><span class="bc-barn">'+done+'/'+(goal||'-')+'</span>';}
 function bcMem(cd){return '<div class="bc-memln">達成 '+cd.staffOK+'/'+cd.activeN+'人</div>';}
 function bcDnCls(d,yy,mm){var w=new Date(yy,mm-1,d).getDay();return 'bc-dn'+(w===0?' bc-w0':w===6?' bc-w6':'');}
-function bcCell(p,d,B,N,yy,mm,td){
+function bcCell(p,d,B,N,yy,mm,td,startDom){
  var dn='<span class="'+bcDnCls(d,yy,mm)+'">'+d+'</span>';
+ if(d<startDom)return '<div class="bc-cc bc-pre"><div class="bc-ccd">'+dn+'</div><div class="bc-restmsg">開始前</div></div>';
  if(d>td)return '<div class="bc-cc bc-future"><div class="bc-ccd">'+dn+'</div></div>';
  var cd=bcCellData(p,d,B,N,yy,mm);
  if(cd.rest)return '<div class="bc-cc bc-rest'+(d===td?' bc-now':'')+'"><div class="bc-ccd">'+dn+'<span class="bc-rtag">休</span></div><div class="bc-restmsg">物出し休</div></div>';
@@ -2625,14 +2630,14 @@ function bcCell(p,d,B,N,yy,mm,td){
  var cls='bc-cc'+(comp?' bc-done':(u?' bc-under':''))+(d===td?' bc-now':'');
  return '<div class="'+cls+'"><div class="bc-ccd">'+dn+(comp?'<span class="bc-chk">✓</span>':'')+'</div><div class="bc-metric"><span class="bc-mlab" style="color:#1A3D6B">物</span>'+b1+'</div><div class="bc-metric"><span class="bc-mlab" style="color:#C99A14">入</span>'+n1+'</div>'+(cd.isAll?bcMem(cd):'')+'</div>';
 }
-function bcStats(p,B,N,yy,mm,td){
+function bcStats(p,B,N,yy,mm,td,startDom,DIM){
  function row(title,dotc,tag,cells){var sc='';cells.forEach(function(c){sc+='<div class="bc-sc"><div class="bc-scn'+(c[0]?' '+c[0]:'')+'">'+c[1]+'</div><div class="bc-scl">'+c[2]+'</div></div>';});return '<div class="bc-stat-row"><div class="bc-stat-big"><span style="width:11px;height:11px;border-radius:3px;background:'+dotc+';display:inline-block"></span>'+esc(title)+(tag?'<span class="bc-tag">'+tag+'</span>':'')+'</div><div class="bc-cells">'+sc+'</div></div>';}
  if(p!=='全体'&&bcExempt(p)){
-  var xb=0,xn=0;for(var d=1;d<=td;d++){if(bcRest(p,d,yy,mm))continue;xb+=(B[p]&&B[p][d])||0;xn+=(N[p]&&N[p][d])||0;}
+  var xb=0,xn=0;for(var d=startDom;d<=td;d++){if(bcRest(p,d,yy,mm))continue;xb+=(B[p]&&B[p][d])||0;xn+=(N[p]&&N[p][d])||0;}
   return row(p,BN_COL[p]||'#888','ノルマ対象外',[['',''+xb,'物出し合計'],['bc-gold',''+xn,'入稿合計']])+'<div class="bc-note">横山さんはノルマ対象外のため達成判定（色）は行いません。</div>';
  }
  var tb=0,tn=0,work=0,bA=0,nA=0,both=0;
- for(var d=1;d<=td;d++){
+ for(var d=startDom;d<=td;d++){
   var cd=bcCellData(p,d,B,N,yy,mm);if(cd.rest)continue;work++;tb+=cd.bDone;tn+=cd.nDone;
   var ba,na;
   if(p==='全体'){var active=BN_QUOTA.filter(function(s){return !bcRest(s,d,yy,mm);});ba=active.length>0&&active.every(function(s){return (((B[s]&&B[s][d])||0)>=BC_GB);});na=active.length>0&&active.every(function(s){return (((N[s]&&N[s][d])||0)>=BC_GN);});}
@@ -2643,23 +2648,29 @@ function bcStats(p,B,N,yy,mm,td){
  var title=p==='全体'?'全体':p,dotc=p==='全体'?'#1A3D6B':(BN_COL[p]||'#888'),tag=p==='全体'?'ノルマ対象4名':'';
  var cells=[['',''+tb,'物出し合計'],['bc-gold',''+tn,'入稿合計'],['',bA+'<span class="bc-scu">/'+work+'</span>','物出し達成日'],['bc-gold',nA+'<span class="bc-scu">/'+work+'</span>','入稿達成日'],['bc-green',both+'<span class="bc-scu">/'+work+'</span>','両方達成日']];
  var note=p==='全体'?'達成日＝出勤した対象者が全員ノルマ達成した日。緑＝全員達成／赤＝未達。「達成 N/M人」はその日に両方達成した人数。':'緑＝物出し・入稿の両方達成／赤＝未達。ノルマ超過は「＋N」で表示。';
- return row(title,dotc,tag,cells)+'<div class="bc-prog"><div class="bc-progbar"><div class="bc-progfill" style="width:'+rate+'%"></div></div><div class="bc-progtxt">達成率 <b>'+rate+'%</b>（両方達成 '+both+' / '+work+'日）</div></div><div class="bc-note">'+note+'</div>';
+ function wd(s){var c=0;for(var k=startDom;k<=DIM;k++){if(!bcRest(s,k,yy,mm))c++;}return c;}
+ var planLine='';
+ if(p==='全体'){var bp=0,parts=[];BN_QUOTA.forEach(function(s){var w=wd(s)*BC_GB;bp+=w;parts.push(esc(s)+w);});planLine='<div class="bc-plan">今月の計画（'+mm+'/'+startDom+'〜月末・出勤日×'+BC_GB+'件）：物出し <b>'+bp+'</b>件 ／ 入稿 <b>'+bp+'</b>件<span class="bc-plan-sub">'+parts.join('・')+'</span></div>';}
+ else{var w=wd(p)*BC_GB;planLine='<div class="bc-plan">今月の計画（'+mm+'/'+startDom+'〜月末・出勤日×'+BC_GB+'件）：物出し <b>'+w+'</b>件 ／ 入稿 <b>'+w+'</b>件</div>';}
+ return row(title,dotc,tag,cells)+'<div class="bc-prog"><div class="bc-progbar"><div class="bc-progfill" style="width:'+rate+'%"></div></div><div class="bc-progtxt">達成率 <b>'+rate+'%</b>（両方達成 '+both+' / '+work+'日）</div></div>'+planLine+'<div class="bc-note">'+note+'</div>';
 }
 function bnCalRender(){
  var mo=today().slice(0,7),yy=parseInt(mo.slice(0,4),10),mm=parseInt(mo.slice(5,7),10),td=parseInt(today().slice(8,10),10);
  var DIM=new Date(yy,mm,0).getDate();
  var D=bnData(mo),B=D.B,N=D.N,p=BN_CALP;
+ var startDom=(mo===BC_START.slice(0,7))?parseInt(BC_START.slice(8,10),10):1;
  var sel='<div class="bc-sel"><button class="bc-selbtn'+(p==='全体'?' bc-on':'')+'" onclick="bnCalSelect(\'全体\')">全体</button>';
  BN_STAFF.forEach(function(s){sel+='<button class="bc-selbtn'+(p===s?' bc-on':'')+'" onclick="bnCalSelect(\''+s+'\')"><span class="bc-seldot" style="background:'+(BN_COL[s]||'#888')+'"></span>'+esc(s)+'</button>';});
  sel+='</div>';
- var stats=bcStats(p,B,N,yy,mm,td);
+ var stats=bcStats(p,B,N,yy,mm,td,startDom,DIM);
  var first=new Date(yy,mm-1,1).getDay(),cells='';
  for(var i=0;i<first;i++)cells+='<div class="bc-cc bc-empty"></div>';
- for(var d=1;d<=DIM;d++)cells+=bcCell(p,d,B,N,yy,mm,td);
+ for(var d=1;d<=DIM;d++)cells+=bcCell(p,d,B,N,yy,mm,td,startDom);
  var wn=['日','月','火','水','木','金','土'],head='';for(var i=0;i<7;i++)head+='<div class="bc-ch '+(i===0?'bc-w0':i===6?'bc-w6':i===3?'bc-w3':'')+'">'+wn[i]+'</div>';
  var grid='<div class="bc-cal">'+head+cells+'</div>';
  var legend='<div class="bc-legend"><span><span class="bc-sw" style="background:#2e9e4f"></span>両方達成</span><span><span class="bc-sw" style="background:#e15b5b"></span>未達</span><span><span class="bc-sw" style="background:#f1f2f4"></span>休・対象外</span><span><span class="bc-dotc" style="background:#1A3D6B"></span>物出し</span><span><span class="bc-dotc" style="background:#C99A14"></span>入稿</span></div>';
- return '<div class="bc-title">物出し・入稿 達成カレンダー（'+mm+'月）　ノルマ：物出し'+BC_GB+'件／入稿'+BC_GN+'件・日</div>'+sel+stats+grid+legend;
+ var startNote=(startDom>1)?('・'+mm+'/'+startDom+'開始'):'';
+ return '<div class="bc-title">物出し・入稿 達成カレンダー（'+mm+'月'+startNote+'）　ノルマ：物出し'+BC_GB+'件／入稿'+BC_GN+'件・日</div>'+sel+stats+grid+legend;
 }
 function bnCalSelect(p){BN_CALP=p;var el=document.getElementById('bnCalWrap');if(el)el.innerHTML=bnCalRender();}
 function bnCalendar(){bnCalInjectCSS();return '<div class="bn-wrap card fade"><div id="bnCalWrap">'+bnCalRender()+'</div></div>';}
