@@ -2337,7 +2337,7 @@ function revToggleMg(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)
 function revMgMemo(id,v){var p=PROPS.find(function(x){return x.id===id;});if(p){p.mgMemo=v;save();}}
 function revEquip(id,ck){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.equipOk=ck;save();var g=document.getElementById('rv_gate');if(g)g.classList.toggle('done',ck);document.querySelectorAll('[data-chipkey="__equip"]').forEach(function(c){c.classList.toggle('done',ck);});}
 function revRegister(){var all=revItems().filter(function(p){return (p.revStatus||'un')==='ok';});var ok=all.filter(function(p){return !!p.tantou&&!!p.stars;});var noT=all.length-ok.length;if(!ok.length){toast(noT?'担当者・物件評価★が未入力の物件があります':'確認済みの物件がありません');return;}ok.forEach(function(p){p.confirmed=true;p.revStatus='un';p.regTs=p.regTs||nowTS();if(!p.regDate)p.regDate=today();});recompute();save();updateBadges();CURREV=null;renderReview();toast(ok.length+'件を入稿ページへ登録しました'+(noT?'（担当者/★未入力 '+noT+'件は保留）':'（確認済みのみ移動）'));}
-var STAFF=['弘中','横山','宮本','田邊','生沼'];
+var STAFF=['弘中','横山','宮本','田邊','生沼','五嶋','岡田'];
 function tantouTag(p){return p.tantou?('<span class="ttag">'+esc(p.tantou)+'</span>'):'';}
 var STAR_COL={5:['#a07a08','#fff4cf','#E8B30A'],4:['#b5610c','#ffe6c7','#F08A24'],3:['#2d6cb5','#e4eefb','#3B82C4'],2:['#6f7884','#eef0f3','#9AA3AE'],1:['#8b929c','#f3f5f7','#C7CCD3']};
 function starChip(n){n=+n||0;if(!n)return '<span class="ttag-none">★未評価</span>';var c=STAR_COL[n];var s='';for(var i=0;i<5;i++)s+='<svg width="10" height="10" viewBox="0 0 24 24" fill="'+(i<n?c[2]:'#dfe3e8')+'"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg>';return '<span class="starv" style="color:'+c[0]+';background:'+c[1]+'">'+s+'<b>'+n+'</b></span>';}
@@ -2432,8 +2432,8 @@ var TANTOU_WHO=null;
 function setTantouWho(n){TANTOU_WHO=n;}
 /* ===== 営業マン別 物出し・入稿 日別ダッシュボード (bn-) ===== */
 var JIRO_GAS="https://script.google.com/macros/s/AKfycbxajOtyPt0cSByjkB2n3DbeFFEM6Ema0BcjbpMd7K0Jz74nFGyuSfOB3A3Iz_Ebf0d5/exec";
-var BN_STAFF=['弘中','横山','宮本','田邊','生沼'];
-var BN_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A'};
+var BN_STAFF=['弘中','横山','宮本','田邊','生沼','五嶋','岡田'];
+var BN_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A','五嶋':'#00838F','岡田':'#AD1457'};
 var _bnJiro=null;
 function bnInjectCSS(){
  if(document.getElementById('bnStyle'))return;
@@ -2536,7 +2536,7 @@ var BN_CALP='全体';
 var BC_GB=5,BC_GN=5;
 var BC_START='2026-06-20';
 function bcRest(s,d,yy,mm){var w=new Date(yy,mm-1,d).getDay();if(w===3)return true;if(s==='田邊'&&w===2)return true;return false;}
-function bcExempt(s){return s==='横山';}
+function bcExempt(s){return s==='横山'||s==='五嶋'||s==='岡田';}
 function bnCalInjectCSS(){
  if(document.getElementById('bcStyle'))return;
  var s=document.createElement('style');s.id='bcStyle';
@@ -2636,7 +2636,7 @@ function bcStats(p,B,N,yy,mm,td,startDom,DIM){
  function row(title,dotc,tag,cells){var sc='';cells.forEach(function(c){sc+='<div class="bc-sc"><div class="bc-scn'+(c[0]?' '+c[0]:'')+'">'+c[1]+'</div><div class="bc-scl">'+c[2]+'</div></div>';});return '<div class="bc-stat-row"><div class="bc-stat-big"><span style="width:11px;height:11px;border-radius:3px;background:'+dotc+';display:inline-block"></span>'+esc(title)+(tag?'<span class="bc-tag">'+tag+'</span>':'')+'</div><div class="bc-cells">'+sc+'</div></div>';}
  if(p!=='全体'&&bcExempt(p)){
   var xb=0,xn=0;for(var d=startDom;d<=td;d++){if(bcRest(p,d,yy,mm))continue;xb+=(B[p]&&B[p][d])||0;xn+=(N[p]&&N[p][d])||0;}
-  return row(p,BN_COL[p]||'#888','ノルマ対象外',[['',''+xb,'物出し合計'],['bc-gold',''+xn,'入稿合計']])+'<div class="bc-note">横山さんはノルマ対象外のため達成判定（色）は行いません。</div>';
+  return row(p,BN_COL[p]||'#888','ノルマ対象外',[['',''+xb,'物出し合計'],['bc-gold',''+xn,'入稿合計']])+'<div class="bc-note">この担当者はノルマ対象外のため達成判定（色）は行いません。</div>';
  }
  var tb=0,tn=0,work=0,bA=0,nA=0,both=0;
  for(var d=startDom;d<=td;d++){
@@ -2647,7 +2647,7 @@ function bcStats(p,B,N,yy,mm,td,startDom,DIM){
   if(ba)bA++;if(na)nA++;if(ba&&na)both++;
  }
  var rate=work?Math.round(both/work*100):0;
- var title=p==='全体'?'全体':p,dotc=p==='全体'?'#1A3D6B':(BN_COL[p]||'#888'),tag=p==='全体'?'ノルマ対象4名':'';
+ var title=p==='全体'?'全体':p,dotc=p==='全体'?'#1A3D6B':(BN_COL[p]||'#888'),tag=p==='全体'?'ノルマ対象'+BN_QUOTA.length+'名':'';
  var cells=[['',''+tb,'物出し合計'],['bc-gold',''+tn,'入稿合計'],['',bA+'<span class="bc-scu">/'+work+'</span>','物出し達成日'],['bc-gold',nA+'<span class="bc-scu">/'+work+'</span>','入稿達成日'],['bc-green',both+'<span class="bc-scu">/'+work+'</span>','両方達成日']];
  var note=p==='全体'?'達成日＝出勤した対象者が全員ノルマ達成した日。緑＝全員達成／赤＝未達。「達成 N/M人」はその日に両方達成した人数。':'緑＝物出し・入稿の両方達成／赤＝未達。ノルマ超過は「＋N」で表示。';
  function wd(s){var c=0;for(var k=startDom;k<=DIM;k++){if(!bcRest(s,k,yy,mm))c++;}return c;}
@@ -3532,7 +3532,7 @@ function staffEquipPanel(p){
 function staffEquip(id,key,btn){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p[key]=p[key]?'':'あり';if(btn)btn.classList.toggle('on',!!p[key]);var ks=['btSep','washStand','petOk','dep0','key0','autoLock','delivBox','twoBurner'];var c=document.getElementById('eqcnt_'+id);if(c)c.textContent='あり '+ks.filter(function(k){return p[k];}).length+' / '+ks.length;save();}
 /* ===== 保留管理（hk）===== */
 var HK_SEL='全体',HK_SORT='lpvd',HK_QOPEN=false;
-var HK_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A'};
+var HK_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A','五嶋':'#00838F','岡田':'#AD1457'};
 function hkInjectCSS(){
  if(document.getElementById('hkStyle'))return;
  var s=document.createElement('style');s.id='hkStyle';
