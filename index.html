@@ -763,6 +763,7 @@ header{padding-left:54px}
  <div class="sn-coll">
   <div class="sn-it" id="tb-review" onclick="tab('review')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5l2.2 2.2L15.5 9"/><rect x="4" y="3.5" width="16" height="17" rx="3"/></svg><span class="sn-t">要データ確認</span><span class="badge" id="rvbadge" style="display:none"></span></div>
   <div class="sn-it" id="tb-staff" onclick="tab('staff')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10.5 13.5M21 3l-7 18-3.5-7.5L3 10z"/></svg><span class="sn-t">要入稿</span><span class="badge" id="stbadge" style="display:none"></span><span class="badge blue" id="stalert" style="display:none"></span></div>
+  <div class="sn-it" id="tb-horyu" onclick="tab('horyu')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg><span class="sn-t">保留管理</span><span class="badge" id="hkbadge" style="display:none"></span></div>
   <div class="sn-it" id="tb-tantou" onclick="tab('tantou')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.4a3 3 0 0 1 0 5.2"/><path d="M17.5 14.6a5.5 5.5 0 0 1 3 5.4"/></svg><span class="sn-t">反響獲得実績</span></div>
  </div>
 </div>
@@ -802,7 +803,7 @@ header{padding-left:54px}
  </div>
 </div>
 </aside>
-<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0621-bf</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
+<div class="smain"><header><h1><span class="dot"></span>花子-Hanako signal <span style="font-size:11px;color:var(--text3);font-weight:600">β</span> <span id="buildtag" style="font-size:10px;color:var(--text3);font-weight:600;border:1px solid var(--border);border-radius:5px;padding:1px 6px;margin-left:4px">build 0621-bg</span></h1><div class="sub">運を、構造化する。 <span id="dbdiag" style="font-size:11px;color:var(--text3);margin-left:8px;cursor:pointer" onclick="showDbDiag()"></span> <span id="savestate" style="font-size:11px;font-weight:700;margin-left:8px;cursor:pointer" onclick="flushPush()"></span></div></header><div id="dbbanner" style="display:none;background:#fbecea;border-bottom:1px solid #f0c2b0;color:#a83a35;font-size:12.5px;font-weight:700;padding:8px 16px;text-align:center;cursor:pointer" onclick="refreshData()">共有DBに接続できていません。保存は一時停止中です（このまま取り込み・編集してもDBに保存されません）。タップで再読込</div><div class="wrap">
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
@@ -815,6 +816,7 @@ header{padding-left:54px}
 </div>
 <div id="v-list" style="display:none"><div class="filt" id="lfilt"></div><div class="filt" id="wfilt"></div><div id="lsort"></div><div id="lbody"></div></div>
 <div id="v-staff" style="display:none"><div id="sbody"></div></div>
+<div id="v-horyu" style="display:none"><div class="planwrap" id="horyubody"></div></div>
 <div id="v-is" style="display:none"><div id="isbody"></div></div>
 <div id="v-devlock" style="display:none"><div class="card"><div class="lockwrap"><div class="lockico"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9.5" rx="2.5"/><path d="M8 11V7.8a4 4 0 0 1 8 0V11"/></svg></div><b>開発タブ</b><p>作成中の機能です。コードを入力してください。</p><input class="lockin" id="devcode" type="password" inputmode="numeric" maxlength="4" placeholder="????" onkeydown="if(event.key==='Enter')devUnlock()"><button class="lockbtn" onclick="devUnlock()">解除</button></div></div></div>
 <div id="v-opt" style="display:none"><div id="obody"></div></div>
@@ -1539,10 +1541,10 @@ function navInit(){try{_autoPaused=localStorage.getItem('ibt_autopause')==='1';}
 function tab(t){
  if(DEVTABS.indexOf(t)>=0&&!devOK()){DEVPEND=t;t='devlock';}
  CURTAB=t;
- var ALL=['dash','add','list','staff','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank','del','is','plan','tantou','regstep','devlock'];
+ var ALL=['dash','add','list','staff','horyu','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank','del','is','plan','tantou','regstep','devlock'];
  ALL.forEach(x=>{var _sh=(x===t)||(t==='regconf'&&x==='review');var v=document.getElementById('v-'+x);if(v)v.style.display=_sh?'':'none';var b=document.getElementById('tb-'+x);if(b)b.className=_sh?'sn-it on':'sn-it';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();if(t==='csv')renderHistMgr();
- var _W=document.querySelector('.wrap');if(_W)_W.classList.toggle('wide',['review','staff','mbank','gbank','del','is','plan','regconf','tantou','regstep'].indexOf(t)>=0);
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();if(t==='horyu')renderHoryu();if(t==='csv')renderHistMgr();
+ var _W=document.querySelector('.wrap');if(_W)_W.classList.toggle('wide',['review','staff','horyu','mbank','gbank','del','is','plan','regconf','tantou','regstep'].indexOf(t)>=0);
  var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}
  navClose();
  updateBadges();}
@@ -2036,7 +2038,7 @@ function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toStri
 async function regOnePend(i){var p=PEND[i];if(!p)return;if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}var prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。通信を確認して再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要入稿へ登録しました');if(!PEND.length)tab('staff');}
 async function pendToReview(i){var p=PEND[i];if(!p)return;if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}var prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');if(!PEND.length)tab('review');}
 function _tsTime(ts){return (ts&&ts.length>=16)?ts.slice(11,16):'';}
-function todayRegCard(){var td=today();var rows=PROPS.filter(function(p){return p.confirmed!==false&&p.regTs&&p.regTs.slice(0,10)===td;});if(!rows.length)return '';rows.sort(function(a,b){return (b.regTs||'').localeCompare(a.regTs||'');});
+function todayRegCard(){var td=today();var rows=PROPS.filter(function(p){return p.confirmed!==false&&((p.regTs&&p.regTs.slice(0,10)===td)||(p.nyukoTs&&p.nyukoTs.slice(0,10)===td));});if(!rows.length)return '';rows.sort(function(a,b){return (b.regTs||'').localeCompare(a.regTs||'');});
   var h='<div class="card fade trcard"><div class="sec-h2"><span class="t">今日 入稿した物件</span><span class="cntp">'+rows.length+'件</span><span class="trhint">行をタップで詳細・修正／担当はその場で変更できます</span></div><div class="trwrap"><table class="trtbl"><tr><th>登録</th><th>担当</th><th>物件名</th><th class="hcol">間取り×エリア</th><th>賃料</th><th>評価</th><th>PDF</th><th></th></tr>';
   rows.forEach(function(p){var pdfOk=!!(p.driveUrl||p.driveId);
     var sel='<select class="trtsel" onclick="event.stopPropagation()" onchange="event.stopPropagation();tantouSet(\''+p.id+'\',this.value)"><option value="">未割当</option>'+STAFF.map(function(nm){return '<option'+(p.tantou===nm?' selected':'')+'>'+esc(nm)+'</option>';}).join('')+'</select>';
@@ -2256,7 +2258,7 @@ function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
  if(r.photo!=null&&r.photo!==''&&String(p.photoCount||'')!==String(r.photo||''))d.push({f:'photoCount',label:'写真数',cur:p.photoCount||'',bj:r.photo||''});
  return d;}
 function bjMismatch(p){return !!(p.bjRef && !p.bjOkAt && bjDiff(p).length>0);}
-function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}var ac=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length;var ae=document.getElementById('stalert');if(ae){if(ac>0){ae.textContent=ac;ae.style.display='';}else{ae.style.display='none';}}}catch(e){}}
+function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}var ac=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length;var ae=document.getElementById('stalert');if(ae){if(ac>0){ae.textContent=ac;ae.style.display='';}else{ae.style.display='none';}}var hc=PROPS.filter(function(p){return p.status==='保留';}).length;var he=document.getElementById('hkbadge');if(he){if(hc>0){he.textContent=hc;he.style.display='';}else{he.style.display='none';}}}catch(e){}}
 function rvFields(p){
  var f=function(field,label,typ){return '<div class="rvf"><label>'+label+'</label>'+inEd(p.id,field,p[field],'',typ)+'</div>';};
  var statusSel='<div class="rvf"><label>状態</label>'+inSel(p.id,'status',p.status,['掲載中','要入稿','落とし済み'])+'</div>';
@@ -3513,6 +3515,7 @@ async function postStaff(id){
  p.video=document.getElementById('vd_'+id).checked;
  var mode=STAFFMODE[id]||'live';
  p.status=mode==='hold'?'保留':'掲載中';
+ p.nyukoTs=nowTS();p.nyukoDate=today();p.statusSrc='manual';p.statusSrcAt=today();
  if(!p.statusLog)p.statusLog=[];
  p.statusLog.push({memo:'要入稿ページで入稿完了（'+(mode==='hold'?'保留':'掲載中')+'）最終スコア'+finalScore(p)+'（'+kijun(finalScore(p))+'）',ts:nowTS()});
  await save();updateBadges();
@@ -3527,6 +3530,138 @@ function staffEquipPanel(p){
  return '<div class="seqcard"><div class="seqhd">設備（タップで修正可）<span class="seqcnt" id="eqcnt_'+p.id+'">あり '+on+' / '+items.length+'</span></div><div class="seqgrid">'+grid+'</div><div class="seqhint">Geminiで漏れやすい設備（オートロック・宅配BOXなど）をその場で修正できます（自動保存）。</div></div>';
 }
 function staffEquip(id,key,btn){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p[key]=p[key]?'':'あり';if(btn)btn.classList.toggle('on',!!p[key]);var ks=['btSep','washStand','petOk','dep0','key0','autoLock','delivBox','twoBurner'];var c=document.getElementById('eqcnt_'+id);if(c)c.textContent='あり '+ks.filter(function(k){return p[k];}).length+' / '+ks.length;save();}
+/* ===== 保留管理（hk）===== */
+var HK_SEL='全体',HK_SORT='lpvd',HK_QOPEN=false;
+var HK_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A'};
+function hkInjectCSS(){
+ if(document.getElementById('hkStyle'))return;
+ var s=document.createElement('style');s.id='hkStyle';
+ s.textContent=[
+  '#horyubody .hk-sel{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}',
+  '.hk-selbtn{border:1px solid #d8dee8;background:#fff;border-radius:20px;padding:6px 15px;font-family:inherit;font-size:12.5px;font-weight:600;color:#46505c;cursor:pointer;display:inline-flex;align-items:center;gap:6px}',
+  '.hk-selbtn .hk-dot{width:9px;height:9px;border-radius:3px}',
+  '.hk-selbtn.on{background:#1A3D6B;color:#fff;border-color:#1A3D6B}.hk-selbtn.on .hk-dot{display:none}',
+  '.hk-sec{margin-bottom:20px}',
+  '.hk-sechd{display:flex;align-items:center;gap:9px;margin:0 2px 9px;flex-wrap:wrap}',
+  '.hk-sechd .hk-nm{font-size:14px;font-weight:700;color:#1A3D6B}',
+  '.hk-sechd .hk-cnt{font-size:11.5px;color:#9aa2ad}.hk-sechd .hk-rule{flex:1;height:1px;background:#e7eaee}',
+  '.hk-ttag{font-size:9px;font-weight:700;color:#fff;border-radius:5px;padding:1px 6px}',
+  '.hk-lk{color:#1A3D6B;font-weight:700;cursor:pointer;border-bottom:1px dashed #b7c4d6}',
+  '.hk-stars{font-size:11px;letter-spacing:-1px;white-space:nowrap;color:#C99A14}',
+  '.hk-src{font-size:10px;font-weight:700;border-radius:6px;padding:2px 8px;white-space:nowrap}',
+  '.hk-src.man{background:#fff3df;color:#8a6d10;border:1px solid #ecd9a8}',
+  '.hk-src.wait{background:#f1f2f4;color:#7a828c;border:1px solid #e2e5e9}',
+  '.hk-spill{font-size:10px;font-weight:700;border-radius:6px;padding:2px 8px;white-space:nowrap}',
+  '.hk-spill.live{background:#e7f6ec;color:#1d7a37}.hk-spill.drop{background:#f1f2f4;color:#7a828c}',
+  '.hk-b{font-size:12.5px;font-weight:700;border-radius:9px;padding:8px 14px;border:none;cursor:pointer;font-family:inherit}',
+  '.hk-b.live{background:#1A3D6B;color:#fff}.hk-b.drop{background:#C0392B;color:#fff}',
+  '.hk-b.dropo{background:#fff;border:1px solid #f0c9c9;color:#C0392B}.hk-b.done{background:#1d8f3b;color:#fff}',
+  '.hk-b.gho{background:#fff;border:1px solid #e7eaee;color:#6a7686}.hk-b.sm{font-size:11.5px;padding:6px 11px}.hk-b:disabled{opacity:.4;cursor:default}',
+  '.hk-empty{font-size:12px;color:#9aa2ad;padding:8px 2px}',
+  '.hk-hold{background:#fff7e6;border:1px solid #f0e0b8;border-radius:11px;padding:10px 13px;margin-bottom:7px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}',
+  '.hk-hold .hk-nmn{font-size:13.5px;font-weight:700}.hk-hold .hk-info{font-size:11.5px;color:#8a7a4a}',
+  '.hk-hold .hk-days{font-size:11.5px;font-weight:700;color:#9a6a00;background:#fdeec2;border-radius:6px;padding:2px 9px}.hk-hold .hk-right{margin-left:auto;display:flex;gap:6px;align-items:center}',
+  '.hk-sortrow{display:flex;gap:5px;align-items:center;margin:0 2px 9px;flex-wrap:wrap}.hk-sortrow .hk-lab{font-size:11px;color:#9aa2ad}',
+  '.hk-sortbtn{border:1px solid #d8dee8;background:#fff;border-radius:8px;padding:5px 11px;font-family:inherit;font-size:11.5px;font-weight:600;color:#46505c;cursor:pointer}.hk-sortbtn.on{background:#eef3fb;border-color:#bcd2ee;color:#1A3D6B}',
+  '.hk-tblwrap{overflow-x:auto;border:1px solid #e7eaee;border-radius:12px;background:#fff}',
+  '.hk-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:780px}',
+  '.hk-tbl th{background:#fafbfc;color:#9aa2ad;font-size:10.5px;font-weight:600;padding:8px 9px;text-align:right;white-space:nowrap;border-bottom:1px solid #e7eaee}',
+  '.hk-tbl th.l,.hk-tbl td.l{text-align:left}.hk-tbl th.c,.hk-tbl td.c{text-align:center}',
+  '.hk-tbl td{padding:8px 9px;text-align:right;border-bottom:1px solid #f1f3f5;font-variant-numeric:tabular-nums;white-space:nowrap;vertical-align:middle}',
+  '.hk-tbl tr:last-child td{border-bottom:none}.hk-tbl .hk-psub{font-size:10.5px;color:#9aa2ad}',
+  '.hk-pvd{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}',
+  '.hk-redday{color:#C0392B;font-weight:800}.hk-reddt{background:#e76a6a}.hk-reddt .hk-pvd{color:#fff}',
+  '.hk-qsum{background:#eef5ff;border:1px solid #cfe0f4;border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}',
+  '.hk-qsum.empty{background:#fafbfc;border-color:#e7eaee;cursor:default}',
+  '.hk-qsum-l{display:flex;flex-direction:column}.hk-qsum-l b{font-size:13.5px;color:#1A3D6B}.hk-qsum-l span{font-size:11.5px;color:#6a7686;margin-top:2px}',
+  '.hk-qsum-go{margin-left:auto;font-size:12px;font-weight:700;color:#1A3D6B}',
+  '.hk-qbtns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}',
+  '.hk-qcard{background:#fff;border:1px solid #e7eaee;border-radius:10px;padding:9px 12px;margin-bottom:7px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}',
+  '.hk-qcard .hk-act{font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 9px}',
+  '.hk-qcard .hk-act.up{background:#e8f1fb;color:#1A3D6B}.hk-qcard .hk-act.dn{background:#fdeded;color:#9a2b2b}',
+  '.hk-qcard .hk-right{margin-left:auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap}',
+  '.hk-note{font-size:11px;color:#9aa2ad;margin:2px 2px 0;line-height:1.6}'
+ ].join('');
+ document.head.appendChild(s);
+}
+function hkTtag(t){return '<span class="hk-ttag" style="background:'+(HK_COL[t]||'#888')+'">'+esc(t)+'</span>';}
+function hkName(p){return (p.name||'(名称未設定)')+(p.room?' '+p.room:'');}
+function hkStars(n){n=+n||0;if(!n)return '<span style="font-size:10px;color:#aab0b9">★未評価</span>';var s='';for(var i=0;i<5;i++)s+=(i<n?'<span style="color:#C99A14">★</span>':'<span style="color:#dfe3e8">★</span>');return '<span class="hk-stars">'+s+'</span>';}
+function hkPdfBtn(id){return '<button class="hk-b gho sm" onclick="event.stopPropagation();viewPdf(\''+id+'\')">PDF</button>';}
+function hkMd(ds){if(!ds)return '';var d=new Date(String(ds).replace(/-/g,'/'));return (d.getMonth()+1)+'/'+d.getDate();}
+function hkNyukoOf(p){if(p.nyukoDate)return p.nyukoDate;if(Array.isArray(p.statusLog)){for(var i=p.statusLog.length-1;i>=0;i--){var m=p.statusLog[i];if(m&&m.memo&&m.memo.indexOf('入稿完了')>=0&&m.ts)return String(m.ts).slice(0,10);}}return p.regDate||'';}
+function hkSelOk(p){return HK_SEL==='全体'||p.tantou===HK_SEL;}
+function hkHolds(){return PROPS.filter(function(p){return p.status==='保留'&&p.confirmed!==false&&hkSelOk(p);});}
+function hkLive(){return PROPS.filter(function(p){return p.status==='掲載中'&&p.confirmed!==false&&!p.suumoTodo&&hkSelOk(p);});}
+function hkQueue(){return PROPS.filter(function(p){return p.suumoTodo&&hkSelOk(p);});}
+function hkRecent(d){if(!d)return false;var t=new Date(String(d).replace(/-/g,'/')).getTime();return (Date.now()-t)<14*86400000;}
+function hkDone(){return PROPS.filter(function(p){return !p.suumoTodo&&p.statusSrc==='manual'&&(p.status==='掲載中'||p.status==='落とし済み')&&hkRecent(p.statusSrcAt)&&hkSelOk(p);});}
+
+function hkSelector(){
+ var h='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体</button>';
+ STAFF.forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#888')+'"></span>'+esc(s)+'</button>';});
+ return h+'</div>';
+}
+function hkHoldSection(){
+ var hs=hkHolds();
+ var inner=hs.length?hs.map(function(p){var nd=hkNyukoOf(p),dd=daysSince(nd);var daysTxt=(dd!=null)?('入稿から '+Math.max(0,dd)+'日（'+hkMd(nd)+'）'):'入稿日不明';
+   return '<div class="hk-hold"><span class="hk-days">'+daysTxt+'</span>'+(HK_SEL==='全体'?hkTtag(p.tantou):'')+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkPdfBtn(p.id)+'<button class="hk-b live sm" onclick="hkPublish(\''+p.id+'\')">掲載中にする</button></span></div>';
+ }).join(''):'<div class="hk-empty">保留中の物件はありません</div>';
+ return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">保留中</span><span class="hk-cnt">'+hs.length+'件 ・ 掲載判断待ち</span><span class="hk-rule"></span></div>'+inner+'</div>';
+}
+function hkDropSection(){
+ var agg=anaAgg();var live=hkLive().slice();
+ live.sort(function(a,b){var sa=pstat(a,agg),sb=pstat(b,agg);if(HK_SORT==='days')return (sb.d||0)-(sa.d||0);var na=!sa.hasData,nb=!sb.hasData;if(na!==nb)return na?1:-1;return sa.lvAvg-sb.lvAvg;});
+ var sort='<div class="hk-sortrow"><span class="hk-lab">並び替え：</span><button class="hk-sortbtn'+(HK_SORT==='lpvd'?' on':'')+'" onclick="hkSetSort(\'lpvd\')">一覧PV/日 少ない順</button><button class="hk-sortbtn'+(HK_SORT==='days'?' on':'')+'" onclick="hkSetSort(\'days\')">掲載日数 長い順</button></div>';
+ var th='<tr>'+(HK_SEL==='全体'?'<th class="l">担当</th>':'')+'<th class="l">物件</th><th class="c">評価</th><th>賃料</th><th>一覧PV/日</th><th>詳細PV/日</th><th>累計詳細PV</th><th>掲載日数</th><th>反響</th><th></th></tr>';
+ var rows=live.map(function(p){var ss=pstat(p,agg),hd=ss.hasData;
+   var lv=hd?ss.lvAvg.toFixed(1):'—',dv=hd?ss.avg.toFixed(1):'—';
+   var redDt=hd&&ss.avg<=0.3,redDay=hd&&ss.d>=30;
+   return '<tr>'+(HK_SEL==='全体'?'<td class="l">'+hkTtag(p.tantou)+'</td>':'')
+    +'<td class="l"><span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span><div class="hk-psub">'+esc((p.station||'')+' / '+(p.madori||''))+'</div></td>'
+    +'<td class="c">'+hkStars(p.stars)+'</td>'
+    +'<td>'+(totalRent(p)?totalRent(p).toFixed(1):'—')+'</td>'
+    +'<td><div class="hk-pvd">'+lv+'</div></td>'
+    +'<td class="'+(redDt?'hk-reddt':'')+'"><div class="hk-pvd">'+dv+'</div></td>'
+    +'<td>'+(hd?ss.pv.toLocaleString():'—')+'</td>'
+    +'<td class="'+(redDay?'hk-redday':'')+'">'+((ss.d&&hd)?ss.d+'日':'—')+'</td>'
+    +'<td>'+(hd?ss.inq:'—')+'</td>'
+    +'<td><div style="display:flex;gap:5px;justify-content:flex-end">'+hkPdfBtn(p.id)+'<button class="hk-b dropo sm" onclick="hkDrop(\''+p.id+'\')">落とす</button></div></td></tr>';
+ }).join('');
+ var tbl=live.length?'<div class="hk-tblwrap"><table class="hk-tbl"><thead>'+th+'</thead><tbody>'+rows+'</tbody></table></div>':'<div class="hk-empty">掲載中の物件はありません</div>';
+ return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">落とし選定</span><span class="hk-cnt">掲載中の全物件・物件名クリックで詳細（カルテ）</span><span class="hk-rule"></span></div>'+sort+tbl+'<div class="hk-note">掲載日数30日以上＝赤字／詳細PV/日0.3以下＝赤塗り。ビジコン未反映（データなし）の物件は「—」表示で判定対象外。</div></div>';
+}
+function hkQueueSection(){
+ var qs=hkQueue();var up=qs.filter(function(p){return p.suumoAct==='掲載';}),dn=qs.filter(function(p){return p.suumoAct==='落とし';});
+ var card='<div class="hk-qsum'+(qs.length?'" onclick="hkToggleQueue()':' empty')+'"><div class="hk-qsum-l"><b>SUUMO対応待ち</b><span>'+(qs.length?('掲載予定 '+up.length+'件 ・ 落とし予定 '+dn.length+'件'):'対応待ちはありません')+'</span></div>'+(qs.length?('<span class="hk-qsum-go">'+(HK_QOPEN?'閉じる ▾':'一覧を見る ▸')+'</span>'):'')+'</div>';
+ var body='';
+ if(qs.length&&HK_QOPEN){
+  body='<div class="hk-qbtns"><button class="hk-b live" '+(up.length?'':'disabled')+' onclick="hkBulk(\'掲載\')">'+up.length+'件を掲載 一括完了</button><button class="hk-b drop" '+(dn.length?'':'disabled')+' onclick="hkBulk(\'落とし\')">'+dn.length+'件を落とし 一括完了</button></div>';
+  body+=qs.map(function(p){return '<div class="hk-qcard"><span class="hk-act '+(p.suumoAct==='掲載'?'up':'dn')+'">'+p.suumoAct+'予定</span>'+(HK_SEL==='全体'?hkTtag(p.tantou):'')+'<span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span><span class="hk-right"><span class="hk-src man">手動</span><button class="hk-b gho sm" onclick="hkSuumoOne(\''+p.id+'\')">対応済み</button></span></div>';}).join('');
+  body+='<div class="hk-note">SUUMOで実際に掲載／落としをしたら、種類ごとにまとめて完了にできます。ビジコン反映後は自動で「ビジコン確認済み」に切替わります。</div>';
+ }
+ return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">SUUMO対応待ち</span><span class="hk-cnt">押した掲載／落としの作業リスト</span><span class="hk-rule"></span></div>'+card+body+'</div>';
+}
+function hkDoneSection(){
+ var ds=hkDone();if(!ds.length)return '';
+ var inner=ds.map(function(p){var live=p.status==='掲載中';var word=live?'掲載':'落とし';
+   return '<div class="hk-qcard">'+(live?'<span class="hk-spill live">掲載中</span>':'<span class="hk-spill drop">落とし済み</span>')+(HK_SEL==='全体'?hkTtag(p.tantou):'')+'<span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span><span class="hk-right"><span class="hk-src man">手動で'+word+'</span><span class="hk-src wait">ビジコン確認待ち</span></span></div>';
+ }).join('');
+ return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">対応済み（直近）</span><span class="hk-cnt">手動はビジコン反映で自動確認に切替</span><span class="hk-rule"></span></div>'+inner+'</div>';
+}
+function renderHoryu(){
+ hkInjectCSS();
+ var host=document.getElementById('horyubody');if(!host)return;
+ host.innerHTML=hkSelector()+hkHoldSection()+hkDropSection()+hkQueueSection()+hkDoneSection();
+}
+function hkSetSel(p){HK_SEL=p;HK_QOPEN=false;renderHoryu();}
+function hkSetSort(s){HK_SORT=s;renderHoryu();}
+function hkToggleQueue(){HK_QOPEN=!HK_QOPEN;renderHoryu();}
+async function hkPublish(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.status='掲載中';p.statusSrc='manual';p.statusSrcAt=today();p.suumoTodo=true;p.suumoAct='掲載';if(!Array.isArray(p.statusLog))p.statusLog=[];p.statusLog.push({memo:'保留管理：掲載中に変更（手動・SUUMO対応待ち）',ts:nowTS()});await save();updateBadges();renderHoryu();toast('掲載中にしました → SUUMO対応待ちへ');}
+async function hkDrop(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.status='落とし済み';p.statusSrc='manual';p.statusSrcAt=today();p.suumoTodo=true;p.suumoAct='落とし';if(!Array.isArray(p.statusLog))p.statusLog=[];p.statusLog.push({memo:'保留管理：落とし済みに変更（手動・SUUMO対応待ち）',ts:nowTS()});await save();updateBadges();renderHoryu();toast('落としにしました → SUUMO対応待ちへ');}
+async function hkSuumoOne(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p.suumoTodo=false;await save();renderHoryu();toast(hkName(p)+' をSUUMO対応済みに（ビジコン確認待ち）');}
+async function hkBulk(act){var qs=hkQueue().filter(function(p){return p.suumoAct===act;});if(!qs.length)return;qs.forEach(function(p){p.suumoTodo=false;});await save();renderHoryu();toast(qs.length+'件を'+act+'で一括完了（ビジコン確認待ち）');}
+
 function staffMemoPanel(p){
  var ms=(p.memos||[]);
  var shiji=ms.filter(function(m){return m.label==='指示';});
@@ -4102,7 +4237,7 @@ function applyBijikon(forceDate){
   var _isLatest=(!p.csvAsOf||date>=p.csvAsOf||date>=_newestBj);
   var _listed=(I.listed<0)?true:/[○◯〇●⚪]/.test(String(row[I.listed]||''));
   var _rep=(I.rep<0)?true:/[○◯〇●⚪]/.test(String(row[I.rep]||''));
-  if(_isLatest){var _newSt=_listed?'掲載中':'落とし済み';if(p.status!==_newSt){p.status=_newSt;if(!Array.isArray(p.statusLog))p.statusLog=[];p.statusLog.push({memo:(_listed?'ビジコン物件掲載○＝掲載中':'ビジコン物件掲載○なし＝掲載終了')+'('+date+')',ts:nowTS()});}p.repAlert=!_rep;}
+  if(_isLatest){var _newSt=_listed?'掲載中':'落とし済み';if(p.status!==_newSt){p.status=_newSt;if(!Array.isArray(p.statusLog))p.statusLog=[];p.statusLog.push({memo:(_listed?'ビジコン物件掲載○＝掲載中':'ビジコン物件掲載○なし＝掲載終了')+'('+date+')',ts:nowTS()});p.statusSrc='bijikon';p.statusSrcAt=date;p.suumoTodo=false;}else if(p.statusSrc==='manual'){p.statusSrc='bijikon';p.statusSrcAt=date;p.suumoTodo=false;}p.repAlert=!_rep;}
   if(!p.suumoListStart||date<p.suumoListStart)p.suumoListStart=date; p.listDate=p.suumoListStart; // 掲載開始日=ビジコン初出（最早日）
   if(code&&!p.suumoCode)p.suumoCode=code;
   // 基本情報の空欄補完（ビジコン）
@@ -4139,7 +4274,7 @@ function applyBijikon(forceDate){
  });
  let ended=0;
  if(date>=_newestBj){ /* 最新日のビジコンを取り込んだ時だけ落とし判定（過去日の取込で現在の掲載中を落とさない） */
-  PROPS.forEach(p=>{if(p.status==='掲載中'&&p.csvAsOf&&!seen[p.id]){p.status='落とし済み';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン未掲載のため掲載終了('+date+')',ts:nowTS()});ended++;}});
+  PROPS.forEach(p=>{if(p.status==='掲載中'&&p.csvAsOf&&!seen[p.id]&&!(p.statusSrc==='manual'&&!p.suumoListStart)){p.status='落とし済み';if(!p.statusLog)p.statusLog=[];p.statusLog.push({memo:'ビジコン未掲載のため掲載終了('+date+')',ts:nowTS()});p.statusSrc='bijikon';p.statusSrcAt=date;p.suumoTodo=false;ended++;}});
  }
  var _bff=freshFastSweep();var _bik=autoIkariSweep();
  viewYM=_latestDataYM()||viewYM;if(!_importBatch){recompute();saveAll();flushPush();}
