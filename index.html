@@ -753,6 +753,10 @@ header{padding-left:54px}
 <button class="navtgl" id="navtgl" onclick="navToggle()" aria-label="メニュー"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <div class="navsc" id="navsc" onclick="navClose()"></div>
 <aside class="snav" id="snav">
+<div class="sn-grp" data-g="pin">
+  <div class="sn-it" id="tb-nyuko" onclick="tab('nyuko')"><span class="sn-ic" style="font-size:15px;line-height:1">🎯</span><span class="sn-t">入稿状況</span><span class="badge" id="nybadge" style="display:none"></span></div>
+  <div class="sn-it" id="tb-add" onclick="tab('add')"><span class="sn-ic" style="font-size:15px;line-height:1">🎯</span><span class="sn-t">物件登録</span></div>
+</div>
 <div class="sn-grp" data-g="top">
  <div class="sn-it on" id="tb-dash" onclick="tab('dash')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="9" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="5.5" rx="1.6"/><rect x="13.5" y="12" width="7.5" height="9" rx="1.6"/><rect x="3" y="15.5" width="7.5" height="5.5" rx="1.6"/></svg><span class="sn-t">ダッシュボード</span></div>
  <div class="sn-it" id="tb-list" onclick="tab('list')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.7" cy="6" r="1.1" fill="currentColor" stroke="none"/><circle cx="3.7" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="3.7" cy="18" r="1.1" fill="currentColor" stroke="none"/></svg><span class="sn-t">物件一覧</span></div>
@@ -765,7 +769,6 @@ header{padding-left:54px}
   <div class="sn-it" id="tb-staff" onclick="tab('staff')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10.5 13.5M21 3l-7 18-3.5-7.5L3 10z"/></svg><span class="sn-t">要入稿</span><span class="badge" id="stbadge" style="display:none"></span><span class="badge blue" id="stalert" style="display:none"></span></div>
   <div class="sn-it" id="tb-horyu" onclick="tab('horyu')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg><span class="sn-t">保留管理</span><span class="badge" id="hkbadge" style="display:none"></span></div>
   <div class="sn-it" id="tb-tantou" onclick="tab('tantou')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.4a3 3 0 0 1 0 5.2"/><path d="M17.5 14.6a5.5 5.5 0 0 1 3 5.4"/></svg><span class="sn-t">反響獲得実績</span></div>
-  <div class="sn-it" id="tb-nyuko" onclick="tab('nyuko')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V4M16 20v-6M21 20H3"/></svg><span class="sn-t">入稿状況</span><span class="badge" id="nybadge" style="display:none"></span></div>
  </div>
 </div>
 <div class="sn-grp" data-g="isg">
@@ -785,7 +788,6 @@ header{padding-left:54px}
 <div class="sn-grp" data-g="mktg">
  <div class="sn-hd" onclick="navGrp('mktg')"><span>マーケ</span><svg class="sn-arr" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 3.5l3 3 3-3"/></svg></div>
  <div class="sn-coll">
-  <div class="sn-it" id="tb-add" onclick="tab('add')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M7 9.5L12 4.5l5 5"/><path d="M4 19.5h16"/></svg><span class="sn-t">物件登録</span></div>
   <div class="sn-it" id="tb-csv" onclick="tab('csv')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><span class="sn-t">データ取り込み</span></div>
  </div>
 </div>
