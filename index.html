@@ -3592,7 +3592,7 @@ function hkStars(n){n=+n||0;if(!n)return '<span style="font-size:10px;color:#aab
 function hkPdfBtn(id){return '<button class="hk-b gho sm" onclick="event.stopPropagation();viewPdf(\''+id+'\')">PDF</button>';}
 function hkMd(ds){if(!ds)return '';var d=new Date(String(ds).replace(/-/g,'/'));return (d.getMonth()+1)+'/'+d.getDate();}
 function hkNyukoOf(p){if(p.nyukoDate)return p.nyukoDate;if(Array.isArray(p.statusLog)){for(var i=p.statusLog.length-1;i>=0;i--){var m=p.statusLog[i];if(m&&m.memo&&m.memo.indexOf('入稿完了')>=0&&m.ts)return String(m.ts).slice(0,10);}}return p.regDate||'';}
-var NYUKO_GOAL_DUE='2026-07-01';
+var NYUKO_GOAL_DUE='2026-06-30';
 var NYUKO_GOAL_TOTAL=800;
 var NYUKO_QUOTA={'弘中':120,'宮本':120,'田邊':120,'生沼':120,'横山':100,'岡田':100,'担当なし':120};
 var NYUKO_KETSU={'弘中':130,'宮本':130,'田邊':130,'生沼':130,'横山':130,'岡田':150};
@@ -3633,16 +3633,23 @@ function renderNyukoStatus(){
   var col=(r.name==='担当なし')?'#888780':((typeof BN_COL!=='undefined'&&BN_COL[r.name])||navy);
   var rem=Math.max(0,r.goal-r.total);
   var pd=daysLeft>0?Math.ceil(rem/daysLeft):rem;
-  var ketsu=(typeof NYUKO_KETSU!=='undefined'&&NYUKO_KETSU[r.name])?('付与枠'+NYUKO_KETSU[r.name]):'';
-  var hi=(r.name==='岡田')?'<span style="font-size:11px;color:'+gold+';margin-left:5px;border:1px solid '+gold+';border-radius:5px;padding:0 5px">高額・仮説</span>':(r.name==='担当なし'?'<span style="font-size:11px;color:#9aa0a6;margin-left:5px">残物件枠</span>':'');
+  var ketsuN=(typeof NYUKO_KETSU!=='undefined')?NYUKO_KETSU[r.name]:0;
+  var ref=(ketsuN?'担当枠(7-9月) <b style="color:#1f2937">'+ketsuN+'</b> ・':(r.name==='担当なし'?'残物件枠 ・':''))+dueLabel+'ノルマ <b style="color:#1f2937">'+r.goal+'</b>';
+  var hi=(r.name==='岡田')?'<span style="font-size:11px;color:'+gold+';margin-left:5px;border:1px solid '+gold+';border-radius:5px;padding:0 5px">高額・仮説</span>':'';
   var done=rem===0;
+  var pct=r.goal>0?Math.min(100,Math.round(r.total/r.goal*100)):0;
   h+='<div style="border:1px solid #e6e8ec;border-radius:12px;padding:13px 15px;background:#fff">';
-  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><span style="width:12px;height:12px;border-radius:50%;background:'+col+'"></span><span style="font-size:16px;font-weight:800;color:#1f2937">'+r.name+'</span>'+hi+'<span style="margin-left:auto;text-align:right;white-space:nowrap">'+(done?'<span style="font-size:18px;font-weight:800;color:#1a8a3c">達成 ✓</span>':'<span style="font-size:12px;color:#9aa0a6">あと</span> <span style="font-size:27px;font-weight:800;letter-spacing:-1px;color:'+navy+'">'+rem+'</span> <span style="font-size:12px;color:#9aa0a6">件</span>')+'</span></div>';
-  h+=_nyukoBar(r.total,r.goal,col);
-  h+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;font-size:13px;color:#5b626b"><span>現在 <b style="color:#1f2937">'+r.total+'</b>/'+r.goal+'</span><span>掲載 <b style="color:#1a3d6b">'+r.live+'</b></span><span>保留 <b style="color:'+gold+'">'+r.hold+'</b></span><span>'+periodLabel+' <b style="color:#1a8a3c">+'+r.recent+'</b></span>'+(done?'':'<span>1日あたり <b style="color:#c0392b">'+pd+'</b>件</span>')+(ketsu?'<span style="color:#9aa0a6">'+ketsu+'</span>':'')+'</div></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="width:12px;height:12px;border-radius:50%;background:'+col+'"></span><span style="font-size:16px;font-weight:800;color:#1f2937">'+r.name+'</span>'+hi+'<span style="margin-left:auto;font-size:12px;color:#6b7280">'+ref+'</span></div>';
+  if(done){
+   h+='<div style="display:flex;align-items:center;justify-content:center;background:#e9f5ec;border-radius:10px;padding:14px"><span style="font-size:20px;font-weight:800;color:#1a8a3c">'+dueLabel+'ノルマ 達成 ✓</span></div>';
+  }else{
+   h+='<div style="display:flex;align-items:center;justify-content:center;gap:24px;background:#eef2f8;border-radius:10px;padding:12px 14px"><div style="text-align:center"><div style="font-size:12px;color:#6b7280">'+dueLabel+'まで 残り</div><div><span style="font-size:30px;font-weight:800;letter-spacing:-1px;color:'+navy+'">'+rem+'</span> <span style="font-size:13px;color:#6b7280">件</span></div></div><div style="width:1px;height:38px;background:#d6dae0"></div><div style="text-align:center"><div style="font-size:12px;color:#6b7280">1日あたり</div><div><span style="font-size:30px;font-weight:800;letter-spacing:-1px;color:#c0392b">'+pd+'</span> <span style="font-size:13px;color:#6b7280">件</span></div></div></div>';
+  }
+  h+='<div style="height:8px;border-radius:5px;background:#eceff3;overflow:hidden;margin-top:11px"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:5px"></div></div>';
+  h+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:#5b626b"><span>現在 <b style="color:#1f2937">'+r.total+'</b>/'+r.goal+'</span><span>掲載 <b style="color:#1a3d6b">'+r.live+'</b></span><span>保留 <b style="color:'+gold+'">'+r.hold+'</b></span><span>'+periodLabel+' <b style="color:#1a8a3c">+'+r.recent+'</b></span></div></div>';
  });
  h+='</div>';
- if(otherTotal>0)h+='<div style="margin-top:10px;font-size:12px;color:#9aa0a6">※ 枠対象外（五嶋など）の入稿 '+otherTotal+'件は750の集計に含めていません。</div>';
+ if(otherTotal>0)h+='<div style="margin-top:10px;font-size:12px;color:#9aa0a6">※ 枠対象外（五嶋など）の入稿 '+otherTotal+'件は'+NYUKO_GOAL_TOTAL+'の集計に含めていません。</div>';
  el.innerHTML=h;
 }
 function hkSelOk(p){return HK_SEL==='全体'||p.tantou===HK_SEL;}
