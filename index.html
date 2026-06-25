@@ -765,6 +765,7 @@ header{padding-left:54px}
   <div class="sn-it" id="tb-staff" onclick="tab('staff')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10.5 13.5M21 3l-7 18-3.5-7.5L3 10z"/></svg><span class="sn-t">要入稿</span><span class="badge" id="stbadge" style="display:none"></span><span class="badge blue" id="stalert" style="display:none"></span></div>
   <div class="sn-it" id="tb-horyu" onclick="tab('horyu')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg><span class="sn-t">保留管理</span><span class="badge" id="hkbadge" style="display:none"></span></div>
   <div class="sn-it" id="tb-tantou" onclick="tab('tantou')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.4a3 3 0 0 1 0 5.2"/><path d="M17.5 14.6a5.5 5.5 0 0 1 3 5.4"/></svg><span class="sn-t">反響獲得実績</span></div>
+  <div class="sn-it" id="tb-nyuko" onclick="tab('nyuko')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V4M16 20v-6M21 20H3"/></svg><span class="sn-t">入稿状況</span><span class="badge" id="nybadge" style="display:none"></span></div>
  </div>
 </div>
 <div class="sn-grp" data-g="isg">
@@ -824,6 +825,7 @@ header{padding-left:54px}
 <div id="v-drop" style="display:none"><div id="dropbody"></div></div>
 <div id="v-review" style="display:none"><div id="reviewbody"></div></div>
 <div id="v-tantou" style="display:none"><div id="tantoubody"></div></div>
+<div id="v-nyuko" style="display:none"><div id="nyukobody"></div></div>
 <div id="v-regstep" style="display:none"><div id="regstepbody"></div></div>
 <div id="v-report" style="display:none"><div id="reportbody"></div></div>
 <div id="v-mbank" style="display:none"><div id="mbankbody"></div></div>
@@ -1541,10 +1543,10 @@ function navInit(){try{_autoPaused=localStorage.getItem('ibt_autopause')==='1';}
 function tab(t){
  if(DEVTABS.indexOf(t)>=0&&!devOK()){DEVPEND=t;t='devlock';}
  CURTAB=t;
- var ALL=['dash','add','list','staff','horyu','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank','del','is','plan','tantou','regstep','devlock'];
+ var ALL=['dash','add','list','staff','horyu','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank','del','is','plan','tantou','nyuko','regstep','devlock'];
  ALL.forEach(x=>{var _sh=(x===t)||(t==='regconf'&&x==='review');var v=document.getElementById('v-'+x);if(v)v.style.display=_sh?'':'none';var b=document.getElementById('tb-'+x);if(b)b.className=_sh?'sn-it on':'sn-it';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();if(t==='horyu')renderHoryu();if(t==='csv')renderHistMgr();
- var _W=document.querySelector('.wrap');if(_W)_W.classList.toggle('wide',['review','staff','horyu','mbank','gbank','del','is','plan','regconf','tantou','regstep'].indexOf(t)>=0);
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();if(t==='horyu')renderHoryu();if(t==='csv')renderHistMgr();if(t==='nyuko')renderNyukoStatus();
+ var _W=document.querySelector('.wrap');if(_W)_W.classList.toggle('wide',['review','staff','horyu','mbank','gbank','del','is','plan','regconf','tantou','nyuko','regstep'].indexOf(t)>=0);
  var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}
  navClose();
  updateBadges();}
@@ -3590,6 +3592,54 @@ function hkStars(n){n=+n||0;if(!n)return '<span style="font-size:10px;color:#aab
 function hkPdfBtn(id){return '<button class="hk-b gho sm" onclick="event.stopPropagation();viewPdf(\''+id+'\')">PDF</button>';}
 function hkMd(ds){if(!ds)return '';var d=new Date(String(ds).replace(/-/g,'/'));return (d.getMonth()+1)+'/'+d.getDate();}
 function hkNyukoOf(p){if(p.nyukoDate)return p.nyukoDate;if(Array.isArray(p.statusLog)){for(var i=p.statusLog.length-1;i>=0;i--){var m=p.statusLog[i];if(m&&m.memo&&m.memo.indexOf('入稿完了')>=0&&m.ts)return String(m.ts).slice(0,10);}}return p.regDate||'';}
+var NYUKO_GOAL_DUE='2026-06-30';
+var NYUKO_GOAL_TOTAL=700;
+var NYUKO_QUOTA={'弘中':130,'宮本':130,'田邊':130,'生沼':130,'横山':130,'岡田':50};
+var NYUKO_ORDER=['弘中','宮本','田邊','生沼','横山','岡田'];
+var NYUKO_DAYS=7;
+function setNyukoDays(n){NYUKO_DAYS=n;renderNyukoStatus();}
+function _nyukoDone(p){return p&&p.confirmed!==false&&(p.status==='掲載中'||p.status==='保留');}
+function _nyukoDaysLeft(){var due=new Date(NYUKO_GOAL_DUE+'T23:59:59');var ms=due-new Date();return Math.max(0,Math.ceil(ms/86400000));}
+function _nyukoBar(cur,goal,col){var pct=goal>0?Math.min(100,Math.round(cur/goal*100)):0;return '<div style="height:10px;border-radius:6px;background:#eceff3;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:6px"></div></div>';}
+function renderNyukoStatus(){
+ var el=document.getElementById('nyukobody');if(!el)return;
+ var cut=_isoBackN(NYUKO_DAYS);
+ function agg(name){var ps=PROPS.filter(function(p){return p.tantou===name&&_nyukoDone(p);});var live=0,hold=0,recent=0;ps.forEach(function(p){if(p.status==='掲載中')live++;else hold++;if(hkNyukoOf(p)>=cut)recent++;});return {name:name,total:ps.length,live:live,hold:hold,recent:recent,goal:NYUKO_QUOTA[name]||0};}
+ var rows=NYUKO_ORDER.map(agg);
+ var allDone=PROPS.filter(_nyukoDone);var allLive=0,allHold=0,allRecent=0;
+ allDone.forEach(function(p){if(p.status==='掲載中')allLive++;else allHold++;if(hkNyukoOf(p)>=cut)allRecent++;});
+ var allTotal=allDone.length;
+ var targetTotal=rows.reduce(function(a,r){return a+r.total;},0);
+ var otherTotal=allTotal-targetTotal;
+ var daysLeft=_nyukoDaysLeft();
+ var remain=Math.max(0,NYUKO_GOAL_TOTAL-allTotal);
+ var needDay=daysLeft>0?Math.ceil(remain/daysLeft):remain;
+ var paceDay=NYUKO_DAYS>0?(allRecent/NYUKO_DAYS):allRecent;
+ var onTrack=paceDay>=needDay;
+ var navy='#1A3D6B',gold='#C99A14';
+ var periodLabel=NYUKO_DAYS===0?'本日':('直近'+NYUKO_DAYS+'日');
+ var h='';
+ h+='<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:4px 0 14px"><span style="font-size:19px;font-weight:700;color:'+navy+'">入稿状況</span><span style="font-size:13px;color:#6b7280">目標：6/30まで 掲載＋保留で '+NYUKO_GOAL_TOTAL+'枠 ／ 残り'+daysLeft+'日</span></div>';
+ h+='<div style="display:flex;gap:6px;margin-bottom:14px;align-items:center"><span style="font-size:12px;color:#6b7280;margin-right:2px">直近</span>';
+ [[0,'本日'],[3,'3日'],[7,'7日']].forEach(function(x){var on=NYUKO_DAYS===x[0];h+='<button onclick="setNyukoDays('+x[0]+')" style="padding:4px 12px;border-radius:999px;border:1px solid '+(on?navy:'#d6dae0')+';background:'+(on?navy:'#fff')+';color:'+(on?'#fff':'#4b5563')+';font-size:13px;cursor:pointer">'+x[1]+'</button>';});
+ h+='</div>';
+ var opct=Math.min(100,Math.round(allTotal/NYUKO_GOAL_TOTAL*100));
+ h+='<div style="border:1px solid #e6e8ec;border-radius:14px;padding:16px 18px;margin-bottom:16px;background:#fff">';
+ h+='<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px"><span style="font-size:13px;color:#6b7280">全体（掲載＋保留）</span><span style="font-size:13px;color:'+(onTrack?'#1a8a3c':'#c0392b')+';font-weight:700">'+(onTrack?'ペース順調':'ペース不足')+'</span></div>';
+ h+='<div style="font-size:32px;font-weight:800;letter-spacing:-1px;color:'+navy+';margin:2px 0 6px">'+allTotal+' <span style="font-size:16px;color:#9aa0a6;font-weight:700">/ '+NYUKO_GOAL_TOTAL+'</span> <span style="font-size:14px;color:#9aa0a6;font-weight:700">（'+opct+'%）</span></div>';
+ h+=_nyukoBar(allTotal,NYUKO_GOAL_TOTAL,navy);
+ h+='<div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:#4b5563"><span>掲載 <b style="color:#1a3d6b">'+allLive+'</b></span><span>保留 <b style="color:'+gold+'">'+allHold+'</b></span><span>'+periodLabel+'入稿 <b style="color:#1a8a3c">+'+allRecent+'</b></span><span>残り <b>'+remain+'</b></span><span>必要ペース <b>'+needDay+'</b>/日</span><span>直近ペース <b>'+(Math.round(paceDay*10)/10)+'</b>/日</span>'+(otherTotal>0?'<span style="color:#9aa0a6">うち枠外 '+otherTotal+'</span>':'')+'</div></div>';
+ h+='<div style="display:flex;flex-direction:column;gap:10px">';
+ rows.forEach(function(r){var col=(typeof BN_COL!=='undefined'&&BN_COL[r.name])||navy;var rem=Math.max(0,r.goal-r.total);var hi=r.name==='岡田'?'<span style="font-size:11px;color:'+gold+';margin-left:4px">高額</span>':'';
+  h+='<div style="border:1px solid #e6e8ec;border-radius:12px;padding:12px 14px;background:#fff">';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="width:11px;height:11px;border-radius:50%;background:'+col+'"></span><span style="font-size:15px;font-weight:700;color:#1f2937">'+r.name+'</span>'+hi+'<span style="margin-left:auto;font-size:15px;font-weight:800;color:'+navy+'">'+r.total+' <span style="font-size:12px;color:#9aa0a6;font-weight:700">/ '+r.goal+'</span></span></div>';
+  h+=_nyukoBar(r.total,r.goal,col);
+  h+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:#5b626b"><span>掲載 <b style="color:#1a3d6b">'+r.live+'</b></span><span>保留 <b style="color:'+gold+'">'+r.hold+'</b></span><span>'+periodLabel+' <b style="color:#1a8a3c">+'+r.recent+'</b></span><span>残り <b>'+rem+'</b></span></div></div>';
+ });
+ h+='</div>';
+ if(otherTotal>0)h+='<div style="margin-top:10px;font-size:12px;color:#9aa0a6">※ 枠対象外の担当（五嶋・未割当など）の入稿 '+otherTotal+'件は全体には含み、担当別カードには表示していません。</div>';
+ el.innerHTML=h;
+}
 function hkSelOk(p){return HK_SEL==='全体'||p.tantou===HK_SEL;}
 function hkHolds(){return PROPS.filter(function(p){return p.status==='保留'&&p.confirmed!==false&&hkSelOk(p);});}
 function hkLive(){return PROPS.filter(function(p){return p.status==='掲載中'&&p.confirmed!==false&&!p.suumoTodo&&hkSelOk(p);});}
