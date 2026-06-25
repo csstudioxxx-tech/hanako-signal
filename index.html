@@ -5006,14 +5006,14 @@ function _saveDB(){ if(typeof saveAll==='function'){saveAll();} else if(typeof s
 function _tanCfgDef(){return {rent:80000,adRate:70,llRate:50,moveRate:40,wifiRate:30,ll:12000,move:5000,wifi:20000,brokerMult:1.1};}
 function normTanCfg(c){return {rent:+c.rent||0,adRate:+c.adRate||0,llRate:+c.llRate||0,moveRate:+c.moveRate||0,wifiRate:+c.wifiRate||0,ll:(c.ll!=null?+c.ll:12000),move:(c.move!=null?+c.move:5000),wifi:(c.wifi!=null?+c.wifi:20000),brokerMult:(c.brokerMult!=null?+c.brokerMult:1.1)};}
 function tankaCompute(c){c=c||_tanCfgDef();var rent=+c.rent||0,bm=(c.brokerMult!=null?+c.brokerMult:1.1);var comps=[{key:'broker',label:'仲介手数料',amt:rent*bm,rate:100},{key:'ad',label:'AD',amt:rent,rate:+c.adRate||0},{key:'ll',label:'ライフライン',amt:(c.ll!=null?+c.ll:12000),rate:+c.llRate||0},{key:'move',label:'引っ越し',amt:(c.move!=null?+c.move:5000),rate:+c.moveRate||0},{key:'wifi',label:'Wi-Fi',amt:(c.wifi!=null?+c.wifi:20000),rate:+c.wifiRate||0}];var total=0;comps.forEach(function(x){x.ev=x.amt*x.rate/100;total+=x.ev;});return {comps:comps,total:total,man:total/10000};}
-function _planDef(){return {m:[7,7,7],hk:100,ap:40,at:70,ct:25,tanCfg:_tanCfgDef(),apoCfg:_apoCfgDef(),updated:''};}
-function planOf(name){var e=EVENTS['PLAN__'+name]; if(!(e&&e.kind==='plan')){var d=_planDef();return {m:d.m.slice(),hk:d.hk,ap:d.ap,at:d.at,ct:d.ct,tanCfg:d.tanCfg,tan:tankaCompute(d.tanCfg).man,apoCfg:_apoCfgDef(),updated:''};}
+function _planDef(){return {m:[7,7,7],kr:100,hk:100,ap:40,at:70,ct:25,tanCfg:_tanCfgDef(),apoCfg:_apoCfgDef(),updated:''};}
+function planOf(name){var e=EVENTS['PLAN__'+name]; if(!(e&&e.kind==='plan')){var d=_planDef();return {m:d.m.slice(),kr:d.kr,hk:d.hk,ap:d.ap,at:d.at,ct:d.ct,tanCfg:d.tanCfg,tan:tankaCompute(d.tanCfg).man,apoCfg:_apoCfgDef(),updated:''};}
  var tanCfg=(e.tanCfg&&typeof e.tanCfg==='object')?normTanCfg(e.tanCfg):null;
  var tan=tanCfg?tankaCompute(tanCfg).man:(+e.tan||0);
  var apoCfg=(e.apoCfg&&typeof e.apoCfg==='object')?normApoCfg(e.apoCfg):null;
  var ap=apoCfg?apoEff(apoCfg):(+e.ap||0);
- return {m:[+(e.m&&e.m[0])||0,+(e.m&&e.m[1])||0,+(e.m&&e.m[2])||0],hk:+e.hk||0,ap:ap,at:+e.at||0,ct:+e.ct||0,tanCfg:tanCfg,tan:tan,apoCfg:apoCfg,updated:e.updated||''};}
-function savePlanObj(name,o){var rec={kind:'plan',m:[+o.m[0]||0,+o.m[1]||0,+o.m[2]||0],hk:+o.hk||0,ap:+o.ap||0,at:+o.at||0,ct:+o.ct||0,tan:+o.tan||0,updated:nowTS()};if(o.tanCfg)rec.tanCfg=normTanCfg(o.tanCfg);if(o.apoCfg){rec.apoCfg=normApoCfg(o.apoCfg);rec.ap=apoEff(rec.apoCfg);}EVENTS['PLAN__'+name]=rec;_saveDB();}
+ return {m:[+(e.m&&e.m[0])||0,+(e.m&&e.m[1])||0,+(e.m&&e.m[2])||0],kr:(e.kr!=null?+e.kr:100),hk:+e.hk||0,ap:ap,at:+e.at||0,ct:+e.ct||0,tanCfg:tanCfg,tan:tan,apoCfg:apoCfg,updated:e.updated||''};}
+function savePlanObj(name,o){var rec={kind:'plan',m:[+o.m[0]||0,+o.m[1]||0,+o.m[2]||0],kr:(o.kr!=null?+o.kr:100),hk:+o.hk||0,ap:+o.ap||0,at:+o.at||0,ct:+o.ct||0,tan:+o.tan||0,updated:nowTS()};if(o.tanCfg)rec.tanCfg=normTanCfg(o.tanCfg);if(o.apoCfg){rec.apoCfg=normApoCfg(o.apoCfg);rec.ap=apoEff(rec.apoCfg);}EVENTS['PLAN__'+name]=rec;_saveDB();}
 function passOf(name){var e=EVENTS['PASS__'+name]; return (e&&e.kind==='pass'&&e.pw)?String(e.pw):'1111';}
 function savePassObj(name,pw){EVENTS['PASS__'+name]={kind:'pass',pw:String(pw)};_saveDB();}
 function _salTiersDef(){return [{from:150,rate:10},{from:200,rate:20},{from:250,rate:30},{from:300,rate:30},{from:350,rate:40},{from:400,rate:50}];}
@@ -5033,7 +5033,7 @@ function betaScn(){var e=EVENTS['BETA__scn']; return (e&&e.kind==='scn'&&Array.i
 function saveBetaScnObj(list){EVENTS['BETA__scn']={kind:'scn',list:list};_saveDB();}
 
 /* ---- 計算（個人） ---- */
-function funnelMonth(p,slots){var inq=slots*(p.hk/100);var apo=inq*(p.ap/100);var visit=apo*(p.at/100);var ctr=visit*(p.ct/100);var sales=ctr*p.tan;return {slots:slots,inq:inq,apo:apo,visit:visit,ctr:ctr,sales:sales};}
+function funnelMonth(p,slots){var inq=slots*((p.kr!=null?p.kr:100)/100)*(p.hk/100);var apo=inq*(p.ap/100);var visit=apo*(p.at/100);var ctr=visit*(p.ct/100);var sales=ctr*p.tan;return {slots:slots,inq:inq,apo:apo,visit:visit,ctr:ctr,sales:sales};}
 function funnelQ(p){var ms=[funnelMonth(p,p.m[0]),funnelMonth(p,p.m[1]),funnelMonth(p,p.m[2])];var q={slots:0,inq:0,apo:0,visit:0,ctr:0,sales:0};ms.forEach(function(m){q.slots+=m.slots;q.inq+=m.inq;q.apo+=m.apo;q.visit+=m.visit;q.ctr+=m.ctr;q.sales+=m.sales;});return {months:ms,q:q,visitRate:(p.ap/100)*(p.at/100)*100,apo2ctr:(p.at/100)*(p.ct/100)*100};}
 
 /* ---- 計算（β） ---- */
@@ -5152,7 +5152,8 @@ function renderPlanPerson(name){
   +'<input type="number" class="pl-num" id="n_m'+i+'" min="0" max="100" step="1" value="'+p.m[i]+'" oninput="'+onm(i)+'">'
   +'<input type="range" class="pl-rng" id="s_m'+i+'" min="0" max="100" step="1" value="'+p.m[i]+'" oninput="'+onm(i)+'"></div>';}
  h+='</div>';
- h+=rowSlider('反響率','枠数→反響','hk',p.hk,0,300,1,'%',on('hk'));
+ h+=rowSlider('枠回転率','枠→総掲載（差し替え含む）','kr',(p.kr!=null?p.kr:100),100,400,5,'%',on('kr'));
+ h+=rowSlider('反響率','総掲載→反響','hk',p.hk,0,300,1,'%',on('hk'));
  h+='<div class="pl-tankrow" id="pl_aporow" onclick="apoOpen(\''+name+'\')"><div class="k">アポ設定率<small>反響→アポ設定・TELあり/なしの分岐から算出</small></div><div class="pl-tankval"><span id="pl_apoeff">'+plN(p.ap)+'</span><small>%</small></div><div class="pl-tankyen">タップで分岐設定</div><button class="pl-btn pri sm" onclick="event.stopPropagation();apoOpen(\''+name+'\')">分岐設定</button></div>';
  h+=rowSlider('アポ参加率','アポ設定→来店','at',p.at,0,100,1,'%',on('at'));
  h+=rowSlider('契約率','来店→契約','ct',p.ct,0,100,1,'%',on('ct'));
@@ -5175,35 +5176,62 @@ function planInput(name,field,val,idx){
 function renderPlanResults(name){
  var host=document.getElementById('plan_results'); if(!host)return;
  var p=PLAN_EDIT; var R=funnelQ(p); var q=R.q; var floor=salOf(name).plan; var mn=['7月','8月','9月'];
+ var kr=(p.kr!=null?+p.kr:100); var totQ=q.slots*kr/100; var sashiQ=Math.max(0,totQ-q.slots);
+ var _sm=function(n){return plN(n/3);};
  var h='';
  if(floor>0&&q.sales<floor){h+='<div class="pl-alert bad"><span class="ic">!</span>クオーター計画売上 '+plMan(q.sales)+' が、想定売上計画 '+plMan(floor)+' を下回っています（不足 '+plMan(floor-q.sales)+'）。枠数や各率を見直してください。</div>';}
  else if(floor>0){h+='<div class="pl-alert good"><span class="ic">&#10003;</span>クオーター計画売上 '+plMan(q.sales)+' は想定売上計画 '+plMan(floor)+' を達成（+'+plMan(q.sales-floor)+'）。</div>';}
- var _sm=function(n){return plN(n/3);};
- var _fst=function(l,v){return '<div style="background:#f5f6f8;border-radius:9px;padding:9px 4px"><div style="font-size:10.5px;color:#8e8e93">'+l+'</div><div style="font-size:17px;font-weight:700;color:#1d1d1f">'+v+'</div></div>';};
+ // 個人計画値
  h+='<div class="pl-card"><div class="pl-h">個人計画値</div><div style="display:flex;align-items:stretch;text-align:center">'
   +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">単月売上</div><div style="font-size:30px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_sm(q.sales)+'<small style="font-size:12px;color:#6e6e73"> 万円</small></div><div style="width:40px;height:2px;background:#1A3D6B;margin:7px auto 0"></div></div>'
   +'<div style="width:1px;background:#e3e3e6;margin:0 16px"></div>'
   +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">Q売上</div><div style="font-size:30px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+plN(q.sales)+'<small style="font-size:12px;color:#6e6e73"> 万円</small></div><div style="width:40px;height:2px;background:#C99A14;margin:7px auto 0"></div></div>'
   +'</div></div>';
+ // 単月ファネル（契約・売上 強調／総掲載数=差し替え併記）
+ var _st=function(l,v,sub){return '<div style="background:#f5f6f8;border-radius:9px;padding:9px 4px"><div style="font-size:10.5px;color:#8e8e93">'+l+'</div><div style="font-size:17px;font-weight:700;color:#1d1d1f">'+v+'</div><div style="font-size:9.5px;color:#8e8e93;margin-top:1px">'+(sub||'&nbsp;')+'</div></div>';};
  h+='<div class="pl-card"><div class="pl-h">単月ファネル<span class="sm">クオーター計画 ÷ 3</span></div>'
-  +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">'
-  +_fst('付与枠',_sm(q.slots))+_fst('反響',_sm(q.inq))+_fst('アポ設定',_sm(q.apo))+_fst('来店',_sm(q.visit))
+  +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;text-align:center">'
+  +_st('付与枠',_sm(q.slots))+_st('総掲載数',_sm(totQ),'差替 '+_sm(sashiQ))+_st('反響',_sm(q.inq))+_st('アポ設定',_sm(q.apo))+_st('来店',_sm(q.visit))
   +'</div>'
   +'<div style="display:flex;align-items:stretch;text-align:center;margin-top:12px;padding-top:14px;border-top:1px solid #e3e3e6">'
   +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">契約</div><div style="font-size:32px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_sm(q.ctr)+'<small style="font-size:12px;color:#6e6e73"> 件</small></div><div style="width:44px;height:2px;background:#1d8f3b;margin:7px auto 0"></div></div>'
   +'<div style="width:1px;background:#e3e3e6;margin:0 16px"></div>'
   +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">売上</div><div style="font-size:32px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_sm(q.sales)+'<small style="font-size:12px;color:#6e6e73"> 万</small></div><div style="width:44px;height:2px;background:#C99A14;margin:7px auto 0"></div></div>'
   +'</div></div>';
- h+='<div class="pl-card"><div class="pl-h">クオーター ファネル（3ヶ月合計）</div>'+planFunnelHtml(q)+'</div>';
- h+='<div class="pl-card"><div class="pl-h">契約数・売上</div><div class="pl-bignum">'
-  +'<div class="pl-big accent"><div class="l">クオーター売上</div><div class="v">'+plN(q.sales)+'<small>万</small></div></div>'
-  +'<div class="pl-big"><div class="l">クオーター契約数</div><div class="v">'+plN(q.ctr)+'<small>件</small></div></div></div>';
+ // 第3Q計画ファネル図（3ヶ月の計画・S=単月）
+ h+='<div class="pl-card"><div class="pl-h">第3Q計画ファネル図（3ヶ月の計画）</div>'+planFunnelSVG(q,kr,p)+'</div>';
+ // 月別テーブル（詳細）
+ h+='<div class="pl-card"><div class="pl-h">月別の内訳</div>';
  h+='<table class="pl-mtab"><thead><tr><th>月</th><th>枠数</th><th>反響</th><th>アポ設定</th><th>来店</th><th>契約</th><th>売上(万)</th></tr></thead><tbody>';
  R.months.forEach(function(m,i){h+='<tr><td>'+mn[i]+'</td><td>'+plN(m.slots)+'</td><td>'+plN(m.inq)+'</td><td>'+plN(m.apo)+'</td><td>'+plN(m.visit)+'</td><td>'+plN(m.ctr)+'</td><td>'+plN(m.sales)+'</td></tr>';});
  h+='<tr class="tot"><td>Q計</td><td>'+plN(q.slots)+'</td><td>'+plN(q.inq)+'</td><td>'+plN(q.apo)+'</td><td>'+plN(q.visit)+'</td><td>'+plN(q.ctr)+'</td><td>'+plN(q.sales)+'</td></tr>';
  h+='</tbody></table>';
  h+='<div class="pl-mini"><span>来店率：<b>'+plPct(R.visitRate)+'</b>（アポ設定率×アポ参加率）</span><span>アポ設定→契約率：<b>'+plPct(R.apo2ctr)+'</b>（アポ参加率×契約率）</span></div></div>';
  host.innerHTML=h;
+}
+function planFunnelSVG(q,kr,p){
+ var totQ=q.slots*kr/100;
+ var stages=[['付与枠',q.slots],['総掲載数',totQ],['反響',q.inq],['アポ設定',q.apo],['来店',q.visit],['契約',q.ctr]];
+ var rates=['枠回転 '+plR1(kr)+'%','反響 '+plR1(p.hk)+'%','設定 '+plR1(p.ap)+'%','来店 '+plR1(p.at)+'%','契約 '+plR1(p.ct)+'%'];
+ var blues=['#cfe0f7','#bcd4f3','#a4c4ef','#7fa9e6','#5b8fdd','#3f78d2'];
+ var W=860,H=252,pad=8,seg=(W-pad*2)/6,cy=150,hL=[128,120,108,94,80,66];
+ var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block">';
+ var r,i,rx,cw,cxx,x,h1,h2,tc;
+ for(r=0;r<5;r++){ rx=pad+seg*(r+1);
+  svg+='<line x1="'+rx+'" y1="46" x2="'+rx+'" y2="'+(cy-hL[r+1]/2)+'" stroke="#d3dae6" stroke-width="1" stroke-dasharray="3 3"/>';
+  cw=84;cxx=rx-cw/2;
+  svg+='<rect x="'+cxx+'" y="22" width="'+cw+'" height="24" rx="12" fill="#fff" stroke="#d8e1f0"/>';
+  svg+='<text x="'+rx+'" y="38" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1565C0">'+rates[r]+'</text>'; }
+ var sy=cy+hL[0]/2+22;
+ for(i=0;i<6;i++){ x=pad+i*seg;h1=hL[i];h2=(i<5?hL[i+1]:hL[5]*0.8);tc=i>=3?'#fff':'#1f3a63';
+  svg+='<polygon points="'+x+','+(cy-h1/2)+' '+(x+seg)+','+(cy-h2/2)+' '+(x+seg)+','+(cy+h2/2)+' '+x+','+(cy+h1/2)+'" fill="'+blues[i]+'"/>';
+  svg+='<text x="'+(x+seg/2)+'" y="'+(cy-8)+'" text-anchor="middle" font-size="12" fill="'+tc+'">'+stages[i][0]+'</text>';
+  svg+='<text x="'+(x+seg/2)+'" y="'+(cy+15)+'" text-anchor="middle" font-size="21" font-weight="800" fill="'+tc+'">'+plN(stages[i][1])+'</text>';
+  svg+='<text x="'+(x+seg/2)+'" y="'+sy+'" text-anchor="middle" font-size="11.5" fill="#8a93a3">S '+plN(stages[i][1]/3)+'</text>'; }
+ svg+='</svg>';
+ var out='<div style="display:flex;gap:12px;margin-top:10px"><div style="flex:1.4;background:#f7f1df;border-radius:12px;padding:12px 14px"><div style="font-size:11px;color:#C99A14;font-weight:600">第3Q 売上（3ヶ月）</div><div style="font-size:26px;font-weight:800;color:#C99A14;letter-spacing:-.5px">'+plN(q.sales)+'<small style="font-size:13px"> 万</small></div></div>'
+  +'<div style="flex:1;background:#f5f6f8;border-radius:12px;padding:12px 14px"><div style="font-size:11px;color:#8e8e93">単月（S）</div><div style="font-size:20px;font-weight:700;color:#6e6e73;letter-spacing:-.5px">'+plN(q.sales/3)+'<small style="font-size:12px"> 万</small></div></div></div>';
+ return svg+out;
 }
 function planSave(name){ savePlanObj(name,PLAN_EDIT); var s=document.getElementById('plan_saved'); if(s)s.textContent='保存しました '+nowTS().replace('T',' '); toast(name+'の計画を保存しました'); }
 
