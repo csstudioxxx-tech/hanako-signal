@@ -712,6 +712,24 @@ header{padding-left:54px}
 .rsprog-note{margin-left:auto;font-size:11px;color:#9aa3b0;font-weight:600}
 .rsff.empty input{border-color:#E8920A !important;background:#fff5e6 !important}
 .rsreq{font-size:9px;font-weight:800;color:#fff;background:#2a6df5;padding:1px 6px;border-radius:99px;vertical-align:1px}
+.netcnt{font-size:11px;color:var(--text3)}.netcnt.over{color:var(--red);font-weight:800}.netcnt.ok{color:var(--green)}
+.nybar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.nybar .nyl{font-size:11px;font-weight:700;color:var(--text2);margin-right:2px}
+.nychip{appearance:none;border:1px solid var(--border);background:#fff;color:var(--text2);font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;cursor:pointer;font-family:inherit}
+.nychip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nkrow{border:1px solid var(--border);border-radius:9px;background:var(--bg);padding:9px 11px;margin-bottom:8px}
+.nkrow-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.nkl{font-size:11px;font-weight:700;color:var(--text2)}
+.nkv{font-size:13.5px;color:var(--text);line-height:1.55;white-space:pre-wrap}
+.nkempty{color:var(--text3)}
+.nkmeta{font-size:12px;color:var(--text2);margin-bottom:8px}
+.nkmeta b{color:var(--text);font-weight:800}
+.nkopt{margin:6px 0 4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.optpill{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px}
+.optpill.yes{background:var(--green-bg);color:var(--green)}
+.optpill.pick{background:var(--accent-soft);color:var(--accent2)}
+.optpill.no{background:var(--gray-bg);color:var(--gray-tx)}
+.nkmemo{font-size:12.5px;color:#6b5828;background:#fffaf0;border:1px solid #f3d9a8;border-radius:8px;padding:8px 10px;margin-top:6px}
 .rsopttag{font-size:9px;font-weight:700;color:#9aa3b0;background:#eef1f5;padding:1px 6px;border-radius:99px;vertical-align:1px}
 .rsact{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
 .rsact .btn{flex:1;min-width:130px}
@@ -2009,6 +2027,17 @@ var REGSTEP_I=0;
 function regStepGo(i){var n=PEND.length;if(!n)return;REGSTEP_I=Math.max(0,Math.min(n-1,i));renderRegStep();}
 function setPendShokan(i,v){if(PEND[i])PEND[i].shokan=v;}
 function setPendTantou(i,v){if(PEND[i])PEND[i].tantou=v;renderRegStep();}
+var NETTPL_DEF={k:[{label:'駅近・好立地',text:'駅徒歩5分の好立地物件'},{label:'ペット相談可',text:'ペット相談可◎の暮らしやすい住まい'},{label:'初期費用おさえめ',text:'初期費用を抑えてご入居いただけます'},{label:'リノベ済み',text:'フルリノベ済みの綺麗なお部屋'},{label:'陽当たり良好',text:'陽当たり良好の南向き住戸'}],c:[{label:'スタンダード',text:'陽当たり・通風良好の明るいお部屋です。周辺にはスーパーやコンビニが揃い、生活利便性も抜群。お気軽にお問い合わせください。'},{label:'ファミリー向け',text:'ファミリーに嬉しい広々とした間取り。学校や公園が近く子育て環境も良好で、収納も充実しています。'},{label:'単身向け',text:'単身の方にぴったりのコンパクトなお部屋。駅近で通勤通学に便利、買い物施設も充実しています。'},{label:'ペット可',text:'ペット相談可の暮らしやすい住まい。大切な家族と一緒に新生活を。周辺は散歩コースも豊富です。'}]};
+function netTpls(kind){try{var raw=EVENTS['NETTPL__'+kind];return raw?JSON.parse(raw):NETTPL_DEF[kind];}catch(e){return NETTPL_DEF[kind];}}
+function netLimit(kind){return kind==='k'?30:100;}
+function netLen(s){return Array.from(s||'').length;}
+function setPendNet(i,field,val){if(!PEND[i])return;PEND[i][field]=val;var kind=(field==='netKatch')?'k':(field==='netComment')?'c':'';if(kind){var cn=document.getElementById('netcnt_'+kind);if(cn){var n=netLen(val),lim=netLimit(kind);cn.textContent=n+' / '+lim;cn.className='netcnt'+(n>lim?' over':(n>0?' ok':''));}}_pendProgRefresh();}
+function setPendNyuko(i,v){if(PEND[i])PEND[i].nyukoTanto=v;_pendProgRefresh();}
+function setPendPost(i,v){if(PEND[i])PEND[i].postIntent=v;renderRegStep();}
+function setPendAV(i,v){if(PEND[i])PEND[i].areaVideo=v;renderRegStep();}
+function setPendSP(i,v){if(PEND[i])PEND[i].smaPick=v;renderRegStep();}
+function applyNetTpl(i,kind,idx){if(idx===''||!PEND[i])return;var t=netTpls(kind)[+idx];if(!t)return;var field=kind==='k'?'netKatch':'netComment';var cur=PEND[i][field]||'';if(cur.trim()!==''&&!confirm('現在の入力をテンプレートで置き換えますか？'))return;PEND[i][field]=t.text;renderRegStep();}
+function netTplNew(kind){var label=prompt('テンプレート名');if(!label)return;var text=prompt(kind==='k'?'キャッチ本文（30文字以内）':'キャッチコメント本文（100文字以内）');if(!text)return;if(netLen(text)>netLimit(kind)){toast(netLimit(kind)+'文字以内で登録してください');return;}var list=netTpls(kind).slice();list.push({label:label.trim(),text:text.trim()});EVENTS['NETTPL__'+kind]=JSON.stringify(list);try{_saveDB();}catch(e){}renderRegStep();toast('テンプレートを登録しました');}
 function setPendStars(i,v){if(PEND[i])PEND[i].stars=(PEND[i].stars===v?0:v);renderRegStep();}
 function setPendEquip(i,k,ck){if(PEND[i])PEND[i][k]=ck?'あり':'';}
 function pendStars(i){var cur=+(PEND[i].stars||0);var s='';for(var k=1;k<=5;k++){s+='<button type="button" class="spk" onclick="setPendStars('+i+','+k+')"><svg width="26" height="26" viewBox="0 0 24 24" fill="'+(cur>=k?'#E8B30A':'#dfe3e8')+'"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg></button>';}return '<div class="starpick">'+s+'<span class="spk-lab">'+(cur?'★'+cur:'未評価（必須）')+'</span></div>';}
@@ -2031,14 +2060,14 @@ function regFeatAdd(i,f){var p=PEND[i];if(!p)return;if(!p.memos)p.memos=[];if(p.
 function regTplNew(i){var name=(prompt('テンプレ名を入力（例：初期費用格安）','')||'').trim();if(!name)return;var body=(prompt('テンプレ本文を入力','')||'').trim();if(!body)return;var list=cmtTpls().slice();list.push({name:name,body:body});EVENTS['CMTTPL__list']=JSON.stringify(list);save();toast('テンプレ「'+name+'」を追加（全員で共有）');renderRegStep();}
 function viewPendPdf(i){var p=PEND[i];if(!p||!p.pdfData){toast('PDFがありません');return;}try{var bin=atob(p.pdfData);var u8=new Uint8Array(bin.length);for(var k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));var w=window.open(url,'_blank');if(!w){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}setTimeout(function(){URL.revokeObjectURL(url);},60000);}catch(e){toast('PDFを開けませんでした');}}
 /* ===== 物件ごと登録・必須チェック（データ確認画面 C+A案） ===== */
-function _pendReqKeys(){return ['name','room','madori','area','structure','age','line','station','walkMin','address','rent','mgmtFee','deposit','keyMoney','mgmtCo'];}
+function _pendReqKeys(){return ['name','room','madori','area','structure','age','line','station','walkMin','address','rent','mgmtFee','deposit','keyMoney','mgmtCo','propNo'];}
 function _pendReqTotal(){return _pendReqKeys().length+2;}
 function pendFieldEmpty(p,k){return !String(p&&p[k]!=null?p[k]:'').trim();}
-function pendRemain(p){if(!p)return _pendReqTotal();var n=0;_pendReqKeys().forEach(function(k){if(pendFieldEmpty(p,k))n++;});if(!p.tantou)n++;if(!(+p.stars>0))n++;return n;}
+function pendRemain(p){if(!p)return _pendReqTotal();var n=0;_pendReqKeys().forEach(function(k){if(pendFieldEmpty(p,k))n++;});if(!p.tantou)n++;if(!(+p.stars>0))n++;if(!String(p.nyukoTanto||'').trim())n++;var _k=String(p.netKatch||'').trim();if(!_k||Array.from(p.netKatch||'').length>30)n++;var _c=String(p.netComment||'').trim();if(!_c||Array.from(p.netComment||'').length>100)n++;return n;}
 function pendReqOk(p){return !!p&&p.auto!=='読取中…'&&pendRemain(p)===0;}
 function pendFieldInput(i,k,v){if(PEND[i])PEND[i][k]=v;_pendProgRefresh();}
 function _pendProgRefresh(){var p=PEND[REGSTEP_I];if(!p)return;var rem=pendRemain(p);var rn=document.getElementById('rsRemN');if(rn)rn.textContent=rem;var pr=document.getElementById('rsProg');if(pr){pr.classList.toggle('ok',!rem);var t=pr.querySelector('.rsprog-t');if(t)t.textContent=rem?'残り必須項目':'必須すべて入力済み ✓';}_pendReqKeys().forEach(function(k){var w=document.querySelector('.rsff[data-rk="'+k+'"]');if(w)w.classList.toggle('empty',pendFieldEmpty(p,k));});var og=document.getElementById('rsOneGo');if(og){og.disabled=!pendReqOk(p);og.textContent=pendReqOk(p)?'この物件を要入稿へ ✓':'この物件を要入稿へ（残'+rem+'）';}var bk=document.getElementById('rsBulk');if(bk){var rdy=PEND.filter(pendReqOk).length;bk.disabled=!rdy;bk.textContent=rdy+'件の登録物件を要入稿へ';}}
-function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toString(36).slice(2,5);var log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});return {id:id,status:'要入稿',confirmed:(confirmed!==false),regTs:nowTS(),bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:true,waku:p.waku||'その他',suumoCode:'',pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,statusLog:log,regDate:today(),tantou:(p.tantou||''),shokan:(p.shokan||''),memos:(p.memos||[]),stars:(+p.stars||0),comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:false,specArea:false,video:false,optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''};}
+function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toString(36).slice(2,5);var log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});return {id:id,status:'要入稿',confirmed:(confirmed!==false),regTs:nowTS(),bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:true,waku:p.waku||'その他',suumoCode:'',pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,statusLog:log,regDate:today(),tantou:(p.tantou||''),shokan:(p.shokan||''),memos:(p.memos||[]),stars:(+p.stars||0),comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:true,specArea:(p.areaVideo==='得エリア'),video:(p.areaVideo==='動画CM'),areaVideo:(p.areaVideo||'指定なし'),smaPick:(p.smaPick||''),nyukoTanto:(p.nyukoTanto||''),netKatch:(p.netKatch||''),netComment:(p.netComment||''),netMemo:(p.netMemo||''),postIntent:(p.postIntent||'live'),optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''};}
 async function regOnePend(i){var p=PEND[i];if(!p)return;if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}var prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。通信を確認して再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要入稿へ登録しました');if(!PEND.length)tab('staff');}
 async function pendToReview(i){var p=PEND[i];if(!p)return;if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}var prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');if(!PEND.length)tab('review');}
 function _tsTime(ts){return (ts&&ts.length>=16)?ts.slice(11,16):'';}
@@ -2069,11 +2098,38 @@ function renderRegStep(){
  var _ed=(REGMEMO_EDIT>=0&&p.memos&&p.memos[REGMEMO_EDIT]);var _et=_ed?esc(p.memos[REGMEMO_EDIT].text):'';var _el=_ed?p.memos[REGMEMO_EDIT].label:'指示';h+='<div class="rmadd2">'+(_ed?'<div class="rmediting">編集中… 内容を直して「更新」を押してください</div>':'')+'<select id="rmlbl"><option'+(_el==='指示'?' selected':'')+'>指示</option><option'+(_el==='実コメント'?' selected':'')+'>実コメント</option></select><textarea id="rmtext" class="rmta" rows="3" placeholder="指示内容や実コメントを入力（改行OK ／ 「追加」を押すまで登録されません）">'+_et+'</textarea><div class="rmadd2b"><button class="btn-sm btn-pri" onclick="regMemoAdd('+REGSTEP_I+')">'+(_ed?'更新':'＋ 追加')+'</button>'+(_ed?'<button class="btn-sm" onclick="regMemoCancelEdit()">キャンセル</button>':'')+'</div></div>';
  h+='<div class="rmtpl"><select id="rmtpl">'+cmtTpls().map(function(t,ti){return '<option value="'+ti+'">'+esc(t.name)+'</option>';}).join('')+'</select><button class="btn-sm" onclick="regMemoTpl('+REGSTEP_I+')">テンプレを実コメントに追加</button><button class="btn-sm" onclick="regTplNew('+REGSTEP_I+')">＋新規テンプレ</button></div>';
  h+='<div class="rmfeat">'+['敷礼0','AD付き','独立系','ペット可','駅近','築浅','即入居','フリーレント'].map(function(f){var on=(p.memos||[]).some(function(m){return m.label==='特徴'&&m.text===f;});return '<button class="rmfc'+(on?' on':'')+'" onclick="regFeatAdd('+REGSTEP_I+',\''+f+'\')">'+f+'</button>';}).join('')+'</div>';
- h+='<div class="rsreqhd">担当者・物件評価は必須（所感・コメントは任意）</div>';
+ var _nk=esc(p.netKatch||''),_nc=esc(p.netComment||''),_nm=esc(p.netMemo||''),_nkN=netLen(p.netKatch||''),_ncN=netLen(p.netComment||'');
+ var _tsel=function(kind){return '<select onchange="applyNetTpl('+REGSTEP_I+',\''+kind+'\',this.value)" style="border:1px solid var(--border);border-radius:8px;padding:7px 8px;font-size:12px;background:#fff;color:var(--text);max-width:210px"><option value="">テンプレートから挿入…</option>'+netTpls(kind).map(function(t,ti){return '<option value="'+ti+'">'+esc(t.label)+'</option>';}).join('')+'</select>';};
+ h+='<div style="margin-top:16px;border:1.5px solid var(--accent);border-radius:12px;background:#fbfcff;padding:13px 14px">';
+ h+='<div style="font-size:13px;font-weight:800;color:var(--accent);margin-bottom:6px">ネット掲載用の文章</div>';
+ h+='<div class="rslab" style="margin-top:6px">ネット用キャッチ <span class="rsreq">必須</span> <span style="font-weight:600;color:var(--text3)">30文字以内</span></div>';
+ h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">'+_tsel('k')+'<button class="btn-sm" onclick="netTplNew(\'k\')">＋新規テンプレ</button></div>';
+ h+='<input value="'+_nk+'" maxlength="60" oninput="setPendNet('+REGSTEP_I+',\'netKatch\',this.value)" placeholder="例）駅徒歩5分の好立地物件" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;background:#fff">';
+ h+='<div style="text-align:right;margin-top:4px"><span class="netcnt'+(_nkN>30?' over':(_nkN?' ok':''))+'" id="netcnt_k">'+_nkN+' / 30</span></div>';
+ h+='<div class="rslab">ネット用キャッチコメント <span class="rsreq">必須</span> <span style="font-weight:600;color:var(--text3)">100文字以内</span></div>';
+ h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">'+_tsel('c')+'<button class="btn-sm" onclick="netTplNew(\'c\')">＋新規テンプレ</button></div>';
+ h+='<textarea maxlength="200" oninput="setPendNet('+REGSTEP_I+',\'netComment\',this.value)" placeholder="例）陽当たり・通風良好の明るいお部屋です。周辺にはスーパーやコンビニが揃い…" style="width:100%;min-height:64px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;background:#fff;resize:vertical">'+_nc+'</textarea>';
+ h+='<div style="text-align:right;margin-top:4px"><span class="netcnt'+(_ncN>100?' over':(_ncN?' ok':''))+'" id="netcnt_c">'+_ncN+' / 100</span></div>';
+ h+='<div class="rslab">指示欄 <span class="rsopttag">任意</span></div>';
+ h+='<textarea oninput="setPendNet('+REGSTEP_I+',\'netMemo\',this.value)" placeholder="入稿担当への指示など" style="width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;background:#fff;resize:vertical">'+_nm+'</textarea>';
+ h+='</div>';
+ var _av=p.areaVideo||'指定なし',_sp=p.smaPick||'';
+ var _ob=function(cur,val,fn){var on=(cur===val);return '<button onclick="'+fn+'('+REGSTEP_I+',\''+val+'\')" style="border:1px solid '+(on?'var(--accent)':'var(--border)')+';background:'+(on?'var(--accent)':'#fff')+';color:'+(on?'#fff':'var(--text2)')+';font-size:12px;font-weight:700;padding:7px 13px;border-radius:8px;cursor:pointer;font-family:inherit">'+val+'</button>';};
+ h+='<div style="margin-top:12px;border:1.5px solid var(--accent);border-radius:12px;background:#fbfcff;padding:13px 14px">';
+ h+='<div style="font-size:13px;font-weight:800;color:var(--accent);margin-bottom:4px">オプション指示</div>';
+ h+='<div style="display:flex;align-items:center;gap:10px;padding:9px 0"><div style="width:144px;font-size:13px;font-weight:700">店ピク<small style="display:block;font-size:10.5px;color:var(--text3);font-weight:400">全件に確定</small></div><span style="font-size:12px;font-weight:700;color:var(--green);background:var(--green-bg);border:1px solid #bfe6cf;border-radius:8px;padding:7px 13px">✓ 確定で入れる（全件）</span></div>';
+ h+='<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border2)"><div style="width:144px;font-size:13px;font-weight:700">得エリア / 動画CM<small style="display:block;font-size:10.5px;color:var(--text3);font-weight:400">どちらか1つ</small></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+_ob(_av,'得エリア','setPendAV')+_ob(_av,'動画CM','setPendAV')+_ob(_av,'指定なし','setPendAV')+'</div></div>';
+ h+='<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border2)"><div style="width:144px;font-size:13px;font-weight:700">スマピク<small style="display:block;font-size:10.5px;color:var(--text3);font-weight:400">入れるか指示</small></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+_ob(_sp,'入れる','setPendSP')+_ob(_sp,'入れない','setPendSP')+'</div></div>';
+ h+='</div>';
+ h+='<div class="rsreqhd">物件番号・入稿担当・担当者・物件評価・ネット用キャッチ／キャッチコメントは必須です</div>';
+ h+='<div class="rslab" style="margin-top:8px">入稿担当（必須）</div><select class="rvtsel" onchange="setPendNyuko('+REGSTEP_I+',this.value)"><option value="">入稿担当を選択…</option>'+['自分','五嶋','店長'].map(function(t){return '<option'+(p.nyukoTanto===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select>';
+ var _pi=p.postIntent||'live';
+ var _pb=function(val,lb){var on=(_pi===val);return '<button onclick="setPendPost('+REGSTEP_I+',\''+val+'\')" style="flex:1;border:1px solid '+(on?'var(--accent)':'var(--border)')+';background:'+(on?'var(--accent)':'#fff')+';color:'+(on?'#fff':'var(--text2)')+';font-size:13px;font-weight:700;padding:9px 0;border-radius:8px;cursor:pointer;font-family:inherit">'+lb+'</button>';};
+ h+='<div class="rslab" style="margin-top:12px">掲載指示（保留 / 掲載）</div><div style="display:flex;gap:8px">'+_pb('live','掲載')+_pb('hold','保留')+'</div>';
  h+='<div class="rslab" style="margin-top:8px">担当者（必須）</div><select class="rvtsel" onchange="setPendTantou('+REGSTEP_I+',this.value)"><option value="">担当者を選択…</option>'+STAFF.map(function(t){return '<option'+(p.tantou===t?' selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select>';
  h+='<div class="rslab" style="margin-top:12px">物件評価（必須）</div>'+pendStars(REGSTEP_I);
  h+='<div class="rslab" style="margin-top:12px">設備</div><div class="ckrow">'+[['btSep','バストイレ別'],['washStand','独立洗面台'],['petOk','ペット相談可'],['dep0','敷金0'],['key0','礼金0'],['autoLock','オートロック'],['delivBox','宅配ボックス'],['twoBurner','2口コンロ']].map(function(e){return '<label class="inck"><input type="checkbox" '+(p[e[0]]?'checked':'')+' onchange="setPendEquip('+REGSTEP_I+',\''+e[0]+'\',this.checked)">'+e[1]+'</label>';}).join('')+'</div>';
- h+='<details class="rsdet" open><summary>物件情報（必須・抜けている箇所を埋めてください）</summary><div class="rsdetbody">'+[['name','物件名',1],['room','号室',1],['madori','間取り',1],['area','面積(㎡)',1],['structure','構造',1],['age','築年数',1],['line','沿線',1],['station','駅',1],['walkMin','徒歩(分)',1],['address','住所',1],['rent','家賃(万)',1],['mgmtFee','管理費(円)',1],['deposit','敷金',1],['keyMoney','礼金',1],['mgmtCo','管理会社',1],['phone','管理会社TEL',0]].map(function(a){var em=a[2]&&pendFieldEmpty(p,a[0]);return '<div class="rsff'+(em?' empty':'')+'" data-rk="'+a[0]+'"><label>'+a[1]+(a[2]?' <span class="rsreq">必須</span>':' <span class="rsopttag">任意</span>')+'</label><input value="'+esc(p[a[0]]||'')+'" oninput="pendFieldInput('+REGSTEP_I+',\''+a[0]+'\',this.value)"></div>';}).join('')+'</div></details>';
+ h+='<details class="rsdet" open><summary>物件情報（必須・抜けている箇所を埋めてください）</summary><div class="rsdetbody">'+[['propNo','物件番号',1],['name','物件名',1],['room','号室',1],['madori','間取り',1],['area','面積(㎡)',1],['structure','構造',1],['age','築年数',1],['line','沿線',1],['station','駅',1],['walkMin','徒歩(分)',1],['address','住所',1],['rent','家賃(万)',1],['mgmtFee','管理費(円)',1],['deposit','敷金',1],['keyMoney','礼金',1],['mgmtCo','管理会社',1],['phone','管理会社TEL',0]].map(function(a){var em=a[2]&&pendFieldEmpty(p,a[0]);return '<div class="rsff'+(em?' empty':'')+'" data-rk="'+a[0]+'"><label>'+a[1]+(a[2]?' <span class="rsreq">必須</span>':' <span class="rsopttag">任意</span>')+'</label><input value="'+esc(p[a[0]]||'')+'" oninput="pendFieldInput('+REGSTEP_I+',\''+a[0]+'\',this.value)"></div>';}).join('')+'</div></details>';
  h+='<div class="rsact"><button class="btn btn-pri" id="rsOneGo" '+(pendReqOk(p)?'':'disabled')+' onclick="regOnePend('+REGSTEP_I+')">'+(pendReqOk(p)?'この物件を要入稿へ ✓':'この物件を要入稿へ（残'+rem+'）')+'</button><button class="btn btn-sec" onclick="pendToReview('+REGSTEP_I+')">要データ確認に回す</button><button class="btn btn-danger" onclick="regStepDel()">削除</button></div>';h+='<div class="rsnav"><button class="btn btn-sec" '+(REGSTEP_I<=0?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I-1)+')">‹ 前へ</button><span class="rspos">'+(REGSTEP_I+1)+' / '+n+'</span><button class="btn btn-sec" '+(REGSTEP_I>=n-1?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I+1)+')">次へ ›</button></div>';
  h+='</div>';
  host.innerHTML=h;
@@ -3490,6 +3546,26 @@ function renderISBody(){
 
 // ---------- STAFF ----------
 function staffItems(){return PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;});}
+var STAFF_NYUKO='';
+function setStaffNyuko(v){STAFF_NYUKO=v;renderStaff();}
+function staffNyukoPanel(p){
+ var row=function(lb,val){val=val||'';return '<div class="nkrow"><div class="nkrow-h"><span class="nkl">'+lb+'</span><button class="btn-sm" data-copy="'+esc(val)+'" onclick="copyEl(this)">コピー</button></div><div class="nkv">'+(val?esc(val):'<span class="nkempty">未入力</span>')+'</div></div>';};
+ var av=p.specArea?'得エリア':(p.video?'動画CM':(p.areaVideo||'指定なし'));
+ var h='<div class="rvform" style="margin-bottom:10px"><div class="rvfhd"><span class="rvst">入稿用情報（コピーして掲載）</span></div><div class="rvfbody">';
+ h+='<div class="nkmeta">入稿担当 <b>'+esc(p.nyukoTanto||'未指定')+'</b></div>';
+ h+=row('物件名',(p.name||'')+(p.room?(' '+p.room):''));
+ h+=row('物件番号',p.propNo);
+ h+=row('ネット用キャッチ',p.netKatch);
+ h+=row('ネット用キャッチコメント',p.netComment);
+ h+='<div class="nkopt"><span class="nkl" style="width:100%">オプション指示</span>';
+ h+='<span class="optpill yes">店ピク 確定</span>';
+ h+='<span class="optpill '+(av==='指定なし'?'no':'pick')+'">'+(av==='指定なし'?'得エリア/動画CM なし':esc(av))+'</span>';
+ h+='<span class="optpill '+(p.smaPick==='入れる'?'yes':'no')+'">スマピク '+(esc(p.smaPick)||'未指定')+'</span>';
+ h+='</div>';
+ if(p.netMemo)h+='<div class="nkmemo">指示：'+esc(p.netMemo)+'</div>';
+ h+='</div></div>';
+ return h;
+}
 function staffToggleList(){var _sy=window.scrollY||window.pageYOffset||0;STAFFLISTOPEN=!STAFFLISTOPEN;renderStaff();try{window.scrollTo(0,_sy);}catch(e){}}
 function staffSelect(id){var _sy=window.scrollY||window.pageYOffset||0;CURSTAFF=id;renderStaff();try{window.scrollTo(0,_sy);}catch(e){}requestAnimationFrame(function(){try{window.scrollTo(0,_sy);}catch(e){}});}
 function staffMode(id,m){
@@ -3744,37 +3820,42 @@ function staffMemoPanel(p){
 function renderStaff(){
  var _a=anaAgg();
  var items=staffItems();
+ var _nyAll=items.slice();
+ if(STAFF_NYUKO){items=items.filter(function(p){return (p.nyukoTanto||'未指定')===STAFF_NYUKO;});}
+ items.sort(function(a,b){return (a.nyukoTanto||'~').localeCompare(b.nyukoTanto||'~','ja');});
+ var _nyc={};_nyAll.forEach(function(p){var nt=p.nyukoTanto||'未指定';_nyc[nt]=(_nyc[nt]||0)+1;});
+ var _nyBar='<div class="nybar"><span class="nyl">入稿担当</span><button class="nychip'+(STAFF_NYUKO===''?' on':'')+'" onclick="setStaffNyuko(\'\')">全て <b>'+_nyAll.length+'</b></button>'+['自分','五嶋','店長','未指定'].filter(function(o){return _nyc[o];}).map(function(o){return '<button class="nychip'+(STAFF_NYUKO===o?' on':'')+'" onclick="setStaffNyuko(\''+o+'\')">'+o+' <b>'+_nyc[o]+'</b></button>';}).join('')+'</div>';
  var host=document.getElementById('sbody');
- if(!items.length){host.innerHTML=repAlertCard()+todayRegCard()+'<div class="rvempty">要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。</div>';return;}
+ if(!items.length){host.innerHTML=repAlertCard()+todayRegCard()+_nyBar+'<div class="rvempty">'+(STAFF_NYUKO?'「'+esc(STAFF_NYUKO)+'」の要入稿物件はありません。':'要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。')+'</div>';return;}
  if(!CURSTAFF||!items.some(function(p){return p.id===CURSTAFF;}))CURSTAFF=items[0].id;
  var byT={};items.forEach(function(x){var t=x.tantou||'未割当';byT[t]=(byT[t]||0)+1;});
  var sumChips=STAFF.concat(['未割当']).filter(function(t){return byT[t];}).map(function(t){return '<span class="stcnt'+(t==='未割当'?' none':'')+'">'+esc(t)+' <b>'+byT[t]+'</b></span>';}).join('');
- var h=repAlertCard()+todayRegCard()+'<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>';
+ var h=repAlertCard()+todayRegCard()+'<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>'+_nyBar;
  h+='<div class="rvwrap'+(STAFFLISTOPEN?'':' lc')+'">';
  // list
  h+='<aside class="rvlist"><div class="rvlhd"><span class="t">入稿待ちリスト（'+items.length+'）</span><button onclick="staffToggleList()">'+(STAFFLISTOPEN?'‹':'›')+'</button></div>';
  h+='<div class="rvitems">'+items.map(function(p){return '<div class="rvit'+(p.id===CURSTAFF?' cur':'')+'" onclick="staffSelect(\''+p.id+'\')"><div class="nm">'+esc(p.name||'(名称未設定)')+(p.room?' '+esc(p.room):'')+(p.tantou?tantouTag(p):'<span class="ttag-none">未割当</span>')+starChip(p.stars)+'</div><div class="mt">'+esc((p.station||'')+' '+(p.madori||''))+(p.deadline?' ・ 納期'+esc(p.deadline.slice(5)):'')+'</div></div>';}).join('')+'</div></aside>';
  // work
  var p=PROPS.find(function(x){return x.id===CURSTAFF;});
- var mode=STAFFMODE[p.id]||'live';
+ var mode=STAFFMODE[p.id]||(p.postIntent==='hold'?'hold':'live');
  var fs=finalScore(p),kj=kijun(fs);
  h+='<div class="rvwork onecol">';
  h+='<div class="pdfhost" id="staff_pdf"></div>';
  h+='<div class="rvrcol">';
  h+=staffMemoPanel(p);
+ h+=staffNyukoPanel(p);
  h+=staffEquipPanel(p);
  h+='<div class="rvform"><div class="rvfhd">入稿チェック<span class="rvst un">要入稿</span></div><div class="rvfbody">';
- h+='<div class="stinfo">'+[p.station,p.madori,rentMan(p),(p.propNo?'物件番号 '+esc(p.propNo):'')].filter(Boolean).join(' ・ ')+'</div>';
  if(p.suumoListStart){h+='<div class="staiku-warn">⚠ この物件は既にSUUMO（ビジコン）に掲載されている可能性があります（掲載開始日 '+esc(p.suumoListStart)+'）。入稿済みなら掲載中へ移してください。<button class="btn-sm" onclick="setStatus(\''+p.id+'\',\'掲載中\').then(renderStaff)">掲載中へ</button></div>';}
- h+='<div class="rvsec">掲載 / 保留</div>';
- h+='<div class="stmode"><button id="sm_live_'+p.id+'" class="stmode-b'+(mode==='live'?' on live':'')+'" onclick="staffMode(\''+p.id+'\',\'live\')">掲載する</button><button id="sm_hold_'+p.id+'" class="stmode-b'+(mode==='hold'?' on hold':'')+'" onclick="staffMode(\''+p.id+'\',\'hold\')">保留</button></div>';
- h+='<div class="sthint" id="sm_hint_'+p.id+'" style="display:'+(mode==='hold'?'block':'none')+'">入稿は済んでいるが掲載待ち（枠不足など）の状態として記録します。</div>';
  h+='<div class="rvsec">名寄せスコア（オプション前）<span class="streq">必須</span></div><input type="number" id="sc_'+p.id+'" value="'+(p.scorePre!==''&&p.scorePre!=null?p.scorePre:'')+'" oninput="updFinal(\''+p.id+'\')" placeholder="例：38">';
- h+='<div class="rvsec">オプション</div>';
+ h+='<div class="rvsec">オプション指示</div>';
  h+='<label class="stck"><input type="checkbox" id="sp_'+p.id+'" '+(p.storePick?'checked':'')+' onchange="updFinal(\''+p.id+'\')"> 店ピク <span class="stadd">+4</span></label>';
  h+='<label class="stck"><input type="checkbox" id="sa_'+p.id+'" '+(p.specArea?'checked':'')+' onchange="updFinal(\''+p.id+'\')"> 得エリ <span class="stadd">+2</span></label>';
  h+='<label class="stck"><input type="checkbox" id="vd_'+p.id+'" '+(p.video?'checked':'')+' onchange="updFinal(\''+p.id+'\')"> 動画CM <span class="stadd">+2</span></label>';
  h+='<div class="scbox"><div class="scbox-t">最終スコア</div><div class="scbox-n" id="fs_'+p.id+'">'+fs+'</div><div class="stkj '+(kj==='基準未満'?'ng':'ok')+'" id="kj_'+p.id+'">'+(kj==='基準未満'?'基準未満（第1基準34点に未達）':kj+'基準に到達')+'</div></div>';
+ h+='<div class="rvsec">保留 / 掲載</div>';
+ h+='<div class="stmode"><button id="sm_live_'+p.id+'" class="stmode-b'+(mode==='live'?' on live':'')+'" onclick="staffMode(\''+p.id+'\',\'live\')">掲載する</button><button id="sm_hold_'+p.id+'" class="stmode-b'+(mode==='hold'?' on hold':'')+'" onclick="staffMode(\''+p.id+'\',\'hold\')">保留</button></div>';
+ h+='<div class="sthint" id="sm_hint_'+p.id+'" style="display:'+(mode==='hold'?'block':'none')+'">入稿は済んでいるが掲載待ち（枠不足など）の状態として記録します。</div>';
  h+='</div>';
  h+='<div class="rvbtns"><button class="b ok" id="postbtn_'+p.id+'" onclick="postStaff(\''+p.id+'\')">'+(mode==='hold'?'入稿完了 → 保留':'入稿完了 → 掲載中')+'</button><div class="brow"><button class="b gho" onclick="pickPdf(\''+p.id+'\')">PDF差し替え</button><button class="b gho" onclick="viewPdf(\''+p.id+'\')">PDF確認</button><button class="b del" onclick="deletePropById(\''+p.id+'\')">削除</button></div></div>';
  h+='</div></div></div></div>';
@@ -5144,21 +5225,24 @@ function renderPlanPerson(name){
  var on=function(f){return "planInput('"+name+"','"+f+"',this.value)";};
  var onm=function(i){return "planInput('"+name+"','m',this.value,"+i+")";};
  var mn=['7月','8月','9月'];
+ var _rc='display:flex;align-items:center;gap:10px;padding:10px 0;border-top:0.5px solid #ededf0';
+ var _kc='width:140px;font-size:13px;font-weight:600;color:#1d1d1f';
+ var _sc='display:block;font-size:10.5px;color:#8e8e93;font-weight:400;margin-top:1px';
+ var _nc='width:66px;font-size:13px;padding:6px 7px;border:1px solid #e3e3e6;border-radius:8px;text-align:right;background:#fff';
+ var _xc='min-width:124px;text-align:right;font-size:11px;color:#1A3D6B;font-weight:600';
+ var _bc='font-size:11px;padding:6px 12px;border:1px solid #1A3D6B;color:#1A3D6B;background:#fff;border-radius:8px;cursor:pointer;white-space:nowrap';
+ var ROW=function(lb,sub,fld,val,mn2,mx,st,un,rid){return '<div style="'+_rc+'"><div style="'+_kc+'">'+lb+'<small style="'+_sc+'">'+sub+'</small></div><input type="range" style="flex:1;min-width:90px;accent-color:#1A3D6B" id="s_'+fld+'" min="'+mn2+'" max="'+mx+'" step="'+st+'" value="'+val+'" oninput="planInput(\''+name+'\',\''+fld+'\',this.value)"><input type="number" style="'+_nc+'" id="n_'+fld+'" min="'+mn2+'" max="'+mx+'" step="'+st+'" value="'+val+'" oninput="planInput(\''+name+'\',\''+fld+'\',this.value)"><span style="width:16px;font-size:12px;color:#8e8e93">'+un+'</span><span style="'+_xc+'" id="'+rid+'"></span></div>';};
  var h=topBar();
  h+='<div class="pl-internal"><span class="pl-tag">営業マン</span><b style="font-size:15px">'+esc(name)+'</b><button class="pl-yen" title="給与確認" onclick="salaryGate(\''+name+'\')">¥</button></div>';
- h+='<div class="pl-card"><div class="pl-h">クオーター計画（第1Q：7〜9月）<span class="sm">率・単価は3ヶ月共通／枠数は月別</span></div>';
- h+='<div class="pl-months">';
- for(var i=0;i<3;i++){h+='<div class="pl-mcell"><div class="ml">'+mn[i]+'の担当枠数</div>'
-  +'<input type="number" class="pl-num" id="n_m'+i+'" min="0" max="100" step="1" value="'+p.m[i]+'" oninput="'+onm(i)+'">'
-  +'<input type="range" class="pl-rng" id="s_m'+i+'" min="0" max="100" step="1" value="'+p.m[i]+'" oninput="'+onm(i)+'"></div>';}
- h+='</div>';
- h+=rowSlider('枠回転率','枠→総掲載（差し替え含む）','kr',(p.kr!=null?p.kr:100),100,400,5,'%',on('kr'));
- h+=rowSlider('反響率','総掲載→反響','hk',p.hk,0,300,1,'%',on('hk'));
- h+='<div class="pl-tankrow" id="pl_aporow" onclick="apoOpen(\''+name+'\')"><div class="k">アポ設定率<small>反響→アポ設定・TELあり/なしの分岐から算出</small></div><div class="pl-tankval"><span id="pl_apoeff">'+plN(p.ap)+'</span><small>%</small></div><div class="pl-tankyen">タップで分岐設定</div><button class="pl-btn pri sm" onclick="event.stopPropagation();apoOpen(\''+name+'\')">分岐設定</button></div>';
- h+=rowSlider('アポ参加率','アポ設定→来店','at',p.at,0,100,1,'%',on('at'));
- h+=rowSlider('契約率','来店→契約','ct',p.ct,0,100,1,'%',on('ct'));
- var _tyen=p.tanCfg?Math.round(tankaCompute(p.tanCfg).total).toLocaleString('ja-JP'):'';
- h+='<div class="pl-tankrow" id="pl_tankrow" onclick="tankaOpen(\''+name+'\')"><div class="k">成約単価<small>1契約あたり・内訳から算出</small></div><div class="pl-tankval"><span id="pl_tanman">'+plN(p.tan)+'</span><small>万</small></div>'+(p.tanCfg?('<div class="pl-tankyen">¥<span id="pl_tanyen">'+_tyen+'</span></div>'):'<div class="pl-tankyen">タップで内訳設定</div>')+'<button class="pl-btn pri sm" onclick="event.stopPropagation();tankaOpen(\''+name+'\')">詳細設定</button></div>';
+ var _slot1=Math.round((p.m[0]+p.m[1]+p.m[2])/3);
+ h+='<div class="pl-card"><div class="pl-h">計画を立てる<span class="sm">スライダーで結果が動きます／率・単価は3ヶ月共通</span></div>';
+ h+=ROW('付与枠','単月の担当枠数','slotAll',_slot1,0,300,1,'','x_slot');
+ h+=ROW('枠回転率','枠→総掲載（差し替え含む）','kr',(p.kr!=null?p.kr:100),100,400,5,'%','x_kr');
+ h+=ROW('反響率','総掲載→反響','hk',p.hk,0,300,1,'%','x_hk');
+ h+='<div style="'+_rc+'"><div style="'+_kc+'">アポ設定率<small style="'+_sc+'">反響→アポ設定・TEL分岐</small></div><div style="flex:1;min-width:90px;font-size:13px;color:#6e6e73">分岐から算出　<b style="color:#1d1d1f;font-size:15px"><span id="pl_apoeff">'+plN(p.ap)+'</span>%</b></div><button style="'+_bc+'" onclick="apoOpen(\''+name+'\')">分岐設定</button><span style="'+_xc+'" id="x_ap"></span></div>';
+ h+=ROW('アポ参加率','アポ設定→来店','at',p.at,0,100,1,'%','x_at');
+ h+=ROW('契約率','来店→契約','ct',p.ct,0,100,1,'%','x_ct');
+ h+='<div style="'+_rc+'"><div style="'+_kc+'">成約単価<small style="'+_sc+'">1契約あたり・内訳から算出</small></div><div style="flex:1;min-width:90px;font-size:13px;color:#6e6e73">内訳から算出　<b style="color:#1d1d1f;font-size:15px"><span id="pl_tanman">'+plN(p.tan)+'</span>万</b></div><button style="'+_bc+'" onclick="tankaOpen(\''+name+'\')">詳細設定</button><span style="'+_xc+'" id="x_tan"></span></div>';
  h+='<div class="pl-btnrow"><button class="pl-btn pri" onclick="planSave(\''+name+'\')">この計画を保存</button><span class="pl-saved" id="plan_saved">'+(p.updated?('最終保存：'+esc(p.updated.replace("T"," "))):'未保存')+'</span></div>';
  h+='<div class="pl-note">このページは行動目標と売上だけを表示します（費用・利益・経営指標はβに集約）。</div>';
  h+='</div>';
@@ -5168,7 +5252,8 @@ function renderPlanPerson(name){
 }
 function planInput(name,field,val,idx){
  if(!PLAN_EDIT)return; val=parseFloat(val); if(isNaN(val))val=0;
- if(field==='m'){PLAN_EDIT.m[idx]=val;var s=document.getElementById('s_m'+idx),n=document.getElementById('n_m'+idx);if(s)s.value=val;if(n&&document.activeElement!==n)n.value=val;}
+ if(field==='slotAll'){PLAN_EDIT.m=[val,val,val];var ss=document.getElementById('s_slotAll'),nn=document.getElementById('n_slotAll');if(ss&&document.activeElement!==ss)ss.value=val;if(nn&&document.activeElement!==nn)nn.value=val;}
+ else if(field==='m'){PLAN_EDIT.m[idx]=val;var s=document.getElementById('s_m'+idx),n=document.getElementById('n_m'+idx);if(s)s.value=val;if(n&&document.activeElement!==n)n.value=val;}
  else{PLAN_EDIT[field]=val;var s2=document.getElementById('s_'+field),n2=document.getElementById('n_'+field);if(s2)s2.value=val;if(n2&&document.activeElement!==n2)n2.value=val;}
  var sv=document.getElementById('plan_saved'); if(sv)sv.textContent='未保存の変更があります（保存ボタンを押してください）';
  renderPlanResults(name);
@@ -5181,12 +5266,15 @@ function renderPlanResults(name){
  var h='';
  if(floor>0&&q.sales<floor){h+='<div class="pl-alert bad"><span class="ic">!</span>クオーター計画売上 '+plMan(q.sales)+' が、想定売上計画 '+plMan(floor)+' を下回っています（不足 '+plMan(floor-q.sales)+'）。枠数や各率を見直してください。</div>';}
  else if(floor>0){h+='<div class="pl-alert good"><span class="ic">&#10003;</span>クオーター計画売上 '+plMan(q.sales)+' は想定売上計画 '+plMan(floor)+' を達成（+'+plMan(q.sales-floor)+'）。</div>';}
- // 個人計画値
- h+='<div class="pl-card"><div class="pl-h">個人計画値</div><div style="display:flex;align-items:stretch;text-align:center">'
-  +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">単月売上</div><div style="font-size:30px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_sm(q.sales)+'<small style="font-size:12px;color:#6e6e73"> 万円</small></div><div style="width:40px;height:2px;background:#1A3D6B;margin:7px auto 0"></div></div>'
+ // 個人計画値（岡田設定＝想定売上計画）
+ var _okQ=(floor>0?plN(floor):'—'), _okM=(floor>0?plN(floor/3):'—');
+ h+='<div class="pl-card"><div class="pl-h">個人計画値<span class="sm">岡田設定</span></div><div style="display:flex;align-items:stretch;text-align:center">'
+  +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">単月売上</div><div style="font-size:30px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_okM+'<small style="font-size:12px;color:#6e6e73"> 万円</small></div><div style="width:40px;height:2px;background:#1A3D6B;margin:7px auto 0"></div></div>'
   +'<div style="width:1px;background:#e3e3e6;margin:0 16px"></div>'
-  +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">Q売上</div><div style="font-size:30px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+plN(q.sales)+'<small style="font-size:12px;color:#6e6e73"> 万円</small></div><div style="width:40px;height:2px;background:#C99A14;margin:7px auto 0"></div></div>'
+  +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">Q売上</div><div style="font-size:30px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_okQ+'<small style="font-size:12px;color:#6e6e73"> 万円</small></div><div style="width:40px;height:2px;background:#C99A14;margin:7px auto 0"></div></div>'
   +'</div></div>';
+ // 第3Q計画ファネル図（※以下 自己計画）
+ h+='<div class="pl-card"><div class="pl-h">第3Q計画ファネル図（3ヶ月の計画）<span class="sm">※以下 自己計画</span></div>'+planFunnelSVG(q,kr,p)+'</div>';
  // 単月ファネル（契約・売上 強調／総掲載数=差し替え併記）
  var _st=function(l,v,sub){return '<div style="background:#f5f6f8;border-radius:9px;padding:9px 4px"><div style="font-size:10.5px;color:#8e8e93">'+l+'</div><div style="font-size:17px;font-weight:700;color:#1d1d1f">'+v+'</div><div style="font-size:9.5px;color:#8e8e93;margin-top:1px">'+(sub||'&nbsp;')+'</div></div>';};
  h+='<div class="pl-card"><div class="pl-h">単月ファネル<span class="sm">クオーター計画 ÷ 3</span></div>'
@@ -5194,12 +5282,10 @@ function renderPlanResults(name){
   +_st('付与枠',_sm(q.slots))+_st('総掲載数',_sm(totQ),'差替 '+_sm(sashiQ))+_st('反響',_sm(q.inq))+_st('アポ設定',_sm(q.apo))+_st('来店',_sm(q.visit))
   +'</div>'
   +'<div style="display:flex;align-items:stretch;text-align:center;margin-top:12px;padding-top:14px;border-top:1px solid #e3e3e6">'
-  +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">契約</div><div style="font-size:32px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_sm(q.ctr)+'<small style="font-size:12px;color:#6e6e73"> 件</small></div><div style="width:44px;height:2px;background:#1d8f3b;margin:7px auto 0"></div></div>'
+  +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">契約</div><div style="font-size:30px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_sm(q.ctr)+'<small style="font-size:12px;color:#6e6e73"> 件</small></div><div style="width:40px;height:2px;background:#1d8f3b;margin:7px auto 0"></div></div>'
   +'<div style="width:1px;background:#e3e3e6;margin:0 16px"></div>'
-  +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">売上</div><div style="font-size:32px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_sm(q.sales)+'<small style="font-size:12px;color:#6e6e73"> 万</small></div><div style="width:44px;height:2px;background:#C99A14;margin:7px auto 0"></div></div>'
+  +'<div style="flex:1"><div style="font-size:12px;color:#6e6e73;margin-bottom:4px">売上</div><div style="font-size:30px;font-weight:800;letter-spacing:-.5px;color:#1d1d1f">'+_sm(q.sales)+'<small style="font-size:12px;color:#6e6e73"> 万</small></div><div style="width:40px;height:2px;background:#C99A14;margin:7px auto 0"></div></div>'
   +'</div></div>';
- // 第3Q計画ファネル図（3ヶ月の計画・S=単月）
- h+='<div class="pl-card"><div class="pl-h">第3Q計画ファネル図（3ヶ月の計画）</div>'+planFunnelSVG(q,kr,p)+'</div>';
  // 月別テーブル（詳細）
  h+='<div class="pl-card"><div class="pl-h">月別の内訳</div>';
  h+='<table class="pl-mtab"><thead><tr><th>月</th><th>枠数</th><th>反響</th><th>アポ設定</th><th>来店</th><th>契約</th><th>売上(万)</th></tr></thead><tbody>';
@@ -5208,6 +5294,23 @@ function renderPlanResults(name){
  h+='</tbody></table>';
  h+='<div class="pl-mini"><span>来店率：<b>'+plPct(R.visitRate)+'</b>（アポ設定率×アポ参加率）</span><span>アポ設定→契約率：<b>'+plPct(R.apo2ctr)+'</b>（アポ参加率×契約率）</span></div></div>';
  host.innerHTML=h;
+ updatePlanEditorResults();
+}
+function updatePlanEditorResults(){
+ var p=PLAN_EDIT; if(!p)return;
+ var s=Math.round((p.m[0]+p.m[1]+p.m[2])/3);
+ var kr=(p.kr!=null?+p.kr:100);
+ var tot=s*kr/100, sa=Math.max(0,tot-s), resp=tot*p.hk/100, apo=resp*p.ap/100, visit=apo*p.at/100, deal=visit*p.ct/100, sales=deal*p.tan;
+ var setT=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+ setT('x_slot','総掲載 '+plN(tot)+' ／ 差替 '+plN(sa));
+ setT('x_kr','総掲載 '+plN(tot));
+ setT('x_hk','反響 '+plN(resp));
+ setT('x_ap','設定 '+plN(apo));
+ setT('x_at','来店 '+plN(visit));
+ setT('x_ct','契約 '+plN(deal)+' 件');
+ setT('x_tan','売上 '+plN(sales)+' 万');
+ var ea=document.getElementById('pl_apoeff'); if(ea)ea.textContent=plN(p.ap);
+ var et=document.getElementById('pl_tanman'); if(et)et.textContent=plN(p.tan);
 }
 function planFunnelSVG(q,kr,p){
  var totQ=q.slots*kr/100;
