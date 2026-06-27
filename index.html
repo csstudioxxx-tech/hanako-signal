@@ -715,7 +715,11 @@ header{padding-left:54px}
 .rsreq{font-size:9px;font-weight:800;color:#fff;background:#2a6df5;padding:1px 6px;border-radius:99px;vertical-align:1px}
 .netcnt{font-size:11px;color:var(--text3)}
 .rqEmpty{border:1.5px solid #E8920A !important;background:#fff7ec !important}
-.rqOk{border:1.5px solid #1f9d57 !important}.netcnt.over{color:var(--red);font-weight:800}.netcnt.ok{color:var(--green)}
+.rqOk{border:1.5px solid #1f9d57 !important}
+.tlsort{margin-left:auto;display:inline-flex;gap:4px}
+.tlsb{border:1px solid var(--border);background:#fff;color:var(--text2);font-size:11px;font-weight:700;padding:4px 9px;border-radius:7px;cursor:pointer;font-family:inherit}
+.tlsb.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tlmore{text-align:center;padding:9px 0 3px}.netcnt.over{color:var(--red);font-weight:800}.netcnt.ok{color:var(--green)}
 .nybar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px}
 .nybar .nyl{font-size:11px;font-weight:700;color:var(--text2);margin-right:2px}
 .nychip{appearance:none;border:1px solid var(--border);background:#fff;color:var(--text2);font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;cursor:pointer;font-family:inherit}
@@ -2085,6 +2089,27 @@ function todayRegCard(){var td=today();var rows=PROPS.filter(function(p){return 
     var sel='<select class="trtsel" onclick="event.stopPropagation()" onchange="event.stopPropagation();tantouSet(\''+p.id+'\',this.value)"><option value="">未割当</option>'+STAFF.map(function(nm){return '<option'+(p.tantou===nm?' selected':'')+'>'+esc(nm)+'</option>';}).join('')+'</select>';
     h+='<tr class="trrow" onclick="openProp(\''+p.id+'\')"><td class="trtm">'+(_tsTime(p.regTs)||esc(p.regDate||''))+'</td><td>'+sel+'</td><td class="trnm">'+esc((p.name||'').slice(0,18))+(p.room?' '+esc(p.room):'')+'</td><td class="hcol trme">'+esc((p.madori||'')+(p.station?(' \u00d7 '+p.station):''))+'</td><td class="trrent">'+esc(rentMan(p)||'\u2014')+'</td><td>'+starChip(p.stars)+'</td><td>'+(pdfOk?'<span class="trpdf ok">\u2713</span>':'<span class="trpdf ng">\u2717</span>')+'</td><td><span class="lk treditlk">編集 ›</span></td></tr>';});
   h+='</table></div></div>';return h;}
+var TLIST_EXP={reg:false,nyuko:false},TLIST_SORT={reg:'time',nyuko:'time'};
+function tlistExp(kind){TLIST_EXP[kind]=!TLIST_EXP[kind];try{refreshCurrentTab();}catch(e){}}
+function tlistSort(kind,m){TLIST_SORT[kind]=m;try{refreshCurrentTab();}catch(e){}}
+function todayListCard(kind){
+ var td=today();var field=(kind==='nyuko')?'nyukoTs':'regTs';
+ var title=(kind==='nyuko')?'今日 入稿した物件':'今日の登録物件';
+ var colh=(kind==='nyuko')?'入稿':'登録';
+ var rows=PROPS.filter(function(p){return p.confirmed!==false&&p[field]&&String(p[field]).slice(0,10)===td;});
+ if(!rows.length)return '';
+ if(TLIST_SORT[kind]==='tantou'){rows.sort(function(a,b){return (a.tantou||'\uffff').localeCompare(b.tantou||'\uffff','ja')||(b[field]||'').localeCompare(a[field]||'');});}
+ else{rows.sort(function(a,b){return (b[field]||'').localeCompare(a[field]||'');});}
+ var exp=!!TLIST_EXP[kind];var show=exp?rows:rows.slice(0,5);
+ var sortBtns='<span class="tlsort"><button class="tlsb'+(TLIST_SORT[kind]==='time'?' on':'')+'" onclick="event.stopPropagation();tlistSort(\''+kind+'\',\'time\')">時刻順</button><button class="tlsb'+(TLIST_SORT[kind]==='tantou'?' on':'')+'" onclick="event.stopPropagation();tlistSort(\''+kind+'\',\'tantou\')">担当者順</button></span>';
+ var h='<div class="card fade trcard"><div class="sec-h2"><span class="t">'+title+'</span><span class="cntp">'+rows.length+'件</span>'+sortBtns+'</div><div class="trwrap"><table class="trtbl"><tr><th>'+colh+'</th><th>担当</th><th>物件名</th><th class="hcol">間取り×エリア</th><th>賃料</th><th>評価</th><th>PDF</th><th></th></tr>';
+ show.forEach(function(p){var pdfOk=!!(p.driveUrl||p.driveId);
+   var sel='<select class="trtsel" onclick="event.stopPropagation()" onchange="event.stopPropagation();tantouSet(\''+p.id+'\',this.value)"><option value="">未割当</option>'+STAFF.map(function(nm){return '<option'+(p.tantou===nm?' selected':'')+'>'+esc(nm)+'</option>';}).join('')+'</select>';
+   var tm=(kind==='nyuko')?(_tsTime(p.nyukoTs)||esc(p.nyukoDate||'')):(_tsTime(p.regTs)||esc(p.regDate||''));
+   h+='<tr class="trrow" onclick="openProp(\''+p.id+'\')"><td class="trtm">'+tm+'</td><td>'+sel+'</td><td class="trnm">'+esc((p.name||'').slice(0,18))+(p.room?' '+esc(p.room):'')+'</td><td class="hcol trme">'+esc((p.madori||'')+(p.station?(' \u00d7 '+p.station):''))+'</td><td class="trrent">'+esc(rentMan(p)||'\u2014')+'</td><td>'+starChip(p.stars)+'</td><td>'+(pdfOk?'<span class="trpdf ok">\u2713</span>':'<span class="trpdf ng">\u2717</span>')+'</td><td><span class="lk treditlk">編集 ›</span></td></tr>';});
+ h+='</table></div>';
+ if(rows.length>5)h+='<div class="tlmore"><button class="btn-sm" onclick="tlistExp(\''+kind+'\')">'+(exp?'閉じる ▲':'もっと見る（残り'+(rows.length-5)+'件） ▼')+'</button></div>';
+ h+='</div>';return h;}
 function renderRegStep(){
  var host=document.getElementById('regstepbody');if(!host)return;
  var n=PEND.length;
@@ -2841,7 +2866,7 @@ function renderReview(){
   h+='<div class="rvsrc">'+[['all','全て'],['csv','CSV読み取り'],['pdf','PDFアップロード']].map(function(o){return '<button class="'+(REVSRC===o[0]?'on':'')+'" onclick="revSrc(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
  }
  h+='<div class="rvsrc" style="margin-left:8px">'+[['default','標準順'],['points','確認ポイント数順']].map(function(o){return '<button class="'+(REVSORT===o[0]?'on':'')+'" onclick="revSortSet(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
- if(!REG_SCOPE){h+=_bjMisSection();h+=todayRegCard();}
+ if(!REG_SCOPE){h+=_bjMisSection();h+=todayListCard('reg');}
 if(!items.length){h+='<div class="rvempty">'+(REG_SCOPE?'登録した物件はすべて確認できました。<br><button class="btn btn-pri" style="margin-top:10px" onclick="regConfirmDone()">要入稿へ進む</button>':(REVSRC==='all'?'未確認の物件はありません。物件登録でPDFを取り込むとここに表示されます。':'この条件（'+(REVSRC==='csv'?'CSV読み取り':'PDFアップロード')+'）の未確認物件はありません。'))+'</div>';document.getElementById('reviewbody').innerHTML=h;updateBadges();return;}
  var _csvN=PROPS.filter(function(p){return p.confirmed===false&&p.fromCsv;}).length;
  if(_csvN)h+='<div class="rvcsvbar"><div class="rvcsv-t">CSV取込分 '+_csvN+'件（過去掲載・PDFなし等）。情報不備でもまとめて確定。ステータスは<b>ビジコンの掲載状況</b>（掲載中／掲載終了＝落とし）のまま、要入稿には送りません。</div><button class="btn-sm btn-pri" onclick="revConfirmAllCsv()">CSVを全選択して確定</button></div>';
@@ -3841,11 +3866,11 @@ function renderStaff(){
  var _nyc={};_nyAll.forEach(function(p){var nt=p.nyukoTanto||'未指定';_nyc[nt]=(_nyc[nt]||0)+1;});
  var _nyBar='<div class="nybar"><span class="nyl">入稿担当</span><button class="nychip'+(STAFF_NYUKO===''?' on':'')+'" onclick="setStaffNyuko(\'\')">全て <b>'+_nyAll.length+'</b></button>'+['自分','五嶋','店長','未指定'].filter(function(o){return _nyc[o];}).map(function(o){return '<button class="nychip'+(STAFF_NYUKO===o?' on':'')+'" onclick="setStaffNyuko(\''+o+'\')">'+o+' <b>'+_nyc[o]+'</b></button>';}).join('')+'</div>';
  var host=document.getElementById('sbody');
- if(!items.length){host.innerHTML=repAlertCard()+todayRegCard()+_nyBar+'<div class="rvempty">'+(STAFF_NYUKO?'「'+esc(STAFF_NYUKO)+'」の要入稿物件はありません。':'要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。')+'</div>';return;}
+ if(!items.length){host.innerHTML=repAlertCard()+todayListCard('nyuko')+_nyBar+'<div class="rvempty">'+(STAFF_NYUKO?'「'+esc(STAFF_NYUKO)+'」の要入稿物件はありません。':'要入稿の物件はありません。要データ確認で「確認済み → 入稿ページへ登録」すると、ここに表示されます。')+'</div>';return;}
  if(!CURSTAFF||!items.some(function(p){return p.id===CURSTAFF;}))CURSTAFF=items[0].id;
  var byT={};items.forEach(function(x){var t=x.tantou||'未割当';byT[t]=(byT[t]||0)+1;});
  var sumChips=STAFF.concat(['未割当']).filter(function(t){return byT[t];}).map(function(t){return '<span class="stcnt'+(t==='未割当'?' none':'')+'">'+esc(t)+' <b>'+byT[t]+'</b></span>';}).join('');
- var h=repAlertCard()+todayRegCard()+'<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>'+_nyBar;
+ var h=repAlertCard()+todayListCard('nyuko')+'<div class="staffsum"><span class="staffsum-t">入稿待ち '+items.length+' 件</span>'+sumChips+'</div>'+_nyBar;
  h+='<div class="rvwrap'+(STAFFLISTOPEN?'':' lc')+'">';
  // list
  h+='<aside class="rvlist"><div class="rvlhd"><span class="t">入稿待ちリスト（'+items.length+'）</span><button onclick="staffToggleList()">'+(STAFFLISTOPEN?'‹':'›')+'</button></div>';
