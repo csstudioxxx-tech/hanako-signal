@@ -3168,10 +3168,11 @@ function rvConfirmPoints(p){
 function rvAmenChk(p){
  return '<div class="rvckrow">'+inChk(p.id,'btSep',p.btSep,'バス・トイレ別')+inChk(p.id,'washStand',p.washStand,'独立洗面台')+inChk(p.id,'petOk',p.petOk,'ペット相談可')+inChk(p.id,'autoLock',p.autoLock,'オートロック')+inChk(p.id,'delivBox',p.delivBox,'宅配BOX')+inChk(p.id,'twoBurner',p.twoBurner,'2口コンロ')+inChk(p.id,'dep0',p.dep0,'敷金0')+inChk(p.id,'key0',p.key0,'礼金0')+'</div>';
 }
+async function dupDismiss(idsCsv){var ids=(idsCsv||'').split(',').filter(Boolean);if(!ids.length)return;var nm='';ids.forEach(function(id){var p=PROPS.find(function(x){return x.id===id;});if(p){p.dupOk=true;if(!nm)nm=p.name||'';}});await save();renderReview();updateBadges();toast('\u300c'+(nm||'物件')+'\u300dを\u300c問題なし\u300dとして重複一覧から除外しました');}
 function _dupRegSection(){
  var map={};
  PROPS.forEach(function(p){if(!p||!p.name||p.isTest)return;var k=_nkey(p.name);if(!k||k.length<2)return;(map[k]=map[k]||[]).push(p);});
- var groups=Object.keys(map).map(function(k){return map[k];}).filter(function(g){return g.length>=2;});
+ var groups=Object.keys(map).map(function(k){return map[k];}).filter(function(g){return g.length>=2&&g.some(function(p){return !p.dupOk;});});
  groups.sort(function(a,b){return b.length-a.length||(a[0].name||'').localeCompare(b[0].name||'','ja');});
  var totalDup=groups.reduce(function(s,g){return s+g.length;},0);
  var has=groups.length>0;
@@ -3183,7 +3184,7 @@ function _dupRegSection(){
  groups.forEach(function(g){
   var rc={};g.forEach(function(p){var rk=_nkey(p.room||'');rc[rk]=(rc[rk]||0)+1;});
   h+='<div style="border:1px solid #ecd4d2;border-radius:12px;background:#fff;padding:11px 12px;margin-bottom:10px">';
-  h+='<div style="font-size:13.5px;font-weight:800;color:#1A3D6B;margin-bottom:9px">'+esc(g[0].name||'(無題)')+' <span style="font-size:11px;font-weight:700;color:#a83a35">'+g.length+'件</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><div style="flex:1;font-size:13.5px;font-weight:800;color:#1A3D6B">'+esc(g[0].name||'(無題)')+' <span style="font-size:11px;font-weight:700;color:#a83a35">'+g.length+'件</span></div><button class="btn-sm" style="flex:none;border-color:#bfe6cf;color:#1f7a52" onclick="dupDismiss(\''+g.map(function(p){return p.id;}).join(',')+'\')">\u2713 問題なし（重複ではない）</button></div>';
   h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">';
   g.slice().sort(function(a,b){return String(a.room||'').localeCompare(String(b.room||''),'ja');}).forEach(function(p){
    var pdfOk=!!(p.driveUrl||p.driveId);
