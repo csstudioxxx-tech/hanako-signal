@@ -3651,13 +3651,21 @@ function staffEquipPanel(p){
 }
 function staffEquip(id,key,btn){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p[key]=p[key]?'':'あり';if(btn)btn.classList.toggle('on',!!p[key]);var ks=['btSep','washStand','petOk','dep0','key0','autoLock','delivBox','twoBurner'];var c=document.getElementById('eqcnt_'+id);if(c)c.textContent='あり '+ks.filter(function(k){return p[k];}).length+' / '+ks.length;save();}
 /* ===== 保留管理（hk）===== */
-var HK_SEL='全体',HK_SORT='lpvd',HK_QOPEN=false,HK_CALDAY='';
+var HK_SEL='全体',HK_SORT='lpvd',HK_QOPEN=false,HK_CALDAY='',HK_MODE='tantou';
+function effNyuko(p){var n=(p&&p.nyukoTanto)||'';if(n==='自分')return (p&&p.tantou)||'未設定';return n||'未設定';}
+function hkNyTag(p){return '<span class="hk-nytag">入稿 '+esc(effNyuko(p))+'</span>';}
 var HK_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A','五嶋':'#00838F','岡田':'#AD1457'};
 function hkInjectCSS(){
  if(document.getElementById('hkStyle'))return;
  var s=document.createElement('style');s.id='hkStyle';
  s.textContent=[
   '#horyubody .hk-sel{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}',
+  '.hk-modetab{display:inline-flex;background:#eef0f2;border-radius:10px;padding:3px;gap:2px;margin-bottom:10px}',
+  '.hk-mbtn{border:none;background:transparent;color:#6b6a66;font-size:12.5px;font-weight:700;padding:7px 16px;border-radius:8px;cursor:pointer;font-family:inherit}',
+  '.hk-mbtn.on{background:#fff;color:#1A3D6B;box-shadow:0 1px 2px rgba(0,0,0,.12)}',
+  '.hk-selbtn b{font-weight:800;margin-left:3px}',
+  '.hk-selbtn.on b{color:#fff}',
+  '.hk-nytag{font-size:9px;font-weight:700;color:#0d6e6e;background:#e3f5f4;border:1px solid #b9e3e0;border-radius:5px;padding:1px 6px;white-space:nowrap}',
   '.hk-selbtn{border:1px solid #d8dee8;background:#fff;border-radius:20px;padding:6px 15px;font-family:inherit;font-size:12.5px;font-weight:600;color:#46505c;cursor:pointer;display:inline-flex;align-items:center;gap:6px}',
   '.hk-selbtn .hk-dot{width:9px;height:9px;border-radius:3px}',
   '.hk-selbtn.on{background:#1A3D6B;color:#fff;border-color:#1A3D6B}.hk-selbtn.on .hk-dot{display:none}',
@@ -3800,7 +3808,7 @@ function renderNyukoStatus(){
  if(otherTotal>0)h+='<div style="margin-top:10px;font-size:12px;color:#9aa0a6">※ 枠対象外（五嶋など）の入稿 '+otherTotal+'件は'+NYUKO_GOAL_TOTAL+'の集計に含めていません。</div>';
  el.innerHTML=h;
 }
-function hkSelOk(p){return HK_SEL==='全体'||p.tantou===HK_SEL;}
+function hkSelOk(p){if(HK_SEL==='全体')return true;if(HK_MODE==='nyuko')return effNyuko(p)===HK_SEL;return p.tantou===HK_SEL;}
 function hkHolds(){return PROPS.filter(function(p){return p.status==='保留'&&p.confirmed!==false&&hkSelOk(p);});}
 function hkLive(){return PROPS.filter(function(p){return p.status==='掲載中'&&p.confirmed!==false&&!p.suumoTodo&&hkSelOk(p);});}
 function hkQueue(){return PROPS.filter(function(p){return p.suumoTodo&&hkSelOk(p);});}
@@ -3808,15 +3816,26 @@ function hkRecent(d){if(!d)return false;var t=new Date(String(d).replace(/-/g,'/
 function hkDone(){return PROPS.filter(function(p){return !p.suumoTodo&&p.statusSrc==='manual'&&(p.status==='掲載中'||p.status==='落とし済み')&&hkRecent(p.statusSrcAt)&&hkSelOk(p);});}
 
 function hkSelector(){
- var h='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体</button>';
- STAFF.forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#888')+'"></span>'+esc(s)+'</button>';});
+ var holds=PROPS.filter(function(p){return p.status==='保留'&&p.confirmed!==false;});
+ var h='<div class="hk-modetab"><button class="hk-mbtn'+(HK_MODE==='tantou'?' on':'')+'" onclick="hkSetMode(\'tantou\')">物件担当者別</button><button class="hk-mbtn'+(HK_MODE==='nyuko'?' on':'')+'" onclick="hkSetMode(\'nyuko\')">入稿担当者別</button></div>';
+ h+='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体 <b>'+holds.length+'</b></button>';
+ if(HK_MODE==='nyuko'){
+  var cnt={};holds.forEach(function(p){var k=effNyuko(p);cnt[k]=(cnt[k]||0)+1;});
+  var all={};PROPS.forEach(function(p){if(p.confirmed!==false){var k=effNyuko(p);if(k&&k!=='未設定')all[k]=1;}});
+  var names=Object.keys(all).sort(function(a,b){return a.localeCompare(b,'ja');});
+  names.forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#0d6e6e')+'"></span>'+esc(s)+' <b>'+(cnt[s]||0)+'</b></button>';});
+ }else{
+  var cntT={};holds.forEach(function(p){var k=p.tantou||'未設定';cntT[k]=(cntT[k]||0)+1;});
+  STAFF.filter(function(s){return ['五嶋','店長'].indexOf(s)<0;}).forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#888')+'"></span>'+esc(s)+' <b>'+(cntT[s]||0)+'</b></button>';});
+ }
  return h+'</div>';
 }
+function hkSetMode(m){HK_MODE=m;HK_SEL='全体';HK_CALDAY='';renderHoryu();}
 function hkHoldSection(){
  var hs=hkHolds().slice();
  hs.sort(function(a,b){return String(hkNyukoOf(b)||'').localeCompare(String(hkNyukoOf(a)||''));});
  var inner=hs.length?hs.map(function(p){var nd=hkNyukoOf(p),dd=daysSince(nd);var daysTxt=(dd!=null)?('入稿から '+Math.max(0,dd)+'日（'+hkMd(nd)+'）'):'入稿日不明';
-   return '<div class="hk-hold"><span class="hk-days">'+daysTxt+'</span>'+(HK_SEL==='全体'?hkTtag(p.tantou):'')+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkPdfBtn(p.id)+'<button class="hk-b live sm" onclick="hkPublish(\''+p.id+'\')">掲載中にする</button></span></div>';
+   return '<div class="hk-hold"><span class="hk-days">'+daysTxt+'</span>'+(HK_SEL==='全体'?hkTtag(p.tantou):'')+hkNyTag(p)+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkPdfBtn(p.id)+'<button class="hk-b live sm" onclick="hkPublish(\''+p.id+'\')">掲載中にする</button></span></div>';
  }).join(''):'<div class="hk-empty">保留中の物件はありません</div>';
  return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">保留中</span><span class="hk-cnt">'+hs.length+'件 ・ 掲載判断待ち</span><span class="hk-rule"></span></div>'+inner+'</div>';
 }
@@ -3829,7 +3848,7 @@ function hkDropSection(){
    var lv=hd?ss.lvAvg.toFixed(1):'—',dv=hd?ss.avg.toFixed(1):'—';
    var redDt=hd&&ss.avg<=0.3,redDay=hd&&ss.d>=30;
    return '<tr>'+(HK_SEL==='全体'?'<td class="l">'+hkTtag(p.tantou)+'</td>':'')
-    +'<td class="l"><span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span><div class="hk-psub">'+esc((p.station||'')+' / '+(p.madori||''))+'</div></td>'
+    +'<td class="l"><span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span><div class="hk-psub">'+esc((p.station||'')+' / '+(p.madori||''))+'　'+hkNyTag(p)+'</div></td>'
     +'<td class="c">'+hkStars(p.stars)+'</td>'
     +'<td>'+(totalRent(p)?totalRent(p).toFixed(1):'—')+'</td>'
     +'<td><div class="hk-pvd">'+lv+'</div></td>'
@@ -3880,7 +3899,7 @@ function _calFmt(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+
 function hkSetCalDay(ds){HK_CALDAY=(HK_CALDAY===ds?'':ds);renderHoryu();}
 function hkCalDetail(ds){
  var ev=hkStatusEvents();var e=ev[ds]||{hold:[],live:[]};
- var grp=function(ids,label,cls){if(!ids.length)return '';return '<div class="hkcal-grp"><div class="hkcal-grphd '+cls+'">'+label+' '+ids.length+'件</div>'+ids.map(function(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return '';return '<div class="hkcal-item" onclick="openProp(\''+id+'\')"><span class="hkcal-inm">'+esc(hkName(p))+'</span><span class="hkcal-isub">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span></div>';}).join('')+'</div>';};
+ var grp=function(ids,label,cls){if(!ids.length)return '';return '<div class="hkcal-grp"><div class="hkcal-grphd '+cls+'">'+label+' '+ids.length+'件</div>'+ids.map(function(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return '';return '<div class="hkcal-item" onclick="openProp(\''+id+'\')"><span class="hkcal-inm">'+esc(hkName(p))+'</span>'+hkNyTag(p)+'<span class="hkcal-isub">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span></div>';}).join('')+'</div>';};
  var body=(e.hold.length+e.live.length)?(grp(e.hold,'保留にした','h')+grp(e.live,'掲載中にした','l')):'<div class="hk-empty">この日の記録はありません</div>';
  return '<div class="hkcal-detail"><div class="hkcal-dethd">'+hkMd(ds)+' に操作した物件</div>'+body+'</div>';
 }
