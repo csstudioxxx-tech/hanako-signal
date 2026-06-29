@@ -3670,6 +3670,8 @@ function hkInjectCSS(){
   '.hk-mbtn{border:none;background:transparent;color:#6b6a66;font-size:12.5px;font-weight:700;padding:7px 16px;border-radius:8px;cursor:pointer;font-family:inherit}',
   '.hk-mbtn.on{background:#fff;color:#1A3D6B;box-shadow:0 1px 2px rgba(0,0,0,.12)}',
   '.hk-selbtn b{font-weight:800;margin-left:3px}',
+  '.hk-bdg{display:inline-block;min-width:15px;height:15px;line-height:15px;padding:0 4px;border-radius:7px;font-size:9.5px;font-weight:800;color:#fff;text-align:center;margin-left:3px;vertical-align:middle;font-variant-numeric:tabular-nums}',
+  '.hk-bdg.bl{background:#2a6df5}.hk-bdg.rd{background:#e5484d}',
   '.hk-selbtn.on b{color:#fff}',
   '.hk-nytag{font-size:9px;font-weight:700;color:#0d6e6e;background:#e3f5f4;border:1px solid #b9e3e0;border-radius:5px;padding:1px 6px;white-space:nowrap}',
   '.hk-cpy{font-size:10.5px;font-weight:700;font-family:inherit;border:1px solid #d8dde4;background:#fff;color:#46505c;border-radius:6px;padding:3px 8px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}',
@@ -3846,21 +3848,19 @@ function hkStatusBar(){
  var hc=base.filter(function(p){return p.status==='保留';}).length;
  return '<div class="hk-statbar"><button class="hk-stbtn'+(HK_STATUS==='both'?' on':'')+'" onclick="hkSetStatus(\'both\')">両方 <b>'+(lc+hc)+'</b></button><button class="hk-stbtn live'+(HK_STATUS==='live'?' on':'')+'" onclick="hkSetStatus(\'live\')">掲載中 <b>'+lc+'</b></button><button class="hk-stbtn hold'+(HK_STATUS==='hold'?' on':'')+'" onclick="hkSetStatus(\'hold\')">保留中 <b>'+hc+'</b></button></div>';
 }
+function hkLHCount(pred){var l=0,hd=0;PROPS.forEach(function(p){if(p.confirmed===false)return;if(!pred(p))return;if(p.status==='保留')hd++;else if(p.status==='掲載中'&&!p.suumoTodo)l++;});return {live:l,hold:hd};}
+function hkLHBadge(c){var s='';if(c.live)s+='<span class="hk-bdg bl" title="掲載中">'+c.live+'</span>';if(c.hold)s+='<span class="hk-bdg rd" title="保留中">'+c.hold+'</span>';return s?(' '+s):'';}
 function hkSelector(){
- var base=hkBaseProps();
  var h='<div class="hk-modetab"><button class="hk-mbtn'+(HK_MODE==='tantou'?' on':'')+'" onclick="hkSetMode(\'tantou\')">物件担当者別</button><button class="hk-mbtn'+(HK_MODE==='nyuko'?' on':'')+'" onclick="hkSetMode(\'nyuko\')">入稿担当者別</button></div>';
- h+='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体 <b>'+base.length+'</b></button>';
- var _unc=base.filter(function(p){return !p.tantou;}).length;
+ h+='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体'+hkLHBadge(hkLHCount(function(){return true;}))+'</button>';
  if(HK_MODE==='nyuko'){
-  var cnt={};base.forEach(function(p){var k=effNyuko(p);cnt[k]=(cnt[k]||0)+1;});
   var all={};PROPS.forEach(function(p){if(p.confirmed!==false){var k=effNyuko(p);if(k&&k!=='未設定')all[k]=1;}});
-  var names=Object.keys(all).sort(function(a,b){return a.localeCompare(b,'ja');});
-  names.forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#0d6e6e')+'"></span>'+esc(s)+' <b>'+(cnt[s]||0)+'</b></button>';});
+  Object.keys(all).sort(function(a,b){return a.localeCompare(b,'ja');}).forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#0d6e6e')+'"></span>'+esc(s)+hkLHBadge(hkLHCount(function(p){return effNyuko(p)===s;}))+'</button>';});
  }else{
-  var cntT={};base.forEach(function(p){var k=p.tantou||'未設定';cntT[k]=(cntT[k]||0)+1;});
-  STAFF.filter(function(s){return ['五嶋','店長'].indexOf(s)<0;}).forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#888')+'"></span>'+esc(s)+' <b>'+(cntT[s]||0)+'</b></button>';});
+  STAFF.filter(function(s){return ['五嶋','店長'].indexOf(s)<0;}).forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#888')+'"></span>'+esc(s)+hkLHBadge(hkLHCount(function(p){return p.tantou===s;}))+'</button>';});
  }
- if(_unc>0||HK_SEL==='担当なし')h+='<button class="hk-selbtn nochg'+(HK_SEL==='担当なし'?' on':'')+'" onclick="hkSetSel(\'担当なし\')">担当なし <b>'+_unc+'</b></button>';
+ var _unc=hkLHCount(function(p){return !p.tantou;});
+ if((_unc.live+_unc.hold)>0||HK_SEL==='担当なし')h+='<button class="hk-selbtn nochg'+(HK_SEL==='担当なし'?' on':'')+'" onclick="hkSetSel(\'担当なし\')">担当なし'+hkLHBadge(_unc)+'</button>';
  return h+'</div>';
 }
 function hkSetMode(m){HK_MODE=m;HK_SEL='全体';HK_CALDAY='';renderHoryu();}
