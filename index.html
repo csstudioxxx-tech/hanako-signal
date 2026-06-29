@@ -3672,6 +3672,11 @@ function hkInjectCSS(){
   '.hk-selbtn b{font-weight:800;margin-left:3px}',
   '.hk-selbtn.on b{color:#fff}',
   '.hk-nytag{font-size:9px;font-weight:700;color:#0d6e6e;background:#e3f5f4;border:1px solid #b9e3e0;border-radius:5px;padding:1px 6px;white-space:nowrap}',
+  '.hk-cpy{font-size:10.5px;font-weight:700;font-family:inherit;border:1px solid #d8dde4;background:#fff;color:#46505c;border-radius:6px;padding:3px 8px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}',
+  '.hk-cpy:hover{border-color:#1A3D6B;color:#1A3D6B;background:#f5f8ff}',
+  '.hk-cpy.code{color:#1A3D6B;font-weight:800;font-variant-numeric:tabular-nums}',
+  '.hk-cpy.code.none{color:#b7bcc4;border-color:#eceef1;cursor:default;background:#fafbfc}',
+  '.hk-hold .hk-right{flex-wrap:wrap;justify-content:flex-end;gap:5px}',
   '.hk-selbtn.nochg{border-color:#f0c889;color:#9a6500}',
   '.hk-selbtn.nochg.on{background:#E8920A;border-color:#E8920A;color:#fff}',
   '.hk-assign{font-size:11.5px;font-weight:700;font-family:inherit;color:#1A3D6B;border:1.5px solid #E8920A;background:#fff7ec;border-radius:7px;padding:5px 8px;cursor:pointer}',
@@ -3752,7 +3757,13 @@ function hkInjectCSS(){
 function hkTtag(t){return '<span class="hk-ttag" style="background:'+(HK_COL[t]||'#888')+'">'+esc(t)+'</span>';}
 function hkName(p){return (p.name||'(名称未設定)')+(p.room?' '+p.room:'');}
 function hkStars(n){n=+n||0;if(!n)return '<span style="font-size:10px;color:#aab0b9">★未評価</span>';var s='';for(var i=0;i<5;i++)s+=(i<n?'<span style="color:#C99A14">★</span>':'<span style="color:#dfe3e8">★</span>');return '<span class="hk-stars">'+s+'</span>';}
-function hkPdfBtn(id){return '<button class="hk-b gho sm" onclick="event.stopPropagation();viewPdf(\''+id+'\')">PDF</button>';}
+function hkPdfBtn(id){
+ var p=PROPS.find(function(x){return x.id===id;})||{};
+ var code=p.suumoCode||'';
+ var codeChip=code?'<button class="hk-cpy code" data-copy="'+esc(code)+'" onclick="event.stopPropagation();copyEl(this)" title="SUUMO物件コードをコピー">#'+esc(code)+'</button>':'<button class="hk-cpy code none" disabled title="SUUMO物件コード未設定">コード無</button>';
+ var nameChip='<button class="hk-cpy nm" data-copy="'+esc(hkName(p))+'" onclick="event.stopPropagation();copyEl(this)" title="物件名をコピー"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>物件名</button>';
+ return codeChip+nameChip+'<button class="hk-b gho sm" onclick="event.stopPropagation();viewPdf(\''+id+'\')">PDF</button>';
+}
 function hkMd(ds){if(!ds)return '';var d=new Date(String(ds).replace(/-/g,'/'));return (d.getMonth()+1)+'/'+d.getDate();}
 function hkNyukoOf(p){if(p.nyukoDate)return p.nyukoDate;if(Array.isArray(p.statusLog)){for(var i=p.statusLog.length-1;i>=0;i--){var m=p.statusLog[i];if(m&&m.memo&&m.memo.indexOf('入稿完了')>=0&&m.ts)return String(m.ts).slice(0,10);}}return p.regDate||'';}
 var NYUKO_GOAL_DUE='2026-06-30';
@@ -3878,7 +3889,7 @@ function hkDropSection(){
     +'<td>'+(hd?ss.pv.toLocaleString():'—')+'</td>'
     +'<td class="'+(redDay?'hk-redday':'')+'">'+((ss.d&&hd)?ss.d+'日':'—')+'</td>'
     +'<td>'+(hd?ss.inq:'—')+'</td>'
-    +'<td><div style="display:flex;gap:5px;justify-content:flex-end">'+hkPdfBtn(p.id)+'<button class="hk-b dropo sm" onclick="hkDrop(\''+p.id+'\')">落とす</button></div></td></tr>';
+    +'<td><div style="display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap;align-items:center">'+hkPdfBtn(p.id)+'<button class="hk-b dropo sm" onclick="hkDrop(\''+p.id+'\')">落としにする</button></div></td></tr>';
  }).join('');
  var tbl=live.length?'<div class="hk-tblwrap"><table class="hk-tbl"><thead>'+th+'</thead><tbody>'+rows+'</tbody></table></div>':'<div class="hk-empty">掲載中の物件はありません</div>';
  return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">落とし選定</span><span class="hk-cnt">掲載中の全物件・物件名クリックで詳細（カルテ）</span><span class="hk-rule"></span></div>'+sort+tbl+'<div class="hk-note">掲載日数30日以上＝赤字／詳細PV/日0.3以下＝赤塗り。ビジコン未反映（データなし）の物件は「—」表示で判定対象外。</div></div>';
