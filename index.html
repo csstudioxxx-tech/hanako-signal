@@ -577,6 +577,8 @@ header{padding-left:54px}
 .rs2-spin{width:8px;height:8px;border:1.5px solid #bcd3ff;border-top-color:#2a6df5;border-radius:50%;animation:rs2sp .8s linear infinite;display:inline-block}
 @keyframes rs2sp{to{transform:rotate(360deg)}}
 .rs2main{min-width:0}
+.sec-rs{font-size:11.5px;font-weight:800;color:#1A3D6B;margin:18px 0 8px;padding-top:14px;border-top:1px solid var(--border2);display:flex;align-items:center;gap:7px}
+.sec-rs::before{content:'';width:3px;height:13px;background:#C99A14;border-radius:2px}
 .rs2-pd{padding:10px 12px;border-bottom:1px solid var(--border2);background:#fff}
 .rs2-pdl{font-size:10px;font-weight:700;color:var(--text3);margin-bottom:4px}
 .rs2-sel{width:100%;font-size:13px;font-weight:700;padding:8px 28px 8px 10px;border:1px solid var(--border);border-radius:9px;font-family:inherit;background:#fff;color:#1A3D6B;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231A3D6B' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 10px center}
@@ -885,10 +887,13 @@ header{padding-left:54px}
 <div id="v-add" style="display:none">
  <div id="drop" class="drop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>マイソクPDFをドロップ</div><div class="ds">複数可 ／ タップして選択 → 自動読み取り</div></div>
  <input type="file" id="pdf" accept="application/pdf" multiple style="display:none">
+ <div id="regstepbody"></div>
+ <button class="btn btn-sec" style="margin-top:9px" onclick="addBlank()">＋ 手動で1件追加</button>
+ <div id="legacyadd" style="display:none">
  <div class="rstest" id="rstestbar_add"><label class="rstest-l"><input type="checkbox" id="testchk_add" onchange="setTestMode(this.checked)">テストモード</label><span class="rstest-d">ONの間に登録した物件はテスト用です。入稿まで進めても、いつでもまとめて削除できます。</span><button class="rstest-del" id="testdel_add" style="display:none" onclick="deleteAllTestProps()">テスト物件を全削除</button></div>
  <div id="pend"></div>
  <div id="addbar" style="display:none"><button class="btn btn-pri" onclick="savePend()">完了：登録してデータ確認へ<span id="pcnt"></span></button></div>
- <button class="btn btn-sec" style="margin-top:9px" onclick="addBlank()">＋ 手動で1件追加</button>
+ </div>
  <div class="bk"><button class="btn btn-sec" onclick="setAPI()">共有設定</button><button id="refbtn" class="btn btn-sec" onclick="refreshData()">再読込</button><button id="autobtn" class="btn btn-sec" onclick="toggleAuto()">自動更新：ON</button><button class="btn btn-sec" onclick="loadSampleGated()">サンプル投入</button><button class="btn btn-sec" onclick="clearAllGated()">全消去</button><button class="btn btn-sec" onclick="exportJ()">バックアップ書出</button><button class="btn btn-sec" onclick="document.getElementById('imp').click()">読込(JSON)</button><input type="file" id="imp" accept=".json" style="display:none" onchange="importJ(event)"></div>
 </div>
 <div id="v-list" style="display:none"><div class="filt" id="lfilt"></div><div class="filt" id="wfilt"></div><div id="lsort"></div><div id="lbody"></div></div>
@@ -902,7 +907,7 @@ header{padding-left:54px}
 <div id="v-review" style="display:none"><div id="reviewbody"></div></div>
 <div id="v-tantou" style="display:none"><div id="tantoubody"></div></div>
 <div id="v-nyuko" style="display:none"><div id="nyukobody"></div></div>
-<div id="v-regstep" style="display:none"><div id="regstepbody"></div></div>
+<div id="v-regstep" style="display:none"></div>
 <div id="v-report" style="display:none"><div id="reportbody"></div></div>
 <div id="v-mbank" style="display:none"><div id="mbankbody"></div></div>
 <div id="v-gbank" style="display:none"><div id="gbankbody"></div></div>
@@ -1621,7 +1626,7 @@ function tab(t){
  CURTAB=t;
  var ALL=['dash','add','list','staff','horyu','opt','sub','drop','review','report','csv','hist','ana','cross','otrend','cost','mbank','gbank','del','is','plan','tantou','nyuko','regstep','devlock'];
  ALL.forEach(x=>{var _sh=(x===t)||(t==='regconf'&&x==='review');var v=document.getElementById('v-'+x);if(v)v.style.display=_sh?'':'none';var b=document.getElementById('tb-'+x);if(b)b.className=_sh?'sn-it on':'sn-it';});
- if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();if(t==='horyu')renderHoryu();if(t==='csv')renderHistMgr();if(t==='nyuko')renderNyukoStatus();
+ if(t==='dash')renderDash();if(t==='list')renderList();if(t==='staff')renderStaff();if(t==='opt')renderOpt();if(t==='hist')renderHist();if(t==='ana')renderAna();if(t==='cross')renderCross();if(t==='otrend')renderOptTrend();if(t==='sub')renderSub();if(t==='drop')renderDrop();if(t==='review'){REG_SCOPE=null;renderReview();}if(t==='regconf')renderReview();if(t==='tantou')renderTantou();if(t==='regstep')renderRegStep();if(t==='add')renderRegStep();if(t==='report')renderReport();if(t==='cost')renderCost();if(t==='mbank')renderMBank();if(t==='gbank')renderGBank();if(t==='del')renderDel();if(t==='is')renderIS();if(t==='plan')renderPlan();if(t==='horyu')renderHoryu();if(t==='csv')renderHistMgr();if(t==='nyuko')renderNyukoStatus();
  var _W=document.querySelector('.wrap');if(_W)_W.classList.toggle('wide',['review','staff','horyu','mbank','gbank','del','is','plan','regconf','tantou','nyuko','regstep'].indexOf(t)>=0);
  var _AG=['dash','ana','drop','cross','opt'];var _gb=document.getElementById('groupbar');if(_gb){if(_AG.indexOf(t)>=0){_gb.innerHTML=groupBar();_gb.style.display='';}else{_gb.style.display='none';}}
  navClose();
@@ -1966,11 +1971,12 @@ function handleFiles(files){
  if(!fs.length)return;
  var fromReg=(CURTAB==='regstep');
  var recs=fs.map(function(f){var rec=mkRec();rec.pdfName=f.name;rec.auto='読取中…';PEND.push(rec);return {f:f,rec:rec};});
- if(fromReg){renderRegStep();renderPend();toast(recs.length+'件を追加で読み込み中…');}
- else{renderPend();REGSTEP_I=0;tab('regstep');}
+ var onAdd=(CURTAB==='add'||CURTAB==='regstep');
+ if(onAdd){renderRegStep();toast(recs.length+'件を追加で読み込み中…');}
+ else{REGSTEP_I=0;tab('add');renderRegStep();}
  askPropTantou(recs);
  Promise.all(recs.map(function(o){return extractInto(o.f,o.rec);})).then(function(){
-  if(fromReg){if(CURTAB==='regstep')renderRegStep();return;}
+  if(onAdd){if(CURTAB==='add'||CURTAB==='regstep')renderRegStep();return;}
   var ok=recs.filter(function(o){return o.rec.name&&o.rec.auto!=='読取不可（手入力）';}).length;
   showUploadDone(ok||recs.length);
  });
@@ -2094,14 +2100,20 @@ function regStepGo(i){var n=PEND.length;if(!n)return;REGSTEP_I=Math.max(0,Math.m
 var RS_TANF='__all';
 var RS_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A','五嶋':'#AD1457','岡田':'#00838F','担当未':'#9aa2ad'};
 function rsSetTanF(v){RS_TANF=v;renderRegStep();}
+var RS_SORT='read';
+function rsSetSort(v){RS_SORT=v;renderRegStep();}
+function _rsRank(p){if(p.auto==='読取中…')return 0;return pendReqOk(p)?2:1;}
 function _rsCntT(t){return PEND.filter(function(p){return (p.tantou||'担当未')===t;}).length;}
 function _rsStaffList(){var s=STAFF.filter(function(t){return _rsCntT(t)>0;});if(_rsCntT('担当未')>0)s.push('担当未');return s;}
 function _rsItem(i,showTan){var p=PEND[i];var rd=(p.auto!=='読取中…');var st=!rd?'<span class="rs2-st read"><span class="rs2-spin"></span>読取中</span>':(pendReqOk(p)?'<span class="rs2-st ok">完了</span>':'<span class="rs2-st need">残'+pendRemain(p)+'</span>');var nm=esc(p.name||p.pdfName||'(無題)')+(p.room?' '+esc(p.room):'');var tag=showTan?(p.tantou?'<span class="rs2-tan">'+esc(p.tantou)+'</span>':'<span class="rs2-tan none">担当未</span>'):'';return '<button class="rs2-it'+(i===REGSTEP_I?' on':'')+'" onclick="regStepGo('+i+')"><span class="rs2-itrow">'+st+tag+'</span><span class="rs2-nm">'+(i+1)+'. '+nm+'</span></button>';}
 function _rsLeft(){var done=PEND.filter(function(p){return p.auto!=='読取中…';}).length;var reading=PEND.length-done;
  var hd='<div class="rs2-lhd">読み取り中物件一覧<span><b style="color:#1f7a52">'+done+'件完了</b> / <b style="color:#2a6df5">'+reading+'件読み取り中</b></span><button class="rs2-del" onclick="clearPendReads()">今回の読み取りを一括削除</button></div>';
  if(RS_TANF!=='__all'&&RS_TANF!=='担当未'&&_rsCntT(RS_TANF)===0&&!(STAFF.indexOf(RS_TANF)>=0))RS_TANF='__all';
- var pd='<div class="rs2-pd"><div class="rs2-pdl">担当者で絞り込み</div><select class="rs2-sel" onchange="rsSetTanF(this.value)"><option value="__all"'+(RS_TANF==='__all'?' selected':'')+'>全員（'+PEND.length+'）</option>'+_rsStaffList().map(function(t){return '<option value="'+esc(t)+'"'+(RS_TANF===t?' selected':'')+'>'+esc(t)+'（'+_rsCntT(t)+'）</option>';}).join('')+'</select></div>';
+ var pd='<div class="rs2-pd"><div class="rs2-pdl">担当者で絞り込み</div><select class="rs2-sel" onchange="rsSetTanF(this.value)"><option value="__all"'+(RS_TANF==='__all'?' selected':'')+'>全員（'+PEND.length+'）</option>'+_rsStaffList().map(function(t){return '<option value="'+esc(t)+'"'+(RS_TANF===t?' selected':'')+'>'+esc(t)+'（'+_rsCntT(t)+'）</option>';}).join('')+'</select><div class="rs2-pdl" style="margin-top:8px">並び順</div><select class="rs2-sel" onchange="rsSetSort(this.value)"><option value="read"'+(RS_SORT==='read'?' selected':'')+'>読込順</option><option value="tan"'+(RS_SORT==='tan'?' selected':'')+'>担当者順</option><option value="nyuko"'+(RS_SORT==='nyuko'?' selected':'')+'>入稿担当者順</option><option value="status"'+(RS_SORT==='status'?' selected':'')+'>状態順（未完了→完了）</option></select></div>';
  var ids=[];PEND.forEach(function(p,i){if(RS_TANF==='__all'||(p.tantou||'担当未')===RS_TANF)ids.push(i);});
+ if(RS_SORT==='tan'){ids.sort(function(a,b){var ta=PEND[a].tantou||'',tb=PEND[b].tantou||'';var ia=ta?STAFF.indexOf(ta):99,ib=tb?STAFF.indexOf(tb):99;if(ia<0)ia=98;if(ib<0)ib=98;if(ia!==ib)return ia-ib;return a-b;});}
+ else if(RS_SORT==='nyuko'){var _no=STAFF.concat(['店長','未設定']);ids.sort(function(a,b){var ia=_no.indexOf(effNyuko(PEND[a])),ib=_no.indexOf(effNyuko(PEND[b]));if(ia<0)ia=97;if(ib<0)ib=97;return ia!==ib?ia-ib:a-b;});}
+ else if(RS_SORT==='status'){ids.sort(function(a,b){var r=_rsRank(PEND[a])-_rsRank(PEND[b]);return r!==0?r:a-b;});}
  var prog='';
  if(RS_TANF!=='__all'){var dn=ids.filter(function(i){return PEND[i].auto!=='読取中…'&&pendReqOk(PEND[i]);}).length;var pct=ids.length?Math.round(dn/ids.length*100):0;var col=RS_COL[RS_TANF]||'#9aa2ad';var av=(RS_TANF==='担当未')?'?':Array.from(RS_TANF)[0];prog='<div class="rs2-prog"><span class="rs2-av" style="background:'+col+'">'+esc(av)+'</span><span class="rs2-pn">'+esc(RS_TANF)+'</span><span class="rs2-bar"><span class="rs2-fill" style="width:'+pct+'%;background:'+col+'"></span></span><span class="rs2-pc">'+dn+'/'+ids.length+'</span></div>';}
  var rows=ids.length?ids.map(function(i){return _rsItem(i,RS_TANF==='__all');}).join(''):'<div class="rs2-empty">該当なし</div>';
@@ -2158,8 +2170,8 @@ function testBadge(p){return (p&&p.isTest)?'<span class="tbadge">TEST</span>':''
 async function deleteAllTestProps(){var t=PROPS.filter(function(p){return p.isTest;});if(!t.length){toast('テスト物件はありません');return;}if(!confirm('テスト物件 '+t.length+'件をすべて削除します（ドライブのPDFも削除）。\nこの操作は取り消せません。よろしいですか？'))return;toast('テスト物件を削除中…');for(var i=0;i<t.length;i++){var p=t[i];if(p.driveId){try{await drivePdfDelete(p.driveId);}catch(e){}}try{await idbSet('pdf_'+p.id,null);}catch(e){}try{localStorage.removeItem('pdf_'+p.id);}catch(e){}}var del={};t.forEach(function(p){del[p.id]=1;});PROPS=PROPS.filter(function(p){return !del[p.id];});await save();await flushPush();recompute();updateBadges();try{refreshCurrentTab();}catch(e){}try{syncTestBars();}catch(e){}toast('テスト物件 '+t.length+'件を削除しました');}
 function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toString(36).slice(2,5);var log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});return {id:id,status:'要入稿',confirmed:(confirmed!==false),regTs:nowTS(),isTest:!!TEST_MODE,bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:true,waku:p.waku||'その他',suumoCode:'',pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,statusLog:log,regDate:today(),tantou:(p.tantou||''),shokan:(p.shokan||''),memos:(p.memos||[]),stars:(+p.stars||0),comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:true,specArea:(p.areaVideo==='得エリア'),video:(p.areaVideo==='動画CM'),areaVideo:(p.areaVideo||''),smaPick:(p.smaPick||''),southFace:(p.southFace||''),nyukoTanto:(p.nyukoTanto||''),netKatch:(p.netKatch||''),netComment:(p.netComment||''),netMemo:(p.netMemo||''),postIntent:(p.postIntent||''),optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''};}
 var _regBusy=false;
-async function regOnePend(i){var p=PEND[i];if(!p)return;if(_regBusy)return;if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}_regBusy=true;var og=document.getElementById('rsOneGo');if(og){og.disabled=true;og.textContent='登録中…';}toast('要入稿に登録しています…');try{var prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。通信を確認して再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();toast('\u2713 「'+(prop.name||'物件')+'」を要入稿に登録しました');if(!PEND.length)tab('staff');else renderRegStep();}finally{_regBusy=false;}}
-async function pendToReview(i){var p=PEND[i];if(!p)return;if(_regBusy)return;if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}_regBusy=true;try{var prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');if(!PEND.length)tab('review');}finally{_regBusy=false;}}
+async function regOnePend(i){var p=PEND[i];if(!p)return;if(_regBusy){toast('処理中です。少しお待ちください');return;}if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}_regBusy=true;var og=document.getElementById('rsOneGo');if(og){og.disabled=true;og.textContent='登録中…';}toast('要入稿に登録しています…');var prop=null,pdfFail=false,err=null;try{prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){pdfFail=true;prop.pdfPending=true;try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){await new Promise(function(r){setTimeout(r,700);});await flushPush();}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();}catch(e){err=e;}finally{_regBusy=false;}if(err){alert('登録中にエラーが発生しました。もう一度お試しください。\n\n'+(err&&err.message?err.message:err));renderRegStep();return;}if(_saveErr){alert('「'+(prop.name||'物件')+'」を要入稿に登録しましたが、サーバー保存に失敗しました（通信エラー）。\n\nデータは消えていません。通信を確認して、画面上部の「再読込」を押すと自動で再送されます。');}if(pdfFail){if(confirm('「'+(prop.name||'物件')+'」のPDF保存に失敗しました。\n\n今すぐPDFを入れ直しますか？\n（キャンセルしても、要入稿の物件カードからいつでも入れ直せます）')){try{pickPdf(prop.id);}catch(e){}}}if(!_saveErr&&!pdfFail)toast('✓ 「'+(prop.name||'物件')+'」を要入稿に登録しました');if(!PEND.length)tab('staff');else renderRegStep();}
+async function pendToReview(i){var p=PEND[i];if(!p)return;if(_regBusy){toast('処理中です。少しお待ちください');return;}if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}_regBusy=true;var prop=null,pdfFail=false,err=null;try{prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){pdfFail=true;prop.pdfPending=true;try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){await new Promise(function(r){setTimeout(r,700);});await flushPush();}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();}catch(e){err=e;}finally{_regBusy=false;}if(err){alert('処理中にエラーが発生しました。もう一度お試しください。\n\n'+(err&&err.message?err.message:err));renderRegStep();return;}if(_saveErr){alert('「'+(prop.name||'物件')+'」を要データ確認に回しましたが、サーバー保存に失敗しました（通信エラー）。\n\nデータは消えていません。通信回復後に「再読込」で再送されます。');}if(pdfFail){if(confirm('「'+(prop.name||'物件')+'」のPDF保存に失敗しました。\n\n今すぐPDFを入れ直しますか？\n（キャンセルしても、物件詳細からいつでも入れ直せます）')){try{pickPdf(prop.id);}catch(e){}}}if(!_saveErr&&!pdfFail)toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');renderRegStep();if(!PEND.length)tab('review');}
 function _tsTime(ts){return (ts&&ts.length>=16)?ts.slice(11,16):'';}
 function todayRegCard(){var td=today();var rows=PROPS.filter(function(p){return p.confirmed!==false&&((p.regTs&&p.regTs.slice(0,10)===td)||(p.nyukoTs&&p.nyukoTs.slice(0,10)===td));});if(!rows.length)return '';rows.sort(function(a,b){return (b.regTs||'').localeCompare(a.regTs||'');});
   var h='<div class="card fade trcard"><div class="sec-h2"><span class="t">今日 入稿した物件</span><span class="cntp">'+rows.length+'件</span><span class="trhint">行をタップで詳細・修正／担当はその場で変更できます</span></div><div class="trwrap"><table class="trtbl"><tr><th>登録</th><th>担当</th><th>物件名</th><th class="hcol">間取り×エリア</th><th>賃料</th><th>評価</th><th>PDF</th><th></th></tr>';
@@ -2245,7 +2257,7 @@ function renderRegStep(){
  h+='<div class="rslab" style="margin-top:12px">駅徒歩（<span style="color:#C99A14;font-weight:800">ランク内の駅</span>から）<span style="font-weight:600;color:var(--text3);font-size:11px">分数を入力</span></div>';
  h+='<div style="display:flex;align-items:center;gap:7px"><input type="number" value="'+esc(p.walkMin||'')+'" oninput="pendFieldInput('+REGSTEP_I+',\'walkMin\',this.value)" placeholder="例）5" style="width:90px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;text-align:center"><span style="font-size:13px;color:var(--text2)">分</span></div>';
  h+='<details class="rsdet" open><summary>物件情報（必須・抜けている箇所を埋めてください）</summary><div class="rsdetbody">'+[['propNo','物件番号',1],['name','物件名',1],['room','号室',1],['madori','間取り',1],['area','面積(㎡)',1],['structure','構造',1],['age','築年数',1],['line','沿線',1],['station','<b style="color:#C99A14">ランク内の駅</b>',1],['address','住所',1],['rent','家賃(万)',1],['mgmtFee','管理費(円)',1],['deposit','敷金',1],['keyMoney','礼金',1],['mgmtCo','管理会社',1],['phone','管理会社TEL',0]].map(function(a){var em=a[2]&&pendFieldEmpty(p,a[0]);return '<div class="rsff'+(em?' empty':'')+'" data-rk="'+a[0]+'"><label>'+a[1]+(a[2]?' <span class="rsreq">必須</span>':' <span class="rsopttag">任意</span>')+'</label><input value="'+esc(p[a[0]]||'')+'" oninput="pendFieldInput('+REGSTEP_I+',\''+a[0]+'\',this.value)"></div>';}).join('')+'</div></details>';
- h+='<div class="rsact"><button class="btn btn-pri" id="rsOneGo" '+(pendReqOk(p)?'':'disabled')+' onclick="regOnePend('+REGSTEP_I+')">'+(pendReqOk(p)?'この物件を要入稿へ ✓':'この物件を要入稿へ（残'+rem+'）')+'</button><button class="btn btn-sec" onclick="pendToReview('+REGSTEP_I+')">要データ確認に回す</button><button class="btn btn-danger" onclick="regStepDel()">削除</button></div>';h+='<div class="rsnav"><button class="btn btn-sec" '+(REGSTEP_I<=0?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I-1)+')">‹ 前へ</button><span class="rspos">'+(REGSTEP_I+1)+' / '+n+'</span><button class="btn btn-sec" '+(REGSTEP_I>=n-1?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I+1)+')">次へ ›</button></div>';
+ var R=REGSTEP_I; h+='<div class="sec-rs">媒体・確認・空室・メモ</div>'; h+='<div class="rslab">媒体</div><div class="row" style="gap:6px;flex-wrap:wrap">'+['atbb','REINS','itandi','その他'].map(function(m){return '<button class="btn-sm'+(p.media===m?' btn-pri':'')+'" onclick="pendMedia('+R+',\''+m+'\')">'+m+'</button>';}).join('')+'</div>'; if(p.media==='その他')h+='<input style="margin-top:6px" value="'+esc(p.mediaOther||'')+'" oninput="PEND['+R+'].mediaOther=this.value" placeholder="媒体名">'; h+='<div class="rslab" style="margin-top:12px">R.T.確認媒体（任意）</div><input value="'+esc(p.rtMedia||'')+'" oninput="PEND['+R+'].rtMedia=this.value" placeholder="Square / ITANDI など">'; h+='<input style="margin-top:6px" value="'+esc(p.rtUrl||'')+'" oninput="PEND['+R+'].rtUrl=this.value" placeholder="URL">'; h+='<div class="rslab" style="margin-top:12px">空室状況</div>'+((p.vacancyLog||[]).map(function(v,vi){return '<div class="row" style="gap:6px;margin-bottom:4px"><input type="date" value="'+(v.date||'')+'" onchange="PEND['+R+'].vacancyLog['+vi+'].date=this.value" style="max-width:150px"><input value="'+esc(v.text||'')+'" oninput="PEND['+R+'].vacancyLog['+vi+'].text=this.value" placeholder="状況"></div>';}).join(''))+'<button class="btn-sm" style="margin-top:2px" onclick="pendVacAdd('+R+')">＋ 空室状況を追加</button>'; h+='<div class="rslab" style="margin-top:12px">I.S. メモ</div><textarea oninput="PEND['+R+'].isMemo=this.value" placeholder="内見状況など 例）6/20 内見あり">'+esc(p.isMemo||'')+'</textarea>'; h+='<div class="rsact"><button class="btn btn-pri" id="rsOneGo" '+(pendReqOk(p)?'':'disabled')+' onclick="regOnePend('+REGSTEP_I+')">'+(pendReqOk(p)?'この物件を要入稿へ ✓':'この物件を要入稿へ（残'+rem+'）')+'</button><button class="btn btn-sec" onclick="pendToReview('+REGSTEP_I+')">要データ確認に回す</button><button class="btn btn-danger" onclick="regStepDel()">削除</button></div>';h+='<div class="rsnav"><button class="btn btn-sec" '+(REGSTEP_I<=0?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I-1)+')">‹ 前へ</button><span class="rspos">'+(REGSTEP_I+1)+' / '+n+'</span><button class="btn btn-sec" '+(REGSTEP_I>=n-1?'disabled':'')+' onclick="regStepGo('+(REGSTEP_I+1)+')">次へ ›</button></div>';
  h+='</div>';
  host.innerHTML='<div class="rs2wrap"><aside class="rs2list">'+_rsLeft()+'</aside><div class="rs2main">'+h+'</div></div>';
 }
@@ -2259,6 +2271,7 @@ function pendMediaAll(v){var name='';if(v==='その他'){name=(prompt('媒体名
 function pendVacAdd(i){if(!PEND[i].vacancyLog)PEND[i].vacancyLog=[];PEND[i].vacancyLog.push({date:new Date().toISOString().slice(0,10),text:''});renderPend();}
 function renderPend(){
  try{syncTestBars();}catch(e){}
+ try{if(typeof renderRegStep==='function')renderRegStep();}catch(e){}
  const el=document.getElementById('pend');document.getElementById('addbar').style.display=PEND.length?'block':'none';
  document.getElementById('pcnt').textContent='（'+PEND.length+'件）';
  var _bulk=PEND.length?'<div class="card" style="padding:10px 12px;margin-bottom:8px"><div class="qlabel" style="margin-top:0">今回の掲載媒体を一括指定（個別でも変更可）</div><div class="row" style="gap:6px;flex-wrap:wrap">'+['atbb','REINS','itandi','その他'].map(function(m){return '<button class="btn-sm" onclick="pendMediaAll(\''+m+'\')">'+m+'</button>';}).join('')+'</div></div>':'';
@@ -2326,20 +2339,21 @@ async function _bulkRegister(decisions){
  var _bk=document.getElementById('rsBulk');if(_bk){_bk.disabled=true;_bk.textContent='登録中…';}
  toast('処理しています…');
  try{
-  var uploads=[],consumed=[],reg=0,pdfadd=0,skip=0;
+  var uploads=[],consumed=[],reg=0,pdfadd=0,skip=0,pdfFails=[];
   for(var i=0;i<decisions.length;i++){
    var d=decisions[i],p=d.p;
    if(d.choice==='skip'){consumed.push(p);skip++;continue;}
-   if(d.choice==='checkpdf'&&d.dup){var ex=d.dup;if(d.fields){Object.keys(d.fields).forEach(function(k){ex[k]=d.fields[k];});}if(p.pdfData){var ok=await uploadPdfToDrive(ex,p.pdfData);if(!ok){try{await gset('pdf_'+ex.id,p.pdfData);}catch(e){}}}if(!Array.isArray(ex.statusLog))ex.statusLog=[];ex.statusLog.push({memo:'一括登録：PDF追加＋情報確認',ts:nowTS()});consumed.push(p);pdfadd++;continue;}
+   if(d.choice==='checkpdf'&&d.dup){var ex=d.dup;if(d.fields){Object.keys(d.fields).forEach(function(k){ex[k]=d.fields[k];});}if(p.pdfData){var ok=await uploadPdfToDrive(ex,p.pdfData);if(!ok){ex.pdfPending=true;pdfFails.push(ex.name||ex.pdfName||'物件');try{await gset('pdf_'+ex.id,p.pdfData);}catch(e){}}}if(!Array.isArray(ex.statusLog))ex.statusLog=[];ex.statusLog.push({memo:'一括登録：PDF追加＋情報確認',ts:nowTS()});consumed.push(p);pdfadd++;continue;}
    var np=_buildPendProp(p,true);PROPS.push(np);if(p.pdfData)uploads.push({id:np.id,b64:p.pdfData});consumed.push(p);reg++;
   }
-  for(var u=0;u<uploads.length;u++){var pp=PROPS.find(function(x){return x.id===uploads[u].id;});var ok2=false;if(pp)ok2=await uploadPdfToDrive(pp,uploads[u].b64);if(!ok2){try{await gset('pdf_'+uploads[u].id,uploads[u].b64);}catch(e){}}}
+  for(var u=0;u<uploads.length;u++){var pp=PROPS.find(function(x){return x.id===uploads[u].id;});var ok2=false;if(pp)ok2=await uploadPdfToDrive(pp,uploads[u].b64);if(!ok2){if(pp)pp.pdfPending=true;pdfFails.push((pp&&(pp.name||pp.pdfName))||'物件');try{await gset('pdf_'+uploads[u].id,uploads[u].b64);}catch(e){}}}
   PEND=PEND.filter(function(x){return consumed.indexOf(x)<0;});
   if(typeof REGSTEP_I!=='undefined'&&REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);
   await save();await flushPush();recompute();updateBadges();
   closeBulkResolve();renderPend();
-  if(_saveErr){toast('\u26a0 保存に失敗しました。通信を確認して再保存してください（データは手元に残っています）');}
+  if(_saveErr){alert('登録は完了しましたが、サーバー保存に失敗しました（通信エラー）。\n\nデータは消えていません。通信を確認して、画面上部の「再読込」を押すと自動で再送されます。');}
   else{toast('完了：登録 '+reg+'件／PDF追加 '+pdfadd+'件／スキップ '+skip+'件');}
+  if(pdfFails.length){alert('次の物件のPDF保存に失敗しました（'+pdfFails.length+'件）。\n\n'+pdfFails.slice(0,10).join('\n')+(pdfFails.length>10?('\n…ほか'+(pdfFails.length-10)+'件'):'')+'\n\n要入稿の物件カードの「PDF」ボタンから入れ直してください。');}
   if(reg&&!PEND.length){tab('staff');}else if(CURTAB==='regstep'){renderRegStep();}
  }finally{_regBusy=false;}
 }
@@ -5287,7 +5301,7 @@ function showUploadDone(n){
  ov.innerHTML='<div class="modal"><div class="mmsg" style="text-align:center"><div style="margin-bottom:6px"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.4 12.3l2.3 2.3 4.8-5"/></svg></div><div style="font-weight:800;font-size:16px;margin-bottom:4px">無事にアップできました</div><div style="font-size:13px;color:var(--text2);line-height:1.6">マイソクを '+n+' 件 読み込みました。<br>内容を確認して担当者を選び、登録に進めます。</div></div><div class="mbtns"><button class="btn btn-sec" id="_udclose">閉じる</button><button class="btn btn-pri" id="_udgo">アップしたデータを確認する</button></div></div>';
  document.body.appendChild(ov);
  ov.querySelector('#_udclose').onclick=function(){ov.remove();};
- ov.querySelector('#_udgo').onclick=function(){ov.remove();tab('regstep');};
+ ov.querySelector('#_udgo').onclick=function(){ov.remove();tab('add');};
  ov.onclick=function(e){if(e.target===ov)ov.remove();};
 }
 
