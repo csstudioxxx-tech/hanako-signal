@@ -2161,18 +2161,23 @@ var _pendPersistT=null;
 function schedulePersistPend(){clearTimeout(_pendPersistT);_pendPersistT=setTimeout(persistPend,500);}
 function persistPend(){try{if(typeof idbSet!=='function')return;idbSet('__PEND__',JSON.stringify({pend:PEND,i:REGSTEP_I,ts:Date.now()}));}catch(e){}}
 async function restorePend(){try{if(typeof idbGet!=='function')return;var raw=await idbGet('__PEND__');if(!raw)return;var o=JSON.parse(raw);if(o&&Array.isArray(o.pend)&&o.pend.length){PEND=o.pend.map(function(p){if(p&&p.auto==='読取中…')p.auto='要確認';return p;});REGSTEP_I=(o.i!=null&&o.i>=0&&o.i<PEND.length)?o.i:0;setTimeout(function(){try{toast('前回の読み込み中だった '+PEND.length+'件を復元しました');}catch(e){}},900);}}catch(e){}}
-var PFF={pdfs:[],matches:[],unmatchedProps:[],skipExist:0,skipNone:0,applied:[],busy:false,showApplied:false};
+var PFF={pdfs:[],gap:[],exist:[],none:[],applied:[],busy:false,showApplied:false};
 function _pffMissing(){return PROPS.filter(function(p){return p.confirmed!==false&&!(p.driveUrl||p.driveId);});}
 function _pffScore(prop,pdf){var nk=_nkey(prop.name||'');if(!nk||nk.length<2)return 0;if(pdf.key.indexOf(nk)<0)return 0;var s=50;var rk=_nkey(prop.room||'');if(rk&&rk.length>=1&&pdf.key.indexOf(rk)>=0)s+=40;return s;}
+function _pffSrc(p){return (p&&p.fromCsv)?'CSV読み取り':'自社物件登録';}
+function _pffUp(p){if(!p)return '—';return p.regDate||p.uploadDate||p.listDate||((p.regTs&&p.regTs.length>=10)?p.regTs.slice(0,10):'')||'—';}
+function _pffPropLine(p){var srcCsv=!!(p&&p.fromCsv);var sc=srcCsv?'#7a5cc0':'#1f7a52';var sb=srcCsv?'#efeafc':'#e3f3e9';
+ return '<div style="font-size:12.5px;font-weight:700"><a onclick="openProp(\''+p.id+'\')" style="color:#1A3D6B;text-decoration:underline;cursor:pointer">'+esc((p.name||'(無題)')+(p.room?(' '+p.room):''))+'</a></div>'
+  +'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:3px"><span style="font-size:10.5px;font-weight:700;color:'+sc+';background:'+sb+';border-radius:6px;padding:2px 7px">'+_pffSrc(p)+'</span><span style="font-size:10.5px;color:#9aa2ad">アップ日 '+esc(_pffUp(p))+'</span></div>';}
 function openPdfFillModal(){
- PFF.pdfs=[];PFF.matches=[];PFF.unmatchedProps=[];PFF.applied=[];PFF.skipExist=0;PFF.skipNone=0;PFF.showApplied=false;
+ PFF.pdfs=[];PFF.gap=[];PFF.exist=[];PFF.none=[];PFF.applied=[];PFF.showApplied=false;
  var ov=document.createElement('div');ov.className='ovl';ov.id='pffov';
  ov.innerHTML='<div class="modal" style="max-width:680px;width:96vw;max-height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">'
   +'<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #eceef1"><b style="flex:1;font-size:15.5px;color:#1A3D6B">抜けPDF 一括補完</b><button onclick="closePdfFillModal()" style="border:none;background:#ececf0;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;color:#555">\u00d7</button></div>'
   +'<div style="padding:14px 16px;overflow:auto">'
-  +'<div style="font-size:12.5px;color:#6b6a66;line-height:1.7">PDFをまとめてドロップすると、<b>PDF未添付の物件</b>に<b>物件名＋号室</b>で自動マッチして差し込みます。すでにPDFがある物件・該当しないPDFはスキップします。</div>'
+  +'<div style="font-size:12.5px;color:#6b6a66;line-height:1.7">PDFをまとめてドロップすると、<b>物件名＋号室</b>で花子のデータと照合して3つに振り分けます。①花子にあり・PDFあり ②花子にあり・PDFなし（差し込み対象）③花子にそもそもない。</div>'
   +'<div style="margin-top:10px"><span id="pffmiss" style="font-size:13px;font-weight:700;background:#fff7ec;color:#9a6500;border:1px solid #f0d9a8;border-radius:8px;padding:6px 12px">PDF未添付の物件：'+_pffMissing().length+'件</span></div>'
-  +'<div id="pffdz" style="margin-top:12px;border:2px dashed #cfd6df;border-radius:14px;padding:26px;text-align:center;cursor:pointer;background:#fff"><div style="font-size:14px;font-weight:800;color:#1A3D6B">\U0001F4C4 PDFをまとめてドロップ（100件程度OK）</div><div style="font-size:11.5px;color:#9aa2ad;margin-top:5px">タップしてまとめて選択 → 自動マッチング</div></div>'
+  +'<div id="pffdz" style="margin-top:12px;border:2px dashed #cfd6df;border-radius:14px;padding:26px;text-align:center;cursor:pointer;background:#fff"><div style="font-size:14px;font-weight:800;color:#1A3D6B">📄 PDFをまとめてドロップ（100件程度OK）</div><div style="font-size:11.5px;color:#9aa2ad;margin-top:5px">タップしてまとめて選択 → 自動マッチング</div></div>'
   +'<input type="file" id="pffinp" accept="application/pdf,.pdf" multiple style="display:none">'
   +'<div id="pffresult" style="margin-top:14px"></div>'
   +'</div></div>';
@@ -2200,42 +2205,48 @@ function computePffMatches(){
  var cands=[];
  missing.forEach(function(prop,pi){PFF.pdfs.forEach(function(pdf,fi){var s=_pffScore(prop,pdf);if(s>=50)cands.push({pi:pi,fi:fi,s:s});});});
  cands.sort(function(a,b){return b.s-a.s;});
- var uP={},uF={},matches=[];
- cands.forEach(function(c){if(uP[c.pi]||uF[c.fi])return;uP[c.pi]=1;uF[c.fi]=1;matches.push({prop:missing[c.pi],pdf:PFF.pdfs[c.fi],score:c.s,apply:true});});
- PFF.matches=matches;
- PFF.unmatchedProps=missing.filter(function(p,pi){return !uP[pi];});
- var se=0,sn=0;
- PFF.pdfs.forEach(function(pdf,fi){if(uF[fi])return;var hit=have.some(function(hp){return _pffScore(hp,pdf)>=50;});if(hit)se++;else sn++;});
- PFF.skipExist=se;PFF.skipNone=sn;
+ var uP={},uF={},gap=[];
+ cands.forEach(function(c){if(uP[c.pi]||uF[c.fi])return;uP[c.pi]=1;uF[c.fi]=1;gap.push({prop:missing[c.pi],pdf:PFF.pdfs[c.fi],score:c.s,apply:true});});
+ var exist=[],none=[];
+ PFF.pdfs.forEach(function(pdf,fi){if(uF[fi])return;var best=null,bs=0;have.forEach(function(hp){var s=_pffScore(hp,pdf);if(s>bs){bs=s;best=hp;}});if(best&&bs>=50)exist.push({prop:best,pdf:pdf,score:bs});else none.push({pdf:pdf});});
+ PFF.gap=gap;PFF.exist=exist;PFF.none=none;
 }
-function pffToggle(i){if(PFF.matches[i])PFF.matches[i].apply=!PFF.matches[i].apply;renderPffResult();}
+function pffToggle(i){if(PFF.gap[i])PFF.gap[i].apply=!PFF.gap[i].apply;renderPffResult();}
 function pffShowApplied(){PFF.showApplied=!PFF.showApplied;renderPffResult();}
 function renderPffResult(){
- var res=document.getElementById('pffresult');if(!res)return;var m=PFF.matches||[];
+ var res=document.getElementById('pffresult');if(!res)return;
+ if(!PFF.pdfs.length){res.innerHTML='';return;}
+ var gap=PFF.gap||[],exist=PFF.exist||[],none=PFF.none||[];
+ var selN=gap.filter(function(x){return x.apply;}).length;
  var h='';
  if(PFF.applied&&PFF.applied.length){
-  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
-   +'<button onclick="pffShowApplied()" style="font-size:12px;font-weight:700;background:#e3f3e9;color:#1f7a52;border:1px solid #bfe6cf;border-radius:8px;padding:6px 12px;cursor:pointer">PDFを差し込んだ物件：'+PFF.applied.length+'件 \u25be</button>'
-   +'<span style="font-size:12px;font-weight:700;background:#eef0f2;color:#6b6a66;border-radius:8px;padding:6px 12px">スキップ（既にPDFあり）：'+PFF.skipExist+'件</span>'
-   +'<span style="font-size:12px;font-weight:700;background:#fff7ec;color:#9a6500;border-radius:8px;padding:6px 12px">該当なし：'+PFF.skipNone+'件</span></div>';
-  if(PFF.showApplied){h+='<div style="border:1px solid #e7eaee;border-radius:12px;overflow:hidden;margin-bottom:10px">'+PFF.applied.map(function(a){return '<div style="padding:9px 12px;border-bottom:1px solid #eceef1;font-size:12.5px"><b style="color:#1A3D6B">'+esc(a.name+(a.room?(' '+a.room):''))+'</b><div style="font-size:11px;color:#9aa2ad">\u2190 '+esc(a.pdfName)+'</div></div>';}).join('')+'</div>';}
-  if((PFF.unmatchedProps||[]).length)h+='<details><summary style="font-size:12px;font-weight:700;color:#9a6500;cursor:pointer">まだPDFが無い物件（'+PFF.unmatchedProps.length+'）</summary><div style="font-size:12px;line-height:1.9;color:#46505c;margin-top:6px">'+PFF.unmatchedProps.slice(0,200).map(function(p){return esc((p.name||'(無題)')+(p.room?(' '+p.room):''));}).join('<br>')+'</div></details>';
-  res.innerHTML=h;return;
+  h+='<div style="margin-bottom:10px"><button onclick="pffShowApplied()" style="font-size:12.5px;font-weight:700;background:#e3f3e9;color:#1f7a52;border:1px solid #bfe6cf;border-radius:8px;padding:7px 13px;cursor:pointer">今回PDFを差し込んだ物件：'+PFF.applied.length+'件 \u25be</button>';
+  if(PFF.showApplied)h+='<div style="border:1px solid #e7eaee;border-radius:12px;overflow:hidden;margin-top:8px">'+PFF.applied.map(function(a){return '<div style="padding:9px 12px;border-bottom:1px solid #eceef1;font-size:12.5px"><b style="color:#1A3D6B">'+esc(a.name+(a.room?(' '+a.room):''))+'</b><div style="font-size:11px;color:#9aa2ad">\u2190 '+esc(a.pdfName)+'</div></div>';}).join('')+'</div>';
+  h+='</div>';
  }
- var selN=m.filter(function(x){return x.apply;}).length;
- h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><span style="font-size:12px;font-weight:700;background:#e3f3e9;color:#1f7a52;border-radius:8px;padding:5px 11px">マッチ '+m.length+'件</span><span style="font-size:12px;font-weight:700;background:#eef0f2;color:#6b6a66;border-radius:8px;padding:5px 11px">スキップ（既にPDFあり） '+PFF.skipExist+'件</span><span style="font-size:12px;font-weight:700;background:#fff7ec;color:#9a6500;border-radius:8px;padding:5px 11px">該当なし '+PFF.skipNone+'件</span></div>';
- if(m.length){
-  h+='<div style="border:1px solid #e7eaee;border-radius:12px;overflow:hidden;max-height:46vh;overflow-y:auto">';
-  m.forEach(function(x,i){var conf=x.score>=90?'物件名＋号室一致':'物件名のみ一致';var cc=x.score>=90?'#1f7a52':'#9a6500';
-   h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #eceef1"><input type="checkbox" '+(x.apply?'checked':'')+' onchange="pffToggle('+i+')" style="width:17px;height:17px;flex:none"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:#1A3D6B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc((x.prop.name||'(無題)')+(x.prop.room?(' '+x.prop.room):''))+'</div><div style="font-size:11px;color:#9aa2ad;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\u2190 '+esc(x.pdf.name)+'</div></div><span style="font-size:10px;font-weight:700;color:'+cc+';flex:none">'+conf+'</span></div>';});
-  h+='</div><button class="btn btn-pri" style="margin-top:12px" onclick="pffApply()"'+(selN?'':' disabled')+'>選択した '+selN+'件のPDFを物件に反映</button>';
- }else if(PFF.pdfs.length){h+='<div style="font-size:13px;color:#6b6a66;padding:10px 0">マッチする抜け物件が見つかりませんでした。物件名がPDF内に無いか、すでにPDFがある物件かもしれません。</div>';}
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+  +'<span style="font-size:12px;font-weight:700;background:#e3f3e9;color:#1f7a52;border-radius:8px;padding:5px 11px">② 花子あり・PDFなし '+gap.length+'件</span>'
+  +'<span style="font-size:12px;font-weight:700;background:#eef0f2;color:#6b6a66;border-radius:8px;padding:5px 11px">① 花子あり・PDFあり '+exist.length+'件</span>'
+  +'<span style="font-size:12px;font-weight:700;background:#fff7ec;color:#9a6500;border-radius:8px;padding:5px 11px">③ 花子にない '+none.length+'件</span></div>';
+ h+='<div style="font-size:13px;font-weight:800;color:#1f7a52;margin:4px 0 7px">② 花子にあり・PDFなし（差し込み対象）'+(gap.length?' '+gap.length+'件':'')+'</div>';
+ if(gap.length){
+  h+='<div style="border:1px solid #bfe6cf;border-radius:12px;overflow:hidden;max-height:42vh;overflow-y:auto">';
+  gap.forEach(function(x,i){var conf=x.score>=90?'号室一致':'物件名一致';
+   h+='<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid #eceef1"><input type="checkbox" '+(x.apply?'checked':'')+' onchange="pffToggle('+i+')" style="width:17px;height:17px;flex:none;margin-top:2px"><div style="flex:1;min-width:0">'+_pffPropLine(x.prop)+'<div style="font-size:11px;color:#9aa2ad;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\u2190 '+esc(x.pdf.name)+'</div></div><span style="font-size:10px;font-weight:700;color:'+(x.score>=90?'#1f7a52':'#9a6500')+';flex:none;margin-top:2px">'+conf+'</span></div>';});
+  h+='</div><button class="btn btn-pri" style="margin-top:10px" onclick="pffApply()"'+(selN?'':' disabled')+'>選択した '+selN+'件のPDFを差し込む</button>';
+ }else{h+='<div style="font-size:12px;color:#9aa2ad;padding:4px 0 8px">該当なし</div>';}
+ h+='<details style="margin-top:14px"><summary style="cursor:pointer;font-size:13px;font-weight:800;color:#6b6a66">① 花子にあり・PDFあり（スキップ） '+exist.length+'件</summary>';
+ if(exist.length){h+='<div style="border:1px solid #e7eaee;border-radius:12px;overflow:hidden;margin-top:8px">'+exist.map(function(x){return '<div style="padding:10px 12px;border-bottom:1px solid #eceef1">'+_pffPropLine(x.prop)+'<div style="font-size:11px;color:#9aa2ad;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\u2190 '+esc(x.pdf.name)+' <span style="color:#1f7a52;font-weight:700">既にPDFあり</span></div></div>';}).join('')+'</div>';}
+ h+='</details>';
+ h+='<details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;font-weight:800;color:#9a6500">③ 花子にそもそもない '+none.length+'件</summary>';
+ if(none.length){h+='<div style="font-size:11.5px;color:#8a6500;margin:6px 2px 4px">花子に一致する物件がありません。必要なら物件登録から取り込んでください。</div><div style="border:1px solid #f0d9a8;border-radius:12px;overflow:hidden;background:#fffdf8">'+none.map(function(x){return '<div style="padding:9px 12px;border-bottom:1px solid #f4e6c8;font-size:12px;color:#5f5638;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'+esc(x.pdf.name)+'</div>';}).join('')+'</div>';}
+ h+='</details>';
  res.innerHTML=h;
 }
 async function pffApply(){
- if(PFF.busy)return;var sel=(PFF.matches||[]).filter(function(x){return x.apply;});
- if(!sel.length){toast('反映する項目がありません');return;}
- if(!confirm(sel.length+'件のPDFを物件に反映します。よろしいですか？'))return;
+ if(PFF.busy)return;var sel=(PFF.gap||[]).filter(function(x){return x.apply;});
+ if(!sel.length){toast('差し込む項目がありません');return;}
+ if(!confirm(sel.length+'件のPDFを物件に差し込みます。よろしいですか？'))return;
  PFF.busy=true;var res=document.getElementById('pffresult');var applied=[],fail=[];
  for(var i=0;i<sel.length;i++){var x=sel[i];if(res)res.innerHTML='<div style="font-size:13px;color:#2a6df5;font-weight:700">アップロード中… '+(i+1)+' / '+sel.length+'</div>';
   var r=false;try{r=await uploadPdfToDrive(x.prop,x.pdf.b64);}catch(e){}
@@ -2243,7 +2254,8 @@ async function pffApply(){
   applied.push({name:x.prop.name||'(無題)',room:x.prop.room||'',pdfName:x.pdf.name});}
  try{await save();await flushPush();}catch(e){}
  PFF.busy=false;recompute();updateBadges();
- PFF.applied=applied;PFF.matches=[];PFF.showApplied=false;
+ PFF.applied=applied;PFF.showApplied=false;
+ computePffMatches();
  var mc=document.getElementById('pffmiss');if(mc)mc.textContent='PDF未添付の物件：'+_pffMissing().length+'件';
  renderPffResult();
  if(fail.length)alert(fail.length+'件はDriveアップロードに失敗し端末内に保存しました（通信回復後に物件カードから入れ直してください）。');
