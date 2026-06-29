@@ -528,6 +528,14 @@ header{padding-left:54px}
 .rrnopdf{font-size:11px;color:var(--text3,#aaa);margin-left:auto}
 /* ===== 案C 読み込み＆所感ステッパー ===== */
 .rsbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.rstest{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px dashed #cbd2da;border-radius:10px;padding:9px 12px;margin:0 0 12px;background:#fafbfc}
+.rstest.on{border-color:#7c3aed;background:#f6f1fe}
+.rstest-l{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:#46505c;cursor:pointer;white-space:nowrap}
+.rstest.on .rstest-l{color:#6d28d9}
+.rstest-l input{width:16px;height:16px;accent-color:#7c3aed;cursor:pointer}
+.rstest-d{font-size:11px;color:#9aa2ad;flex:1;min-width:150px;line-height:1.5}
+.rstest-del{border:1px solid #e0a89a;background:#fff;color:#c2410c;font-family:inherit;font-weight:800;font-size:12px;padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.tbadge{display:inline-block;font-size:9px;font-weight:800;color:#fff;background:#7c3aed;border-radius:5px;padding:1px 6px;margin-right:4px;vertical-align:middle;letter-spacing:.03em}
 .rsbar .rst{font-size:15px;font-weight:800}
 .rsbar .rssub{font-size:12px;color:var(--text2)}
 .rsbar .rsgo{width:auto;margin-left:auto;padding:9px 16px}
@@ -1925,7 +1933,9 @@ function handleFiles(files){
   showUploadDone(ok||recs.length);
  });
 }
-function _needPng(j){return !j||!j.bukken_mei||j.chinryo==null;}
+function _fillPendBlanks(rec,raw,fname){try{if(!raw)return;var f=extractFields(raw,fname);if(!f)return;var ks=['room','line','station','madori','rent','area','structure','age','address','floor','propNo','mgmtFee','deposit','keyMoney','mgmtCo','phone','fax','btSep','washStand','petOk','dep0','key0','autoLock','delivBox','twoBurner'];ks.forEach(function(k){if((rec[k]==null||rec[k]==='')&&f[k]!=null&&f[k]!=='')rec[k]=String(f[k]);});}catch(e){}}
+function _detectAtbb(raw,rec){try{if(raw&&/infosheet/i.test(raw))rec.media='atbb';}catch(e){}}
+function _needPng(j){return !j||!j.bukken_mei||j.chinryo==null||j.needs_review===true||!j.madori||j.senyu_menseki==null;}
 let GEMERR='';
 async function geminiExtract(b64,mime){gprogShow('Gemini解析中（マイソク読み取り）');try{var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'extractPdf',data:b64,mime:mime})});var tx=await r.text();var d=null;try{d=JSON.parse(tx);}catch(pe){GEMERR='GAS\u5fdc\u7b54\u304cJSON\u3067\u306f\u3042\u308a\u307e\u305b\u3093\uff08\u518d\u30c7\u30d7\u30ed\u30a4\u672a\u5b9f\u65bd\u304b\u516c\u958b\u8a2d\u5b9a\u306e\u53ef\u80fd\u6027\uff09';return null;}if(d&&d.ok&&d.data){GEMERR='';return d.data;}GEMERR=(d&&d.error)?String(d.error):'GAS\u304c extractPdf \u3092\u51e6\u7406\u3057\u3066\u3044\u307e\u305b\u3093\uff08\u65b0\u30d0\u30fc\u30b8\u30e7\u30f3\u3067\u306e\u518d\u30c7\u30d7\u30ed\u30a4\u304c\u5fc5\u8981\uff09';return null;}catch(e){GEMERR='\u901a\u4fe1\u30a8\u30e9\u30fc: '+e.message;return null;}finally{gprogDone();}}
 async function pdfToPng(file){try{const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;const pg=await pdf.getPage(1);const vp=pg.getViewport({scale:2.5});const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;return cv.toDataURL('image/png').split(',')[1];}catch(e){return null;}}
@@ -2010,6 +2020,9 @@ function mapGemini(j,rec){if(!j)return;
  if(!ks.length&&j.kotsu_text){ks=_parseKotsuText(String(j.kotsu_text));}
  if(ks.length){rec.stations=ks;var mi=ks.findIndex(function(x){return RANK[x.sta];});if(mi<0)mi=0;rec.station=ks[mi].sta;rec.line=ks[mi].line;rec.walkMin=ks[mi].walkMin;}
  rec.nearby=[(j.torihiki_taiyo?'取引: '+j.torihiki_taiyo:''),(j.ad?'AD: '+j.ad:''),(j.biko||'')].filter(Boolean).join(' / ');
+ if(j.goushitsu)rec.room=String(j.goushitsu);
+ if(j.muki&&/南/.test(String(j.muki)))rec.southFace='あり';
+ if(j.setsubi){var _sb=j.setsubi;if(_sb.bt_sep)rec.btSep='あり';if(_sb.washstand)rec.washStand='あり';if(_sb.autolock)rec.autoLock='あり';if(_sb.delivery_box)rec.delivBox='あり';if(_sb.two_burner)rec.twoBurner='あり';if(_sb.pet)rec.petOk='あり';}
  rec.needsReview=!!j.needs_review;rec.reviewReason=(Array.isArray(j.review_reason)?j.review_reason.join('、'):(j.review_reason||''));
  if(rec.station&&rec.madori)rec.waku=autoWaku(rec.station,rec.madori,String(totFromParts(rec.rent,rec.mgmtFee)||'0'));
  rec.auto=rec.needsReview?('要確認：'+(rec.reviewReason||'')):'Gemini自動読取';}
@@ -2018,13 +2031,14 @@ async function extractInto(file,rec){
  if(API&&rec.pdfData){try{
   var gj=await geminiExtract(rec.pdfData,'application/pdf');
   if(_needPng(gj)){var png=await pdfToPng(file);if(png){var gj2=await geminiExtract(png,'image/png');if(gj2&&gj2.bukken_mei)gj=gj2;}}
-  if(gj&&gj.bukken_mei){mapGemini(gj,rec);try{var _rawc=await pdfText(file);fillContacts(rec,_rawc);}catch(e){}if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');renderPend();if(CURTAB==='regstep')renderRegStep();pendDupDialog(rec);return;}
+  if(gj&&gj.bukken_mei){mapGemini(gj,rec);try{var _rawc=await pdfText(file);fillContacts(rec,_rawc);_fillPendBlanks(rec,_rawc,file.name);_detectAtbb(_rawc,rec);}catch(e){}if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');renderPend();if(CURTAB==='regstep')renderRegStep();pendDupDialog(rec);return;}
  }catch(e){}}
  try{const raw=await pdfText(file);const f=extractFields(raw,file.name);
   const okread=f._readable,manual=f._manual,mr=f._manualReason||'';
   delete f._readable;delete f._manual;delete f._manualReason;
   Object.keys(f).forEach(k=>{if(f[k]!=null&&f[k]!=='')rec[k]=String(f[k]);});
   fillContacts(rec,raw);
+  _detectAtbb(raw,rec);
   if(!rec.name)rec.name=file.name.replace(/\.pdf$/i,'');
   rec.auto=!okread?'読取不可（手入力）':(manual?('要手動対応'+(mr?'：'+mr:'')):'自動読取(簡易)');
   if(rec.station&&rec.madori)rec.waku=autoWaku(rec.station,rec.madori,String(totFromParts(rec.rent,rec.mgmtFee)||'0'));
@@ -2032,7 +2046,7 @@ async function extractInto(file,rec){
  }catch(e){rec.auto='読取不可（手入力）';}
  renderPend();if(CURTAB==='regstep')renderRegStep();pendDupDialog(rec);}
 function addBlank(){const r=mkRec();r.pdfName='手動入力';r.auto='手動';PEND.push(r);renderPend();tab('add');}
-async function rereadPend(i){var rec=PEND[i];if(!rec)return;if(_regBusy)return;if(!rec.pdfData){toast('再読み込み用のPDFデータがありません（PDFを差し替えてください）');return;}if(!API){toast('PDF自動読み取りが未設定です');return;}_regBusy=true;var _prev=rec.auto;rec.auto='読取中…';if(CURTAB==='regstep')renderRegStep();try{var gj=await geminiExtract(rec.pdfData,'application/pdf');if(_needPng(gj)){try{var blob=_b64ToBlob(rec.pdfData,'application/pdf');if(blob){var png=await pdfToPng(blob);if(png){var gj2=await geminiExtract(png,'image/png');if(gj2&&gj2.bukken_mei)gj=gj2;}}}catch(e){}}if(gj&&gj.bukken_mei){mapGemini(gj,rec);renderPend();if(CURTAB==='regstep')renderRegStep();toast('\u2713 PDFを再読み込みしました');}else{rec.auto=_prev||'要確認';if(CURTAB==='regstep')renderRegStep();toast('再読み込みできませんでした'+(GEMERR?'：'+GEMERR:''));}}catch(e){rec.auto=_prev||'要確認';if(CURTAB==='regstep')renderRegStep();toast('再読み込みでエラーが発生しました');}finally{_regBusy=false;}}
+async function rereadPend(i){var rec=PEND[i];if(!rec)return;if(_regBusy)return;if(!rec.pdfData){toast('再読み込み用のPDFデータがありません（PDFを差し替えてください）');return;}if(!API){toast('PDF自動読み取りが未設定です');return;}_regBusy=true;var _prev=rec.auto;rec.auto='読取中…';if(CURTAB==='regstep')renderRegStep();try{var gj=await geminiExtract(rec.pdfData,'application/pdf');if(_needPng(gj)){try{var blob=_b64ToBlob(rec.pdfData,'application/pdf');if(blob){var png=await pdfToPng(blob);if(png){var gj2=await geminiExtract(png,'image/png');if(gj2&&gj2.bukken_mei)gj=gj2;}}}catch(e){}}if(gj&&gj.bukken_mei){mapGemini(gj,rec);try{var _rb=_b64ToBlob(rec.pdfData,'application/pdf');if(_rb){var _rt=await pdfText(_rb);_fillPendBlanks(rec,_rt,rec.pdfName||'');_detectAtbb(_rt,rec);}}catch(e){}renderPend();if(CURTAB==='regstep')renderRegStep();toast('\u2713 PDFを再読み込みしました');}else{rec.auto=_prev||'要確認';if(CURTAB==='regstep')renderRegStep();toast('再読み込みできませんでした'+(GEMERR?'：'+GEMERR:''));}}catch(e){rec.auto=_prev||'要確認';if(CURTAB==='regstep')renderRegStep();toast('再読み込みでエラーが発生しました');}finally{_regBusy=false;}}
 var REGSTEP_I=0;
 function regStepGo(i){var n=PEND.length;if(!n)return;REGSTEP_I=Math.max(0,Math.min(n-1,i));renderRegStep();}
 function setPendShokan(i,v){if(PEND[i])PEND[i].shokan=v;}
@@ -2078,7 +2092,11 @@ function pendRemain(p){if(!p)return _pendReqTotal();var n=0;_pendReqKeys().forEa
 function pendReqOk(p){return !!p&&p.auto!=='読取中…'&&pendRemain(p)===0;}
 function pendFieldInput(i,k,v){if(PEND[i])PEND[i][k]=v;_pendProgRefresh();}
 function _pendProgRefresh(){var p=PEND[REGSTEP_I];if(!p)return;var rem=pendRemain(p);var rn=document.getElementById('rsRemN');if(rn)rn.textContent=rem;var pr=document.getElementById('rsProg');if(pr){pr.classList.toggle('ok',!rem);var t=pr.querySelector('.rsprog-t');if(t)t.textContent=rem?'残り必須項目':'必須すべて入力済み ✓';}_pendReqKeys().forEach(function(k){var w=document.querySelector('.rsff[data-rk="'+k+'"]');if(w)w.classList.toggle('empty',pendFieldEmpty(p,k));});var og=document.getElementById('rsOneGo');if(og){og.disabled=!pendReqOk(p);og.textContent=pendReqOk(p)?'この物件を要入稿へ ✓':'この物件を要入稿へ（残'+rem+'）';}var bk=document.getElementById('rsBulk');if(bk){var rdy=PEND.filter(pendReqOk).length;bk.disabled=!rdy;bk.textContent=rdy+'件の登録物件を要入稿へ';}}
-function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toString(36).slice(2,5);var log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});return {id:id,status:'要入稿',confirmed:(confirmed!==false),regTs:nowTS(),bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:true,waku:p.waku||'その他',suumoCode:'',pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,statusLog:log,regDate:today(),tantou:(p.tantou||''),shokan:(p.shokan||''),memos:(p.memos||[]),stars:(+p.stars||0),comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:true,specArea:(p.areaVideo==='得エリア'),video:(p.areaVideo==='動画CM'),areaVideo:(p.areaVideo||''),smaPick:(p.smaPick||''),southFace:(p.southFace||''),nyukoTanto:(p.nyukoTanto||''),netKatch:(p.netKatch||''),netComment:(p.netComment||''),netMemo:(p.netMemo||''),postIntent:(p.postIntent||''),optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''};}
+var TEST_MODE=false;
+function setTestMode(v){TEST_MODE=!!v;renderRegStep();toast(TEST_MODE?'テストモードON：登録物件はテスト用です':'テストモードOFF');}
+function testBadge(p){return (p&&p.isTest)?'<span class="tbadge">TEST</span>':'';}
+async function deleteAllTestProps(){var t=PROPS.filter(function(p){return p.isTest;});if(!t.length){toast('テスト物件はありません');return;}if(!confirm('テスト物件 '+t.length+'件をすべて削除します（ドライブのPDFも削除）。\nこの操作は取り消せません。よろしいですか？'))return;toast('テスト物件を削除中…');for(var i=0;i<t.length;i++){var p=t[i];if(p.driveId){try{await drivePdfDelete(p.driveId);}catch(e){}}try{await idbSet('pdf_'+p.id,null);}catch(e){}try{localStorage.removeItem('pdf_'+p.id);}catch(e){}}var del={};t.forEach(function(p){del[p.id]=1;});PROPS=PROPS.filter(function(p){return !del[p.id];});await save();await flushPush();recompute();updateBadges();try{refreshCurrentTab();}catch(e){}toast('テスト物件 '+t.length+'件を削除しました');}
+function _buildPendProp(p,confirmed){var id='PR'+Date.now()+Math.random().toString(36).slice(2,5);var log=[];if(p.pendMemo)log.push({memo:p.pendMemo,ts:nowTS()});return {id:id,status:'要入稿',confirmed:(confirmed!==false),regTs:nowTS(),isTest:!!TEST_MODE,bjRef:null,bjOkAt:'',revStatus:'un',mgMemo:'',equipOk:true,waku:p.waku||'その他',suumoCode:'',pdfName:p.pdfName,name:p.name||p.pdfName,madori:p.madori,line:p.line,station:p.station,walkMin:p.walkMin,rent:p.rent,mgmt:(p.mgmtFee?String(p.mgmtFee).replace(/[^0-9.]/g,''):''),structure:p.structure,age:p.age,area:p.area,address:p.address,mgmtCo:p.mgmtCo,fax:p.fax||'',phone:p.phone,holiday:p.holiday,propNo:((p.media==='atbb')?(p.propNo||''):(p.propNo||'なし')),media:p.media||'',mediaOther:p.mediaOther||'',rtMedia:((p.rtMedia&&p.rtMedia.trim())?p.rtMedia:'-'),rtUrl:p.rtUrl||'',vacancyLog:p.vacancyLog||[],pubDate:p.pubDate,nearby:p.nearby,btSep:p.btSep||'',washStand:p.washStand||'',petOk:p.petOk||'',dep0:p.dep0||'',key0:p.key0||'',autoLock:p.autoLock||'',delivBox:p.delivBox||'',twoBurner:p.twoBurner||'',room:p.room||'',floor:p.floor||'',deposit:p.deposit||'',keyMoney:p.keyMoney||'',stations:p.stations||[],reviewReason:p.reviewReason||'',uploadDate:p.uploadDate,deadline:p.deadline,rawText:p.rawText||'',commentA:p.commentA,commentB:p.commentB,analysisMemo:p.analysisMemo,prospect:p.prospect,statusLog:log,regDate:today(),tantou:(p.tantou||''),shokan:(p.shokan||''),memos:(p.memos||[]),stars:(+p.stars||0),comments:[],stamps:{},listDate:'',belowCount:'',t1Count:'',t2Count:'',t3Count:'',photoCount:'',scorePre:'',infoDate:(p.infoDate||''),isMemo:(p.isMemo||''),storePick:true,specArea:(p.areaVideo==='得エリア'),video:(p.areaVideo==='動画CM'),areaVideo:(p.areaVideo||''),smaPick:(p.smaPick||''),southFace:(p.southFace||''),nyukoTanto:(p.nyukoTanto||''),netKatch:(p.netKatch||''),netComment:(p.netComment||''),netMemo:(p.netMemo||''),postIntent:(p.postIntent||''),optReviewed:false,optReviewedAt:'',compDataAt:'',optAppliedAt:'',needShoot:false,shootDate:'',subStdJudge:'',subStdAction:'',csvInq:0,csvPV:0,csvInqB:0,csvScore:'',csvAsOf:'',suumoListStart:'',compTotal:''};}
 var _regBusy=false;
 async function regOnePend(i){var p=PEND[i];if(!p)return;if(_regBusy)return;if(!pendReqOk(p)){toast('未入力の必須が残っています（残り'+pendRemain(p)+'個）');return;}_regBusy=true;var og=document.getElementById('rsOneGo');if(og){og.disabled=true;og.textContent='登録中…';}toast('要入稿に登録しています…');try{var prop=_buildPendProp(p,true);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。通信を確認して再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();toast('\u2713 「'+(prop.name||'物件')+'」を要入稿に登録しました');if(!PEND.length)tab('staff');else renderRegStep();}finally{_regBusy=false;}}
 async function pendToReview(i){var p=PEND[i];if(!p)return;if(_regBusy)return;if(p.auto==='読取中…'){toast('読み込み完了までお待ちください');return;}_regBusy=true;try{var prop=_buildPendProp(p,false);PROPS.push(prop);if(p.pdfData){var ok=await uploadPdfToDrive(prop,p.pdfData);if(!ok){try{await gset('pdf_'+prop.id,p.pdfData);}catch(e){}}}await save();await flushPush();if(_saveErr){PROPS=PROPS.filter(function(x){return x.id!==prop.id;});toast('\u26a0 保存に失敗しました。再度お試しください（データは手元に残っています）');renderRegStep();return;}PEND.splice(i,1);if(REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);recompute();updateBadges();renderRegStep();toast('「'+(prop.name||'物件')+'」を要データ確認に回しました');if(!PEND.length)tab('review');}finally{_regBusy=false;}}
@@ -2116,7 +2134,7 @@ function renderRegStep(){
  if(!n){host.innerHTML='<div class="empty" style="padding:20px">読み込み中の物件はありません。<br>「物件登録」でマイソクを取り込むと、ここで所感を書きながら順番に確認できます。</div>';return;}
  if(REGSTEP_I>=n)REGSTEP_I=n-1;if(REGSTEP_I<0)REGSTEP_I=0;
  var doneN=PEND.filter(function(p){return p.auto!=='読取中…';}).length;var _rdyN=PEND.filter(pendReqOk).length;
- var h='<div class="rsbar"><span class="rst">読み込み＆所感</span><span class="rssub">読込完了 '+doneN+' / '+n+'</span><button class="btn btn-sec rsadd" onclick="document.getElementById(\'pdf\').click()">＋ 物件を追加</button><button class="btn btn-pri rsgo" id="rsBulk" '+(_rdyN?'':'disabled')+' onclick="savePend()">'+_rdyN+'件の登録物件を要入稿へ</button></div>';
+ var h='<div class="rsbar"><span class="rst">読み込み＆所感</span><span class="rssub">読込完了 '+doneN+' / '+n+'</span><button class="btn btn-sec rsadd" onclick="document.getElementById(\'pdf\').click()">＋ 物件を追加</button><button class="btn btn-pri rsgo" id="rsBulk" '+(_rdyN?'':'disabled')+' onclick="savePend()">'+_rdyN+'件の登録物件を要入稿へ</button></div><div class="rstest'+(TEST_MODE?' on':'')+'"><label class="rstest-l"><input type="checkbox" '+(TEST_MODE?'checked':'')+' onchange="setTestMode(this.checked)">テストモード</label><span class="rstest-d">ONの間に登録した物件はテスト用です。入稿まで進めても、いつでもまとめて削除できます。</span>'+((function(){var _tn=PROPS.filter(function(p){return p.isTest;}).length;return _tn?'<button class="rstest-del" onclick="deleteAllTestProps()">テスト物件を全削除（'+_tn+'）</button>':'';})())+'</div>';
  h+='<div class="rschips">'+PEND.map(function(p,i){var rd=p.auto!=='読取中…';var ic=rd?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10.5"/></svg>':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>';return '<button class="rschip'+(i===REGSTEP_I?' on':'')+(rd?(pendReqOk(p)?' done':' need'):' load')+'" onclick="regStepGo('+i+')">'+ic+'<span>'+(i+1)+'</span></button>';}).join('')+'</div>';
  var p=PEND[REGSTEP_I];var rd=p.auto!=='読取中…';var rem=pendRemain(p);
  var dup=rd?pendDup(p):null;
@@ -2233,22 +2251,117 @@ function pendDup(p){var nn=_nkey(p.name||p.pdfName||'');if(!nn)return null;retur
 function pendExactDup(p){var nn=normName(p.name||p.pdfName||'');if(!nn)return null;var rr=normName(p.room||'');return PROPS.find(function(x){return normName(x.name||'')===nn&&normName(x.room||'')===rr;});}
 function pendDupDialog(rec){try{if(!rec||rec.dupAsked)return;var dup=pendDup(rec);if(!dup)return;rec.dupAsked=true;var liveTxt=(dup.status==='掲載中')?'掲載中':statusLabel(dup.status);var when=dup.regDate||dup.listDate||dup.uploadDate||'不明';var lines=[];lines.push('物件名：'+(dup.name||'(無名)')+(dup.room?(' '+dup.room):''));lines.push('状態：'+liveTxt+(dup.status==='掲載中'?'（現在掲載中）':''));lines.push('担当：'+(dup.tantou||'未割当'));lines.push('登録日：'+when+((dup.listDate&&dup.listDate!==when)?(' ／ 掲載日 '+dup.listDate):''));var info=[dup.station,dup.madori,(typeof rentMan==='function'?rentMan(dup):'')].filter(Boolean).join(' ・ ');if(info)lines.push('物件：'+info);var ov=document.createElement('div');ov.className='ovl';ov.innerHTML='<div class="modal"><div style="font-size:15px;font-weight:700;margin-bottom:6px;color:#a83a35">重複の可能性があります</div><div class="mmsg" style="text-align:left;white-space:pre-line">読み取った「'+esc(rec.name||rec.pdfName||'物件')+'」と同名／酷似の物件が既に登録されています。\n\n【既存の物件】\n'+esc(lines.join('\n'))+'\n\nこの読み込みを削除しますか？</div><div class="mbtns"><button class="btn btn-sec" id="_dno">残す</button><button class="btn btn-danger" id="_dyes">削除する</button></div></div>';document.body.appendChild(ov);ov.querySelector('#_dno').onclick=function(){ov.remove();};ov.querySelector('#_dyes').onclick=function(){ov.remove();var ix=PEND.indexOf(rec);if(ix<0)ix=PEND.findIndex(function(x){return x.fid===rec.fid;});if(ix>=0){PEND.splice(ix,1);if(typeof REGSTEP_I!=='undefined'&&REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);}renderPend();if(CURTAB==='regstep')renderRegStep();toast('重複の読み込みを削除しました');};ov.onclick=function(e){if(e.target===ov)ov.remove();};}catch(e){}}
 async function savePend(){
+ if(_regBusy)return;
+ var complete=PEND.filter(function(p){return p.auto!=='読取中…'&&pendReqOk(p);});
+ var incompleteN=PEND.filter(function(p){return p.auto!=='読取中…'&&!pendReqOk(p);}).length;
+ if(!complete.length){toast(incompleteN?('必須をすべて入力すると登録できます（未完了 '+incompleteN+'件）'):'登録できる物件がありません');return;}
+ var hasDup=complete.some(function(p){return !!pendDup(p);});
+ if(hasDup){openBulkResolve(complete);return;}
+ await _bulkRegister(complete.map(function(p){return {p:p,dup:null,choice:'new'};}));
+}
+async function _bulkRegister(decisions){
  if(_regBusy)return;_regBusy=true;
  var _bk=document.getElementById('rsBulk');if(_bk){_bk.disabled=true;_bk.textContent='登録中…';}
- toast('要入稿に登録しています…');
- const doSave=async()=>{
- var skipped=[];var _uploads=[];var _newIds=[];var remain=[];var incomplete=[];
- PEND.forEach(p=>{
-  if(p.auto==='読取中…'){remain.push(p);return;}
-  if(pendExactDup(p)){skipped.push(p.name||p.pdfName);return;}
-  var _memN=(p.memos||[]).filter(function(m){return m.label==='指示'||m.label==='実コメント'||m.tpl;}).length;
-  if(!pendReqOk(p)){incomplete.push(p.name||p.pdfName);remain.push(p);return;}
-  var _np=_buildPendProp(p,true);PROPS.push(_np);_newIds.push(_np.id);if(p.pdfData)_uploads.push({id:_np.id,b64:p.pdfData});});
-  var _dn=0;for(var _u=0;_u<_uploads.length;_u++){var _pp=PROPS.find(function(x){return x.id===_uploads[_u].id;});var _ok=false;if(_pp){_ok=await uploadPdfToDrive(_pp,_uploads[_u].b64);}if(_ok)_dn++;else{try{await gset('pdf_'+_uploads[_u].id,_uploads[_u].b64);}catch(e){}}}
-  await save();await flushPush();var _added=_newIds.length;PEND=remain;renderPend();recompute();updateBadges();if(_added&&_saveErr){toast('\u26a0 '+_added+'件を要入稿にしましたが共有DBへの保存に失敗しました。通信を確認し、上部の保存表示をタップして再保存してください（データは手元に残っています）。');tab('staff');return;}toast(_added?(_added+'件を要入稿へ登録しました'+(incomplete.length?'／未入力 '+incomplete.length+'件は読み込み画面に残しました':'')+(skipped.length?'（重複'+skipped.length+'件スキップ）':'')+(_uploads.length?'／PDF保存 '+_dn+'/'+_uploads.length:'')):(incomplete.length?'必須項目をすべて入力すると要入稿へ登録できます（未完了 '+incomplete.length+'件）':'登録できる物件がありません'));if(_newIds.length){tab('staff');}else{renderRegStep();}
- };
- try{await doSave();}finally{_regBusy=false;}
+ toast('処理しています…');
+ try{
+  var uploads=[],consumed=[],reg=0,pdfadd=0,skip=0;
+  for(var i=0;i<decisions.length;i++){
+   var d=decisions[i],p=d.p;
+   if(d.choice==='skip'){consumed.push(p);skip++;continue;}
+   if(d.choice==='checkpdf'&&d.dup){var ex=d.dup;if(d.fields){Object.keys(d.fields).forEach(function(k){ex[k]=d.fields[k];});}if(p.pdfData){var ok=await uploadPdfToDrive(ex,p.pdfData);if(!ok){try{await gset('pdf_'+ex.id,p.pdfData);}catch(e){}}}if(!Array.isArray(ex.statusLog))ex.statusLog=[];ex.statusLog.push({memo:'一括登録：PDF追加＋情報確認',ts:nowTS()});consumed.push(p);pdfadd++;continue;}
+   var np=_buildPendProp(p,true);PROPS.push(np);if(p.pdfData)uploads.push({id:np.id,b64:p.pdfData});consumed.push(p);reg++;
+  }
+  for(var u=0;u<uploads.length;u++){var pp=PROPS.find(function(x){return x.id===uploads[u].id;});var ok2=false;if(pp)ok2=await uploadPdfToDrive(pp,uploads[u].b64);if(!ok2){try{await gset('pdf_'+uploads[u].id,uploads[u].b64);}catch(e){}}}
+  PEND=PEND.filter(function(x){return consumed.indexOf(x)<0;});
+  if(typeof REGSTEP_I!=='undefined'&&REGSTEP_I>=PEND.length)REGSTEP_I=Math.max(0,PEND.length-1);
+  await save();await flushPush();recompute();updateBadges();
+  closeBulkResolve();renderPend();
+  if(_saveErr){toast('\u26a0 保存に失敗しました。通信を確認して再保存してください（データは手元に残っています）');}
+  else{toast('完了：登録 '+reg+'件／PDF追加 '+pdfadd+'件／スキップ '+skip+'件');}
+  if(reg&&!PEND.length){tab('staff');}else if(CURTAB==='regstep'){renderRegStep();}
+ }finally{_regBusy=false;}
 }
+var BRES=null;
+var _icCsv='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>';
+var _icDoc='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+function _dupSnap(d){var ks=['name','room','line','station','madori','rent','deposit','keyMoney','mgmt','age','structure','area','address','propNo'];var o={};ks.forEach(function(k){o[k]=(d[k]!=null?String(d[k]):'');});return o;}
+function openBulkResolve(complete){bulkInjectCSS();BRES={items:complete.map(function(p){var dup=pendDup(p);var it={p:p,dup:dup||null};if(!dup){it.choice='new';}else if(listHasPdf(dup)){it.choice='skip';}else{it.choice='checkpdf';it.fields=_dupSnap(dup);}return it;})};renderBulkResolve();}
+function closeBulkResolve(){var ov=document.getElementById('bulkov');if(ov){try{BRES&&BRES.items.forEach(function(it){if(it._purl){URL.revokeObjectURL(it._purl);it._purl='';}});}catch(e){}ov.remove();}BRES=null;}
+function _pdfUrl(it){if(it._purl)return it._purl;if(!it.p.pdfData)return '';try{var bin=atob(it.p.pdfData);var u8=new Uint8Array(bin.length);for(var k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);it._purl=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));return it._purl;}catch(e){return '';}}
+function bulkPdfChip(has,who){return '<span class="bk2-pchip '+(has?'y':'n')+'">'+(has?'✓':'✗')+' '+who+' PDF'+(has?'あり':'なし')+'</span>';}
+function bulkEditor(it){var url=_pdfUrl(it);var f=it.fields||{};var flds=[['name','物件名'],['room','号室'],['station','駅'],['madori','間取り'],['rent','賃料(万)'],['deposit','敷金'],['keyMoney','礼金'],['mgmt','管理費'],['age','築年'],['structure','構造'],['area','面積'],['address','住所'],['propNo','物件番号']];var inputs=flds.map(function(a){var warn=(['deposit','keyMoney','mgmt'].indexOf(a[0])>=0)&&!f[a[0]];return '<div class="bk2-fld"><label>'+a[1]+'</label><input value="'+esc(f[a[0]]||'')+'"'+(warn?' class="warn" placeholder="未入力（要確認）"':'')+' oninput="bulkField('+it._i+',\''+a[0]+'\',this.value)"></div>';}).join('');var prev=url?'<iframe class="bk2-pdf" src="'+url+'#toolbar=0&navpanes=0"></iframe>':'<div class="bk2-nopdf">今回の読み込みにPDFがありません</div>';return '<div class="bk2-edhd">PDFを見ながら情報確認・修正（既存物件を更新します）</div><div class="bk2-edgrid">'+prev+'<div class="bk2-fields">'+inputs+'</div></div>';}
+function bulkDupCard(it){var p=it.p,ex=it.dup,i=it._i;var isCsv=!!ex.fromCsv;var srcCls=isCsv?'csv':'reg';var srcLab=isCsv?'CSV経由で登録':'物件登録経由で登録';var exPdf=listHasPdf(ex);
+ var h='<div class="bk2-item dup'+(isCsv?' csvbad':'')+'"><div class="bk2-top"><span class="bk2-nm">'+esc(p.name||p.pdfName||'物件')+(p.room?' <span class="bk2-rm">'+esc(p.room)+'</span>':'')+'</span>'+(isCsv?'<span class="bk2-flag csv">CSV経由・要注意</span>':'<span class="bk2-flag dup">重複あり</span>')+'</div>';
+ h+='<div class="bk2-cmp"><div class="bk2-c new"><div class="bk2-ch">今回の読み込み</div>'+bulkPdfChip(!!p.pdfData,'今回')+'<div class="bk2-ci">'+esc([p.station,p.madori,(typeof rentMan==='function'?rentMan(p):'')].filter(Boolean).join(' ・ '))+'</div></div><div class="bk2-c ex"><div class="bk2-ch">既存の物件</div>'+bulkPdfChip(exPdf,'既存')+'<div class="bk2-ci">'+esc([ex.station,ex.madori,(typeof rentMan==='function'?rentMan(ex):'')].filter(Boolean).join(' ・ '))+'</div></div></div>';
+ h+='<div class="bk2-src '+srcCls+'"><div class="bk2-srcic">'+(isCsv?_icCsv:_icDoc)+'</div><div class="bk2-srctx"><b>'+srcLab+'</b><span>'+esc(statusLabel(ex.status))+' ・ 担当 '+esc(ex.tantou||'未割当')+' ・ 登録 '+esc(ex.regDate||ex.listDate||'不明')+'</span></div></div>';
+ if(exPdf){h+='<div class="bk2-skiponly">既存にPDF・情報あり。この読み込みはスキップします<span class="bk2-sktag">スキップ</span></div>';}
+ else{h+='<div class="bk2-choices"><button class="bk2-choice'+(it.choice==='checkpdf'?' on good':'')+'" onclick="bulkPick('+i+',\'checkpdf\')"><div class="t">PDFを入れて情報確認</div><div class="d">今回のPDFを既存に添付し、PDFを見ながら情報を確認・修正</div></button><button class="bk2-choice'+(it.choice==='skip'?' on gray':'')+'" onclick="bulkPick('+i+',\'skip\')"><div class="t">スキップ</div><div class="d">何もしない</div></button></div><div class="bk2-ed'+(it.choice==='checkpdf'?' show':'')+'">'+bulkEditor(it)+'</div>';}
+ return h+'</div>';
+}
+function bulkOkCard(it){var p=it.p;return '<div class="bk2-item ok"><div class="bk2-top"><span class="bk2-nm">'+esc(p.name||p.pdfName||'物件')+(p.room?' <span class="bk2-rm">'+esc(p.room)+'</span>':'')+'</span><span class="bk2-flag ok">新規登録</span></div><div class="bk2-ci2">'+bulkPdfChip(!!p.pdfData,'今回')+' '+esc([p.station,p.madori,(typeof rentMan==='function'?rentMan(p):'')].filter(Boolean).join(' ・ '))+'</div></div>';}
+function renderBulkResolve(){if(!BRES)return;var dups=[],oks=[];BRES.items.forEach(function(it,i){it._i=i;if(it.dup)dups.push(it);else oks.push(it);});
+ var h='<div class="bk2-modal"><div class="bk2-hd"><span>一括登録の確認（重複・PDFチェック）</span><button class="bk2-x" onclick="closeBulkResolve()">✕</button></div><div class="bk2-body">';
+ h+='<div class="bk2-sec">重複あり：対応が必要 <b>'+dups.length+'件</b></div>'+(dups.length?dups.map(bulkDupCard).join(''):'<div class="bk2-empty">重複はありません</div>');
+ h+='<div class="bk2-sec">重複なし：そのまま新規登録 <b>'+oks.length+'件</b></div>'+(oks.length?oks.map(bulkOkCard).join(''):'<div class="bk2-empty">なし</div>');
+ h+='</div><div class="bk2-foot"><div class="bk2-sum" id="bk2sum"></div><button class="bk2-run" onclick="bulkExec()">この内容で実行</button></div></div>';
+ var ov=document.getElementById('bulkov');if(!ov){ov=document.createElement('div');ov.id='bulkov';ov.className='bk2-ov';ov.onclick=function(e){if(e.target===ov)closeBulkResolve();};document.body.appendChild(ov);}
+ ov.innerHTML=h;bulkSum();}
+function bulkPick(i,v){if(!BRES||!BRES.items[i])return;BRES.items[i].choice=v;renderBulkResolve();}
+function bulkField(i,k,val){if(!BRES||!BRES.items[i]||!BRES.items[i].fields)return;BRES.items[i].fields[k]=val;bulkSum();}
+function bulkSum(){if(!BRES)return;var reg=0,chk=0,skip=0;BRES.items.forEach(function(it){if(!it.dup){reg++;}else if(listHasPdf(it.dup)){skip++;}else{if(it.choice==='checkpdf')chk++;else skip++;}});var el=document.getElementById('bk2sum');if(el)el.innerHTML='新規登録 <b>'+reg+'</b>／PDF追加 <b>'+chk+'</b>／スキップ <b>'+skip+'</b>';}
+function bulkExec(){if(!BRES)return;var decisions=BRES.items.map(function(it){var ch=it.choice;if(!it.dup)ch='new';else if(listHasPdf(it.dup))ch='skip';return {p:it.p,dup:it.dup,choice:ch,fields:it.fields};});_bulkRegister(decisions);}
+function bulkInjectCSS(){if(document.getElementById('bk2css'))return;var s=document.createElement('style');s.id='bk2css';s.textContent=`
+.bk2-ov{position:fixed;inset:0;background:rgba(20,25,35,.5);z-index:9000;display:flex;align-items:flex-end;justify-content:center}
+.bk2-modal{background:#f7f7f5;width:100%;max-width:760px;max-height:92vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.bk2-hd{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fff;border-bottom:1px solid #e7eaee;font-size:15px;font-weight:800;color:#1A3D6B}
+.bk2-x{margin-left:auto;border:none;background:#eef0f2;width:30px;height:30px;border-radius:8px;font-size:14px;cursor:pointer;color:#6b6a66}
+.bk2-body{overflow:auto;padding:14px;flex:1}
+.bk2-sec{font-size:12.5px;font-weight:800;color:#1A3D6B;margin:6px 2px 9px;display:flex;align-items:center;gap:8px}
+.bk2-sec:first-child{margin-top:0}.bk2-sec b{color:#6b6a66;font-weight:700}
+.bk2-empty{font-size:12px;color:#9aa2ad;padding:6px 2px 12px}
+.bk2-item{border:1px solid #e7eaee;border-radius:14px;padding:13px;margin-bottom:11px;background:#fff}
+.bk2-item.dup{border-color:#f0c2b0}
+.bk2-item.csvbad{border:1.5px solid #e5484d;background:#fdf3f2;box-shadow:0 0 0 3px rgba(229,72,77,.08)}
+.bk2-item.ok{border-color:#bfe6d3;background:#fcfffe}
+.bk2-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:10px}
+.bk2-nm{font-size:14.5px;font-weight:800;color:#1A3D6B}.bk2-rm{color:#9aa2ad;font-weight:700;font-size:12.5px}
+.bk2-flag{font-size:10px;font-weight:800;border-radius:6px;padding:3px 9px;margin-left:auto}
+.bk2-flag.dup{background:#fbecea;color:#a83a35}.bk2-flag.csv{background:#e5484d;color:#fff}.bk2-flag.ok{background:#eafaf0;color:#1f7a52}
+.bk2-cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.bk2-c{border:1px solid #eceef1;border-radius:10px;padding:9px 10px}
+.bk2-c.new{background:#f7faff;border-color:#cfe0fb}.bk2-c.ex{background:#fafbfc}
+.bk2-ch{font-size:10px;font-weight:800;margin-bottom:5px;color:#6b6a66}.bk2-c.new .bk2-ch{color:#2a6df5}
+.bk2-ci{font-size:11.5px;color:#6b6a66;margin-top:5px}
+.bk2-ci2{font-size:11.5px;color:#6b6a66;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bk2-pchip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;border-radius:7px;padding:3px 8px}
+.bk2-pchip.y{background:#e3f3e9;color:#1f7a52}.bk2-pchip.n{background:#fbecea;color:#c4453f}
+.bk2-src{display:flex;align-items:center;gap:9px;border-radius:10px;padding:9px 11px;margin-bottom:10px}
+.bk2-src.csv{background:#e6f6f5;border:1px solid #bfe6e2}.bk2-src.reg{background:#eaf0fb;border:1px solid #c9d8f4}
+.bk2-srcic{width:30px;height:30px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff}
+.bk2-src.csv .bk2-srcic{background:#0d8a8a}.bk2-src.reg .bk2-srcic{background:#1A3D6B}
+.bk2-srctx b{font-size:13px;font-weight:800;display:block}.bk2-src.csv .bk2-srctx b{color:#0a6e6e}.bk2-src.reg .bk2-srctx b{color:#1A3D6B}
+.bk2-srctx span{color:#6b6a66;font-size:11px}
+.bk2-skiponly{display:flex;align-items:center;gap:10px;font-size:12px;color:#6b6a66;background:#f1f2f4;border-radius:9px;padding:9px 12px}
+.bk2-sktag{margin-left:auto;font-size:11px;font-weight:800;color:#46505c;background:#e2e5e9;border-radius:6px;padding:3px 10px}
+.bk2-choices{display:flex;gap:8px;flex-wrap:wrap}
+.bk2-choice{flex:1;min-width:140px;border:1.5px solid #e7eaee;background:#fff;border-radius:11px;padding:10px 12px;cursor:pointer;font-family:inherit;text-align:left}
+.bk2-choice .t{font-size:13px;font-weight:800;color:#1d1d1f}.bk2-choice .d{font-size:10.5px;color:#9aa2ad;margin-top:3px;line-height:1.4}
+.bk2-choice.on.good{border-color:#1f9d57;background:#eafaf0}.bk2-choice.on.gray{border-color:#9aa2ad;background:#f1f2f4}
+.bk2-ed{display:none;margin-top:10px;border:1px dashed #bcd0ee;border-radius:12px;background:#f7faff;padding:11px}.bk2-ed.show{display:block}
+.bk2-edhd{font-size:12px;font-weight:800;color:#1A3D6B;margin-bottom:9px}
+.bk2-edgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:11px}
+.bk2-pdf{width:100%;height:300px;border:1px solid #cfd3d8;border-radius:8px;background:#525659}
+.bk2-nopdf{height:300px;border:1px solid #e7eaee;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:#9aa2ad;font-size:12px}
+.bk2-fields{display:flex;flex-direction:column;gap:7px}
+.bk2-fld{display:flex;align-items:center;gap:8px}
+.bk2-fld label{font-size:11px;font-weight:700;color:#6b6a66;width:62px;flex:none}
+.bk2-fld input{flex:1;min-width:0;font-size:13px;padding:7px 9px;border:1px solid #e7eaee;border-radius:8px;font-family:inherit;background:#fff}
+.bk2-fld input:focus{outline:none;border-color:#2a6df5}.bk2-fld input.warn{border-color:#E8920A;background:#fff7ec}
+.bk2-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;background:#fff;border-top:1px solid #e7eaee}
+.bk2-sum{font-size:12px;color:#6b6a66;flex:1;min-width:140px}.bk2-sum b{color:#1A3D6B;font-weight:800}
+.bk2-run{border:none;background:#1A3D6B;color:#fff;font-family:inherit;font-weight:800;font-size:13.5px;padding:11px 22px;border-radius:11px;cursor:pointer}
+@media(max-width:560px){.bk2-edgrid{grid-template-columns:1fr}.bk2-pdf,.bk2-nopdf{height:220px}.bk2-cmp{grid-template-columns:1fr}}
+`;document.head.appendChild(s);}
 
 // ---------- info card + status block ----------
 function otherStHtml(p){if(!p.stations||p.stations.length<2)return '';var rest=p.stations.filter(function(x){return x.sta&&x.sta!==p.station;});if(!rest.length)return '';return '<div class="fi"><b>他の駅</b>'+rest.map(function(x){return esc((x.line||'')+' '+(x.sta||'')+' '+(x.walk||''))+(RANK[x.sta]?'（ランク）':'');}).join(' ／ ')+'</div>';}
@@ -3759,7 +3872,19 @@ function hkInjectCSS(){
   '.hkcal-item{display:block;border:1px solid #eceef1;border-radius:9px;padding:9px 11px;margin-bottom:6px;cursor:pointer;background:#fff}',
   '.hkcal-item:hover{border-color:#1A3D6B;background:#f7faff}',
   '.hkcal-inm{font-size:13px;font-weight:700;color:#1A3D6B}',
-  '.hkcal-isub{display:block;font-size:11px;font-weight:400;color:#9aa2ad;margin-top:2px}'
+  '.hkcal-isub{display:block;font-size:11px;font-weight:400;color:#9aa2ad;margin-top:2px}',
+  '.hkcal-sum{margin-top:12px;border:1px solid #e7eaee;border-radius:12px;background:#fff;padding:12px 13px}',
+  '.hkcal-sumhd{font-size:12.5px;font-weight:800;color:#1A3D6B;margin-bottom:10px;display:flex;align-items:baseline;gap:8px}',
+  '.hkcal-sumhd span{font-size:10.5px;font-weight:600;color:#9aa2ad}',
+  '.hkcal-sumgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}',
+  '.hkcal-sc{border:1px solid #eceef1;border-radius:9px;padding:8px 4px;text-align:center;background:#fafbfc}',
+  '.hkcal-sc .l{display:block;font-size:10px;font-weight:700;color:#6b6a66}',
+  '.hkcal-sc .n{display:block;font-size:19px;font-weight:800;color:#46505c;line-height:1.2;margin-top:2px}',
+  '.hkcal-sc.hold{border-color:#f0d9ad;background:#fff9ef}.hkcal-sc.hold .n{color:#9a6500}',
+  '.hkcal-sc.live{border-color:#bfe6d3;background:#f3fbf6}.hkcal-sc.live .n{color:#1f7a52}',
+  '.hkcal-sc.atbb{border-color:#c9d8f4;background:#f4f8ff}.hkcal-sc.atbb .n{color:#1A3D6B}',
+  '.hkcal-sc.other{border-color:#e0c6c2;background:#fdf4f3}.hkcal-sc.other .n{color:#a83a35}',
+  '@media(max-width:560px){.hkcal-sumgrid{grid-template-columns:repeat(3,1fr)}}'
  ].join('');
  document.head.appendChild(s);
 }
@@ -3879,7 +4004,7 @@ function hkNoPdfSection(){
  rows.sort(function(a,b){return String(hkNyukoOf(b)||'').localeCompare(String(hkNyukoOf(a)||''));});
  var inner=rows.length?rows.map(function(p){
    var stb=(p.status==='保留')?'<span class="hk-spill drop">保留中</span>':'<span class="hk-spill live">掲載中</span>';
-   return '<div class="hk-hold">'+stb+(HK_SEL==='全体'?hkTtag(p.tantou):'')+hkNyTag(p)+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkAssignSel(p)+'<button class="hk-b live sm" onclick="event.stopPropagation();pickPdf(\''+p.id+'\')">＋ PDF追加</button><button class="hk-b gho sm" onclick="event.stopPropagation();hkPdfNA(\''+p.id+'\')">再取得不可</button></span></div>';
+   return '<div class="hk-hold">'+stb+(HK_SEL==='全体'?hkTtag(p.tantou):'')+hkNyTag(p)+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+testBadge(p)+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkAssignSel(p)+'<button class="hk-b live sm" onclick="event.stopPropagation();pickPdf(\''+p.id+'\')">＋ PDF追加</button><button class="hk-b gho sm" onclick="event.stopPropagation();hkPdfNA(\''+p.id+'\')">再取得不可</button></span></div>';
  }).join(''):'<div class="hk-empty">PDFなしの物件はありません</div>';
  return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">PDFなし</span><span class="hk-cnt">'+rows.length+'件 ・ PDF追加 または 再取得不可で一覧から消えます</span><span class="hk-rule"></span></div>'+inner+'</div>';
 }
@@ -3888,7 +4013,7 @@ function hkHoldSection(){
  var hs=hkHolds().slice();
  hs.sort(function(a,b){return String(hkNyukoOf(b)||'').localeCompare(String(hkNyukoOf(a)||''));});
  var inner=hs.length?hs.map(function(p){var nd=hkNyukoOf(p),dd=daysSince(nd);var daysTxt=(dd!=null)?('入稿から '+Math.max(0,dd)+'日（'+hkMd(nd)+'）'):'入稿日不明';
-   return '<div class="hk-hold"><span class="hk-days">'+daysTxt+'</span>'+(HK_SEL==='全体'?hkTtag(p.tantou):'')+hkNyTag(p)+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkAssignSel(p)+hkPdfBtn(p.id)+'<button class="hk-b live sm" onclick="hkPublish(\''+p.id+'\')">掲載中にする</button></span></div>';
+   return '<div class="hk-hold"><span class="hk-days">'+daysTxt+'</span>'+(HK_SEL==='全体'?hkTtag(p.tantou):'')+hkNyTag(p)+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+testBadge(p)+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkAssignSel(p)+hkPdfBtn(p.id)+'<button class="hk-b live sm" onclick="hkPublish(\''+p.id+'\')">掲載中にする</button></span></div>';
  }).join(''):'<div class="hk-empty">保留中の物件はありません</div>';
  return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">保留中</span><span class="hk-cnt">'+hs.length+'件 ・ 掲載判断待ち</span><span class="hk-rule"></span></div>'+inner+'</div>';
 }
@@ -3901,7 +4026,7 @@ function hkDropSection(){
    var lv=hd?ss.lvAvg.toFixed(1):'—',dv=hd?ss.avg.toFixed(1):'—';
    var redDt=hd&&ss.avg<=0.3,redDay=hd&&ss.d>=30;
    return '<tr>'+(HK_SEL==='全体'?'<td class="l">'+hkTtag(p.tantou)+'</td>':'')
-    +'<td class="l"><span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span><div class="hk-psub">'+esc((p.station||'')+' / '+(p.madori||''))+'　'+hkNyTag(p)+'</div>'+hkAssignSel(p)+'</td>'
+    +'<td class="l"><span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+testBadge(p)+esc(hkName(p))+'</span><div class="hk-psub">'+esc((p.station||'')+' / '+(p.madori||''))+'　'+hkNyTag(p)+'</div>'+hkAssignSel(p)+'</td>'
     +'<td class="c">'+hkStars(p.stars)+'</td>'
     +'<td>'+(totalRent(p)?totalRent(p).toFixed(1):'—')+'</td>'
     +'<td><div class="hk-pvd">'+lv+'</div></td>'
@@ -3952,7 +4077,7 @@ function _calFmt(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+
 function hkSetCalDay(ds){HK_CALDAY=(HK_CALDAY===ds?'':ds);renderHoryu();}
 function hkCalDetail(ds){
  var ev=hkStatusEvents();var e=ev[ds]||{hold:[],live:[]};
- var grp=function(ids,label,cls){if(!ids.length)return '';return '<div class="hkcal-grp"><div class="hkcal-grphd '+cls+'">'+label+' '+ids.length+'件</div>'+ids.map(function(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return '';return '<div class="hkcal-item" onclick="openProp(\''+id+'\')"><span class="hkcal-inm">'+esc(hkName(p))+'</span>'+hkNyTag(p)+'<span class="hkcal-isub">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span></div>';}).join('')+'</div>';};
+ var grp=function(ids,label,cls){if(!ids.length)return '';return '<div class="hkcal-grp"><div class="hkcal-grphd '+cls+'">'+label+' '+ids.length+'件</div>'+ids.map(function(id){var p=PROPS.find(function(x){return x.id===id;});if(!p)return '';return '<div class="hkcal-item" onclick="openProp(\''+id+'\')"><span class="hkcal-inm">'+testBadge(p)+esc(hkName(p))+'</span>'+hkNyTag(p)+'<span class="hkcal-isub">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span></div>';}).join('')+'</div>';};
  var body=(e.hold.length+e.live.length)?(grp(e.hold,'保留にした','h')+grp(e.live,'掲載中にした','l')):'<div class="hk-empty">この日の記録はありません</div>';
  return '<div class="hkcal-detail"><div class="hkcal-dethd">'+hkMd(ds)+' に操作した物件</div>'+body+'</div>';
 }
@@ -3972,6 +4097,10 @@ function hkCalendarCard(){
    d.setDate(d.getDate()+1);}h+='</tr>';}
  h+='</tbody></table>';
  if(HK_CALDAY)h+=hkCalDetail(HK_CALDAY);
+ var ym=tds.slice(0,7);var holdSet={},liveSet={},allSet={};
+ Object.keys(ev).forEach(function(ds){if(ds.slice(0,7)!==ym)return;(ev[ds].hold||[]).forEach(function(id){holdSet[id]=1;allSet[id]=1;});(ev[ds].live||[]).forEach(function(id){liveSet[id]=1;allSet[id]=1;});});
+ var ids=Object.keys(allSet),atbb=0,other=0;ids.forEach(function(id){var pp=PROPS.find(function(x){return x.id===id;});if(pp&&pp.media==='atbb')atbb++;else other++;});
+ h+='<div class="hkcal-sum"><div class="hkcal-sumhd">今月の集計（'+(today0.getMonth()+1)+'月）<span>保留・掲載にした物件</span></div><div class="hkcal-sumgrid"><div class="hkcal-sc"><span class="l">合計</span><span class="n">'+ids.length+'</span></div><div class="hkcal-sc hold"><span class="l">保留</span><span class="n">'+Object.keys(holdSet).length+'</span></div><div class="hkcal-sc live"><span class="l">掲載</span><span class="n">'+Object.keys(liveSet).length+'</span></div><div class="hkcal-sc atbb"><span class="l">atbb</span><span class="n">'+atbb+'</span></div><div class="hkcal-sc other"><span class="l">その他</span><span class="n">'+other+'</span></div></div></div>';
  h+='</div>';return h;
 }
 function renderHoryu(){
@@ -4017,7 +4146,7 @@ function renderStaff(){
  h+='<div class="rvwrap'+(STAFFLISTOPEN?'':' lc')+'">';
  // list
  h+='<aside class="rvlist"><div class="rvlhd"><span class="t">入稿待ちリスト（'+items.length+'）</span><button onclick="staffToggleList()">'+(STAFFLISTOPEN?'‹':'›')+'</button></div>';
- h+='<div class="rvitems">'+items.map(function(p){return '<div class="rvit'+(p.id===CURSTAFF?' cur':'')+'" onclick="staffSelect(\''+p.id+'\')"><div class="nm">'+esc(p.name||'(名称未設定)')+(p.room?' '+esc(p.room):'')+(p.tantou?tantouTag(p):'<span class="ttag-none">未割当</span>')+starChip(p.stars)+'</div><div class="mt">'+esc((p.station||'')+' '+(p.madori||''))+(p.deadline?' ・ 納期'+esc(p.deadline.slice(5)):'')+'</div></div>';}).join('')+'</div></aside>';
+ h+='<div class="rvitems">'+items.map(function(p){return '<div class="rvit'+(p.id===CURSTAFF?' cur':'')+'" onclick="staffSelect(\''+p.id+'\')"><div class="nm">'+testBadge(p)+esc(p.name||'(名称未設定)')+(p.room?' '+esc(p.room):'')+(p.tantou?tantouTag(p):'<span class="ttag-none">未割当</span>')+starChip(p.stars)+'</div><div class="mt">'+esc((p.station||'')+' '+(p.madori||''))+(p.deadline?' ・ 納期'+esc(p.deadline.slice(5)):'')+'</div></div>';}).join('')+'</div></aside>';
  // work
  var p=PROPS.find(function(x){return x.id===CURSTAFF;});
  var mode=STAFFMODE[p.id]||(p.postIntent==='hold'?'hold':'live');
