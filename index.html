@@ -792,7 +792,7 @@ header{padding-left:54px}
  <div class="sn-coll">
   <div class="sn-it" id="tb-review" onclick="tab('review')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5l2.2 2.2L15.5 9"/><rect x="4" y="3.5" width="16" height="17" rx="3"/></svg><span class="sn-t">要データ確認</span><span class="badge" id="rvbadge" style="display:none"></span></div>
   <div class="sn-it" id="tb-staff" onclick="tab('staff')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10.5 13.5M21 3l-7 18-3.5-7.5L3 10z"/></svg><span class="sn-t">要入稿</span><span class="badge" id="stbadge" style="display:none"></span><span class="badge blue" id="stalert" style="display:none"></span></div>
-  <div class="sn-it" id="tb-horyu" onclick="tab('horyu')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg><span class="sn-t">保留管理</span><span class="badge" id="hkbadge" style="display:none"></span></div>
+  <div class="sn-it" id="tb-horyu" onclick="tab('horyu')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg><span class="sn-t">掲載管理</span><span class="badge blue" id="hklivebadge" style="display:none"></span><span class="badge" id="hkbadge" style="display:none;margin-left:3px"></span></div>
   <div class="sn-it" id="tb-tantou" onclick="tab('tantou')"><svg class="sn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.4a3 3 0 0 1 0 5.2"/><path d="M17.5 14.6a5.5 5.5 0 0 1 3 5.4"/></svg><span class="sn-t">反響獲得実績</span></div>
  </div>
 </div>
@@ -2357,7 +2357,7 @@ function bjDiff(p){if(!p.bjRef)return [];var r=p.bjRef,d=[];
  if(r.photo!=null&&r.photo!==''&&String(p.photoCount||'')!==String(r.photo||''))d.push({f:'photoCount',label:'写真数',cur:p.photoCount||'',bj:r.photo||''});
  return d;}
 function bjMismatch(p){return !!(p.bjRef && !p.bjOkAt && bjDiff(p).length>0);}
-function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}var ac=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length;var ae=document.getElementById('stalert');if(ae){if(ac>0){ae.textContent=ac;ae.style.display='';}else{ae.style.display='none';}}var hc=PROPS.filter(function(p){return p.status==='保留';}).length;var he=document.getElementById('hkbadge');if(he){if(hc>0){he.textContent=hc;he.style.display='';}else{he.style.display='none';}}}catch(e){}}
+function updateBadges(){try{var c=PROPS.filter(function(p){return p.confirmed===false;}).length;var el=document.getElementById('rvbadge');if(el){if(c>0){el.textContent=c;el.style.display='';}else{el.style.display='none';}}var sc=PROPS.filter(function(p){return p.status==='要入稿'&&p.confirmed!==false;}).length;var se=document.getElementById('stbadge');if(se){if(sc>0){se.textContent=sc;se.style.display='';}else{se.style.display='none';}}var ac=PROPS.filter(function(p){return p.repAlert&&p.status==='掲載中';}).length;var ae=document.getElementById('stalert');if(ae){if(ac>0){ae.textContent=ac;ae.style.display='';}else{ae.style.display='none';}}var hc=PROPS.filter(function(p){return p.status==='保留';}).length;var he=document.getElementById('hkbadge');if(he){if(hc>0){he.textContent=hc;he.style.display='';}else{he.style.display='none';}}var lcb=PROPS.filter(function(p){return p.status==='掲載中'&&p.confirmed!==false;}).length;var leb=document.getElementById('hklivebadge');if(leb){if(lcb>0){leb.textContent=lcb;leb.style.display='';}else{leb.style.display='none';}}}catch(e){}}
 function rvFields(p){
  var f=function(field,label,typ){return '<div class="rvf"><label>'+label+'</label>'+inEd(p.id,field,p[field],'',typ)+'</div>';};
  var statusSel='<div class="rvf"><label>状態</label>'+inSel(p.id,'status',p.status,['掲載中','要入稿','落とし済み'])+'</div>';
@@ -3651,7 +3651,7 @@ function staffEquipPanel(p){
 }
 function staffEquip(id,key,btn){var p=PROPS.find(function(x){return x.id===id;});if(!p)return;p[key]=p[key]?'':'あり';if(btn)btn.classList.toggle('on',!!p[key]);var ks=['btSep','washStand','petOk','dep0','key0','autoLock','delivBox','twoBurner'];var c=document.getElementById('eqcnt_'+id);if(c)c.textContent='あり '+ks.filter(function(k){return p[k];}).length+' / '+ks.length;save();}
 /* ===== 保留管理（hk）===== */
-var HK_SEL='全体',HK_SORT='lpvd',HK_QOPEN=false,HK_CALDAY='',HK_MODE='tantou';
+var HK_SEL='全体',HK_SORT='lpvd',HK_QOPEN=false,HK_CALDAY='',HK_MODE='tantou',HK_STATUS='both';
 function effNyuko(p){var n=(p&&p.nyukoTanto)||'';if(n==='自分')return (p&&p.tantou)||'未設定';return n||'未設定';}
 function hkNyTag(p){return '<span class="hk-nytag">入稿 '+esc(effNyuko(p))+'</span>';}
 var HK_COL={'弘中':'#1565C0','横山':'#C0392B','宮本':'#2E7D32','田邊':'#E67E22','生沼':'#6A1B9A','五嶋':'#00838F','岡田':'#AD1457'};
@@ -3661,6 +3661,12 @@ function hkInjectCSS(){
  s.textContent=[
   '#horyubody .hk-sel{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}',
   '.hk-modetab{display:inline-flex;background:#eef0f2;border-radius:10px;padding:3px;gap:2px;margin-bottom:10px}',
+  '.hk-statbar{display:flex;gap:7px;margin-bottom:12px}',
+  '.hk-stbtn{flex:1;border:1px solid #e0e3e8;background:#fff;color:#6b6a66;font-size:13px;font-weight:800;padding:10px 8px;border-radius:11px;cursor:pointer;font-family:inherit}',
+  '.hk-stbtn b{margin-left:4px;font-weight:800}',
+  '.hk-stbtn.on{border-color:#1A3D6B;background:#1A3D6B;color:#fff}',
+  '.hk-stbtn.live.on{border-color:#2a6df5;background:#2a6df5}',
+  '.hk-stbtn.hold.on{border-color:#E8920A;background:#E8920A}',
   '.hk-mbtn{border:none;background:transparent;color:#6b6a66;font-size:12.5px;font-weight:700;padding:7px 16px;border-radius:8px;cursor:pointer;font-family:inherit}',
   '.hk-mbtn.on{background:#fff;color:#1A3D6B;box-shadow:0 1px 2px rgba(0,0,0,.12)}',
   '.hk-selbtn b{font-weight:800;margin-left:3px}',
@@ -3821,18 +3827,26 @@ function hkQueue(){return PROPS.filter(function(p){return p.suumoTodo&&hkSelOk(p
 function hkRecent(d){if(!d)return false;var t=new Date(String(d).replace(/-/g,'/')).getTime();return (Date.now()-t)<14*86400000;}
 function hkDone(){return PROPS.filter(function(p){return !p.suumoTodo&&p.statusSrc==='manual'&&(p.status==='掲載中'||p.status==='落とし済み')&&hkRecent(p.statusSrcAt)&&hkSelOk(p);});}
 
+function hkBaseProps(){return PROPS.filter(function(p){if(p.confirmed===false)return false;if(HK_STATUS==='hold')return p.status==='保留';if(HK_STATUS==='live')return p.status==='掲載中'&&!p.suumoTodo;return p.status==='保留'||(p.status==='掲載中'&&!p.suumoTodo);});}
+function hkSetStatus(s){HK_STATUS=s;HK_CALDAY='';renderHoryu();}
+function hkStatusBar(){
+ var base=PROPS.filter(function(p){return p.confirmed!==false&&hkSelOk(p);});
+ var lc=base.filter(function(p){return p.status==='掲載中'&&!p.suumoTodo;}).length;
+ var hc=base.filter(function(p){return p.status==='保留';}).length;
+ return '<div class="hk-statbar"><button class="hk-stbtn'+(HK_STATUS==='both'?' on':'')+'" onclick="hkSetStatus(\'both\')">両方 <b>'+(lc+hc)+'</b></button><button class="hk-stbtn live'+(HK_STATUS==='live'?' on':'')+'" onclick="hkSetStatus(\'live\')">掲載中 <b>'+lc+'</b></button><button class="hk-stbtn hold'+(HK_STATUS==='hold'?' on':'')+'" onclick="hkSetStatus(\'hold\')">保留中 <b>'+hc+'</b></button></div>';
+}
 function hkSelector(){
- var holds=PROPS.filter(function(p){return p.status==='保留'&&p.confirmed!==false;});
+ var base=hkBaseProps();
  var h='<div class="hk-modetab"><button class="hk-mbtn'+(HK_MODE==='tantou'?' on':'')+'" onclick="hkSetMode(\'tantou\')">物件担当者別</button><button class="hk-mbtn'+(HK_MODE==='nyuko'?' on':'')+'" onclick="hkSetMode(\'nyuko\')">入稿担当者別</button></div>';
- h+='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体 <b>'+holds.length+'</b></button>';
- var _unc=holds.filter(function(p){return !p.tantou;}).length;
+ h+='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体 <b>'+base.length+'</b></button>';
+ var _unc=base.filter(function(p){return !p.tantou;}).length;
  if(HK_MODE==='nyuko'){
-  var cnt={};holds.forEach(function(p){var k=effNyuko(p);cnt[k]=(cnt[k]||0)+1;});
+  var cnt={};base.forEach(function(p){var k=effNyuko(p);cnt[k]=(cnt[k]||0)+1;});
   var all={};PROPS.forEach(function(p){if(p.confirmed!==false){var k=effNyuko(p);if(k&&k!=='未設定')all[k]=1;}});
   var names=Object.keys(all).sort(function(a,b){return a.localeCompare(b,'ja');});
   names.forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#0d6e6e')+'"></span>'+esc(s)+' <b>'+(cnt[s]||0)+'</b></button>';});
  }else{
-  var cntT={};holds.forEach(function(p){var k=p.tantou||'未設定';cntT[k]=(cntT[k]||0)+1;});
+  var cntT={};base.forEach(function(p){var k=p.tantou||'未設定';cntT[k]=(cntT[k]||0)+1;});
   STAFF.filter(function(s){return ['五嶋','店長'].indexOf(s)<0;}).forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#888')+'"></span>'+esc(s)+' <b>'+(cntT[s]||0)+'</b></button>';});
  }
  if(_unc>0||HK_SEL==='担当なし')h+='<button class="hk-selbtn nochg'+(HK_SEL==='担当なし'?' on':'')+'" onclick="hkSetSel(\'担当なし\')">担当なし <b>'+_unc+'</b></button>';
@@ -3932,7 +3946,8 @@ function hkCalendarCard(){
 function renderHoryu(){
  hkInjectCSS();
  var host=document.getElementById('horyubody');if(!host)return;
- host.innerHTML=hkSelector()+hkCalendarCard()+hkHoldSection()+hkDropSection()+hkQueueSection()+hkDoneSection();
+ var sec=(HK_STATUS==='hold')?hkHoldSection():(HK_STATUS==='live')?hkDropSection():(hkHoldSection()+hkDropSection());
+ host.innerHTML=hkStatusBar()+hkSelector()+hkCalendarCard()+sec+hkQueueSection()+hkDoneSection();
 }
 function hkSetSel(p){HK_SEL=p;HK_QOPEN=false;renderHoryu();}
 function hkSetSort(s){HK_SORT=s;renderHoryu();}
