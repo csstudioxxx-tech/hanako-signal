@@ -885,6 +885,7 @@ header{padding-left:54px}
 <div id="groupbar" style="display:none"></div>
 <div id="v-dash"></div>
 <div id="v-add" style="display:none">
+ <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn btn-sec" style="width:auto;padding:8px 14px" onclick="openPdfFillModal()">📎 抜けPDF一括補完</button></div>
  <div id="drop" class="drop"><div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>マイソクPDFをドロップ</div><div class="ds">複数可 ／ タップして選択 → 自動読み取り</div></div>
  <input type="file" id="pdf" accept="application/pdf" multiple style="display:none">
  <div id="regstepbody"></div>
@@ -2156,6 +2157,97 @@ function regFeatAdd(i,f){var p=PEND[i];if(!p)return;if(!p.memos)p.memos=[];if(p.
 function regTplNew(i){var name=(prompt('テンプレ名を入力（例：初期費用格安）','')||'').trim();if(!name)return;var body=(prompt('テンプレ本文を入力','')||'').trim();if(!body)return;var list=cmtTpls().slice();list.push({name:name,body:body});EVENTS['CMTTPL__list']=JSON.stringify(list);save();toast('テンプレ「'+name+'」を追加（全員で共有）');renderRegStep();}
 function viewPendPdf(i){var p=PEND[i];if(!p||!p.pdfData){toast('PDFがありません');return;}try{var bin=atob(p.pdfData);var u8=new Uint8Array(bin.length);for(var k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));var w=window.open(url,'_blank');if(!w){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}setTimeout(function(){URL.revokeObjectURL(url);},60000);}catch(e){toast('PDFを開けませんでした');}}
 function pickPendPdf(i){var inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,.pdf';inp.onchange=async function(){var ff=inp.files&&inp.files[0];if(!ff)return;var rec=PEND[i];if(!rec)return;if(!/pdf/i.test(ff.type)&&!/\.pdf$/i.test(ff.name)){toast('PDFファイルを選択してください');return;}try{var ab=await ff.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);rec.pdfData=btoa(bs);rec.pdfName=ff.name;renderRegStep();toast('PDFを添付しました（AI再読み込みで自動入力もできます）');}catch(e){toast('PDFの読み込みに失敗しました');}};inp.click();}
+var _pendPersistT=null;
+function schedulePersistPend(){clearTimeout(_pendPersistT);_pendPersistT=setTimeout(persistPend,500);}
+function persistPend(){try{if(typeof idbSet!=='function')return;idbSet('__PEND__',JSON.stringify({pend:PEND,i:REGSTEP_I,ts:Date.now()}));}catch(e){}}
+async function restorePend(){try{if(typeof idbGet!=='function')return;var raw=await idbGet('__PEND__');if(!raw)return;var o=JSON.parse(raw);if(o&&Array.isArray(o.pend)&&o.pend.length){PEND=o.pend.map(function(p){if(p&&p.auto==='読取中…')p.auto='要確認';return p;});REGSTEP_I=(o.i!=null&&o.i>=0&&o.i<PEND.length)?o.i:0;setTimeout(function(){try{toast('前回の読み込み中だった '+PEND.length+'件を復元しました');}catch(e){}},900);}}catch(e){}}
+var PFF={pdfs:[],matches:[],unmatchedProps:[],skipExist:0,skipNone:0,applied:[],busy:false,showApplied:false};
+function _pffMissing(){return PROPS.filter(function(p){return p.confirmed!==false&&!(p.driveUrl||p.driveId);});}
+function _pffScore(prop,pdf){var nk=_nkey(prop.name||'');if(!nk||nk.length<2)return 0;if(pdf.key.indexOf(nk)<0)return 0;var s=50;var rk=_nkey(prop.room||'');if(rk&&rk.length>=1&&pdf.key.indexOf(rk)>=0)s+=40;return s;}
+function openPdfFillModal(){
+ PFF.pdfs=[];PFF.matches=[];PFF.unmatchedProps=[];PFF.applied=[];PFF.skipExist=0;PFF.skipNone=0;PFF.showApplied=false;
+ var ov=document.createElement('div');ov.className='ovl';ov.id='pffov';
+ ov.innerHTML='<div class="modal" style="max-width:680px;width:96vw;max-height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">'
+  +'<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #eceef1"><b style="flex:1;font-size:15.5px;color:#1A3D6B">抜けPDF 一括補完</b><button onclick="closePdfFillModal()" style="border:none;background:#ececf0;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;color:#555">\u00d7</button></div>'
+  +'<div style="padding:14px 16px;overflow:auto">'
+  +'<div style="font-size:12.5px;color:#6b6a66;line-height:1.7">PDFをまとめてドロップすると、<b>PDF未添付の物件</b>に<b>物件名＋号室</b>で自動マッチして差し込みます。すでにPDFがある物件・該当しないPDFはスキップします。</div>'
+  +'<div style="margin-top:10px"><span id="pffmiss" style="font-size:13px;font-weight:700;background:#fff7ec;color:#9a6500;border:1px solid #f0d9a8;border-radius:8px;padding:6px 12px">PDF未添付の物件：'+_pffMissing().length+'件</span></div>'
+  +'<div id="pffdz" style="margin-top:12px;border:2px dashed #cfd6df;border-radius:14px;padding:26px;text-align:center;cursor:pointer;background:#fff"><div style="font-size:14px;font-weight:800;color:#1A3D6B">\U0001F4C4 PDFをまとめてドロップ（100件程度OK）</div><div style="font-size:11.5px;color:#9aa2ad;margin-top:5px">タップしてまとめて選択 → 自動マッチング</div></div>'
+  +'<input type="file" id="pffinp" accept="application/pdf,.pdf" multiple style="display:none">'
+  +'<div id="pffresult" style="margin-top:14px"></div>'
+  +'</div></div>';
+ document.body.appendChild(ov);
+ ov.onclick=function(e){if(e.target===ov)closePdfFillModal();};
+ var dz=document.getElementById('pffdz'),inp=document.getElementById('pffinp');
+ if(dz&&inp){dz.onclick=function(){inp.click();};dz.ondragover=function(e){e.preventDefault();dz.style.borderColor='#2a6df5';};dz.ondragleave=function(){dz.style.borderColor='#cfd6df';};dz.ondrop=function(e){e.preventDefault();dz.style.borderColor='#cfd6df';handlePffFiles(e.dataTransfer.files);};inp.onchange=function(){handlePffFiles(inp.files);inp.value='';};}
+}
+function closePdfFillModal(){var ov=document.getElementById('pffov');if(ov)ov.remove();}
+async function handlePffFiles(files){
+ var fs=[].slice.call(files).filter(function(f){return /pdf/i.test(f.type)||/\.pdf$/i.test(f.name);});
+ if(!fs.length){toast('PDFが見つかりません');return;}
+ var res=document.getElementById('pffresult');PFF.pdfs=[];PFF.applied=[];PFF.showApplied=false;
+ for(var i=0;i<fs.length;i++){
+  if(res)res.innerHTML='<div style="font-size:13px;color:#2a6df5;font-weight:700">PDFを解析中… '+(i+1)+' / '+fs.length+'</div>';
+  var ff=fs[i],b64='',txt='';
+  try{var ab=await ff.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);b64=btoa(bs);}catch(e){}
+  try{txt=(await pdfText(ff))||'';}catch(e){txt='';}
+  PFF.pdfs.push({name:ff.name,b64:b64,key:_nkey(txt)});
+ }
+ computePffMatches();renderPffResult();
+}
+function computePffMatches(){
+ var missing=_pffMissing();var have=PROPS.filter(function(p){return p.confirmed!==false&&(p.driveUrl||p.driveId);});
+ var cands=[];
+ missing.forEach(function(prop,pi){PFF.pdfs.forEach(function(pdf,fi){var s=_pffScore(prop,pdf);if(s>=50)cands.push({pi:pi,fi:fi,s:s});});});
+ cands.sort(function(a,b){return b.s-a.s;});
+ var uP={},uF={},matches=[];
+ cands.forEach(function(c){if(uP[c.pi]||uF[c.fi])return;uP[c.pi]=1;uF[c.fi]=1;matches.push({prop:missing[c.pi],pdf:PFF.pdfs[c.fi],score:c.s,apply:true});});
+ PFF.matches=matches;
+ PFF.unmatchedProps=missing.filter(function(p,pi){return !uP[pi];});
+ var se=0,sn=0;
+ PFF.pdfs.forEach(function(pdf,fi){if(uF[fi])return;var hit=have.some(function(hp){return _pffScore(hp,pdf)>=50;});if(hit)se++;else sn++;});
+ PFF.skipExist=se;PFF.skipNone=sn;
+}
+function pffToggle(i){if(PFF.matches[i])PFF.matches[i].apply=!PFF.matches[i].apply;renderPffResult();}
+function pffShowApplied(){PFF.showApplied=!PFF.showApplied;renderPffResult();}
+function renderPffResult(){
+ var res=document.getElementById('pffresult');if(!res)return;var m=PFF.matches||[];
+ var h='';
+ if(PFF.applied&&PFF.applied.length){
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
+   +'<button onclick="pffShowApplied()" style="font-size:12px;font-weight:700;background:#e3f3e9;color:#1f7a52;border:1px solid #bfe6cf;border-radius:8px;padding:6px 12px;cursor:pointer">PDFを差し込んだ物件：'+PFF.applied.length+'件 \u25be</button>'
+   +'<span style="font-size:12px;font-weight:700;background:#eef0f2;color:#6b6a66;border-radius:8px;padding:6px 12px">スキップ（既にPDFあり）：'+PFF.skipExist+'件</span>'
+   +'<span style="font-size:12px;font-weight:700;background:#fff7ec;color:#9a6500;border-radius:8px;padding:6px 12px">該当なし：'+PFF.skipNone+'件</span></div>';
+  if(PFF.showApplied){h+='<div style="border:1px solid #e7eaee;border-radius:12px;overflow:hidden;margin-bottom:10px">'+PFF.applied.map(function(a){return '<div style="padding:9px 12px;border-bottom:1px solid #eceef1;font-size:12.5px"><b style="color:#1A3D6B">'+esc(a.name+(a.room?(' '+a.room):''))+'</b><div style="font-size:11px;color:#9aa2ad">\u2190 '+esc(a.pdfName)+'</div></div>';}).join('')+'</div>';}
+  if((PFF.unmatchedProps||[]).length)h+='<details><summary style="font-size:12px;font-weight:700;color:#9a6500;cursor:pointer">まだPDFが無い物件（'+PFF.unmatchedProps.length+'）</summary><div style="font-size:12px;line-height:1.9;color:#46505c;margin-top:6px">'+PFF.unmatchedProps.slice(0,200).map(function(p){return esc((p.name||'(無題)')+(p.room?(' '+p.room):''));}).join('<br>')+'</div></details>';
+  res.innerHTML=h;return;
+ }
+ var selN=m.filter(function(x){return x.apply;}).length;
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><span style="font-size:12px;font-weight:700;background:#e3f3e9;color:#1f7a52;border-radius:8px;padding:5px 11px">マッチ '+m.length+'件</span><span style="font-size:12px;font-weight:700;background:#eef0f2;color:#6b6a66;border-radius:8px;padding:5px 11px">スキップ（既にPDFあり） '+PFF.skipExist+'件</span><span style="font-size:12px;font-weight:700;background:#fff7ec;color:#9a6500;border-radius:8px;padding:5px 11px">該当なし '+PFF.skipNone+'件</span></div>';
+ if(m.length){
+  h+='<div style="border:1px solid #e7eaee;border-radius:12px;overflow:hidden;max-height:46vh;overflow-y:auto">';
+  m.forEach(function(x,i){var conf=x.score>=90?'物件名＋号室一致':'物件名のみ一致';var cc=x.score>=90?'#1f7a52':'#9a6500';
+   h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #eceef1"><input type="checkbox" '+(x.apply?'checked':'')+' onchange="pffToggle('+i+')" style="width:17px;height:17px;flex:none"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:#1A3D6B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc((x.prop.name||'(無題)')+(x.prop.room?(' '+x.prop.room):''))+'</div><div style="font-size:11px;color:#9aa2ad;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\u2190 '+esc(x.pdf.name)+'</div></div><span style="font-size:10px;font-weight:700;color:'+cc+';flex:none">'+conf+'</span></div>';});
+  h+='</div><button class="btn btn-pri" style="margin-top:12px" onclick="pffApply()"'+(selN?'':' disabled')+'>選択した '+selN+'件のPDFを物件に反映</button>';
+ }else if(PFF.pdfs.length){h+='<div style="font-size:13px;color:#6b6a66;padding:10px 0">マッチする抜け物件が見つかりませんでした。物件名がPDF内に無いか、すでにPDFがある物件かもしれません。</div>';}
+ res.innerHTML=h;
+}
+async function pffApply(){
+ if(PFF.busy)return;var sel=(PFF.matches||[]).filter(function(x){return x.apply;});
+ if(!sel.length){toast('反映する項目がありません');return;}
+ if(!confirm(sel.length+'件のPDFを物件に反映します。よろしいですか？'))return;
+ PFF.busy=true;var res=document.getElementById('pffresult');var applied=[],fail=[];
+ for(var i=0;i<sel.length;i++){var x=sel[i];if(res)res.innerHTML='<div style="font-size:13px;color:#2a6df5;font-weight:700">アップロード中… '+(i+1)+' / '+sel.length+'</div>';
+  var r=false;try{r=await uploadPdfToDrive(x.prop,x.pdf.b64);}catch(e){}
+  if(!r){try{await gset('pdf_'+x.prop.id,x.pdf.b64);}catch(e){}fail.push(x.prop.name||'物件');}
+  applied.push({name:x.prop.name||'(無題)',room:x.prop.room||'',pdfName:x.pdf.name});}
+ try{await save();await flushPush();}catch(e){}
+ PFF.busy=false;recompute();updateBadges();
+ PFF.applied=applied;PFF.matches=[];PFF.showApplied=false;
+ var mc=document.getElementById('pffmiss');if(mc)mc.textContent='PDF未添付の物件：'+_pffMissing().length+'件';
+ renderPffResult();
+ if(fail.length)alert(fail.length+'件はDriveアップロードに失敗し端末内に保存しました（通信回復後に物件カードから入れ直してください）。');
+}
 /* ===== 物件ごと登録・必須チェック（データ確認画面 C+A案） ===== */
 function _pendReqKeys(){return ['name','room','madori','area','structure','age','line','station','address','rent','mgmtFee','deposit','keyMoney','mgmtCo','propNo'];}
 function _pendReqTotal(){return _pendReqKeys().length+2;}
@@ -2263,6 +2355,7 @@ function renderRegStep(){
  var _prevList=host.querySelector('.rs2list');var _lsT=_prevList?_prevList.scrollTop:null;var _winY=(window.pageYOffset||document.documentElement.scrollTop||0);
  host.innerHTML='<div class="rs2wrap"><aside class="rs2list">'+_rsLeft()+'</aside><div class="rs2main">'+h+'</div></div>';
  try{if(_lsT!=null){var _nl=host.querySelector('.rs2list');if(_nl)_nl.scrollTop=_lsT;}window.scrollTo(0,_winY);}catch(e){}
+ try{schedulePersistPend();}catch(e){}
 }
 function statusChips(idx){return STATUSES.map(s=>'<button type="button" class="chip" onclick="pendStat('+idx+',\''+s+'\',this)">'+s+'</button>').join('');}
 function pendStat(i,s,el){PEND[i].pendStatus=(PEND[i].pendStatus===s?'':s);[...el.parentNode.children].forEach(c=>c.classList.remove('on'));if(PEND[i].pendStatus)el.classList.add('on');}
@@ -5326,12 +5419,16 @@ async function importJ(ev){const f=ev.target.files[0];if(!f)return;try{const o=J
 
 // ---------- init ----------
 (async function(){try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}catch(e){}
- await load();navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}try{updateSaveState();}catch(e){}try{_lastSig=_dataSig();}catch(e){}})();
+ await load();try{await restorePend();}catch(e){}navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}try{updateSaveState();}catch(e){}try{_lastSig=_dataSig();}catch(e){}})();
 let _lastRefresh=Date.now();
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')maybeAutoRefresh();else _beaconSave();});
 setInterval(function(){try{quietRefresh();}catch(e){}},30000);
 window.addEventListener('pagehide',_beaconSave);
 window.addEventListener('beforeunload',_beaconSave);
+window.addEventListener('pagehide',function(){try{persistPend();}catch(e){}});
+window.addEventListener('beforeunload',function(){try{persistPend();}catch(e){}});
+document.addEventListener('visibilitychange',function(){if(document.hidden){try{persistPend();}catch(e){}}});
+document.addEventListener('input',function(e){try{var t=e.target;if(t&&t.closest&&t.closest('#regstepbody'))schedulePersistPend();}catch(err){}},true);
 document.addEventListener('focusin',function(e){var t=e.target;if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))_editing=true;});
 document.addEventListener('focusout',function(){_editing=false;setTimeout(function(){if(!isEditing()&&_pendingRefresh&&!_autoPaused)doRefreshNow();},900);});
 
