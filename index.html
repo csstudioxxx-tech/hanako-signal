@@ -3666,6 +3666,10 @@ function hkInjectCSS(){
   '.hk-selbtn b{font-weight:800;margin-left:3px}',
   '.hk-selbtn.on b{color:#fff}',
   '.hk-nytag{font-size:9px;font-weight:700;color:#0d6e6e;background:#e3f5f4;border:1px solid #b9e3e0;border-radius:5px;padding:1px 6px;white-space:nowrap}',
+  '.hk-selbtn.nochg{border-color:#f0c889;color:#9a6500}',
+  '.hk-selbtn.nochg.on{background:#E8920A;border-color:#E8920A;color:#fff}',
+  '.hk-assign{font-size:11.5px;font-weight:700;font-family:inherit;color:#1A3D6B;border:1.5px solid #E8920A;background:#fff7ec;border-radius:7px;padding:5px 8px;cursor:pointer}',
+  '.hk-psub .hk-assign,td .hk-assign{margin-top:5px}',
   '.hk-selbtn{border:1px solid #d8dee8;background:#fff;border-radius:20px;padding:6px 15px;font-family:inherit;font-size:12.5px;font-weight:600;color:#46505c;cursor:pointer;display:inline-flex;align-items:center;gap:6px}',
   '.hk-selbtn .hk-dot{width:9px;height:9px;border-radius:3px}',
   '.hk-selbtn.on{background:#1A3D6B;color:#fff;border-color:#1A3D6B}.hk-selbtn.on .hk-dot{display:none}',
@@ -3808,7 +3812,9 @@ function renderNyukoStatus(){
  if(otherTotal>0)h+='<div style="margin-top:10px;font-size:12px;color:#9aa0a6">※ 枠対象外（五嶋など）の入稿 '+otherTotal+'件は'+NYUKO_GOAL_TOTAL+'の集計に含めていません。</div>';
  el.innerHTML=h;
 }
-function hkSelOk(p){if(HK_SEL==='全体')return true;if(HK_MODE==='nyuko')return effNyuko(p)===HK_SEL;return p.tantou===HK_SEL;}
+function hkSelOk(p){if(HK_SEL==='全体')return true;if(HK_SEL==='担当なし')return !p.tantou;if(HK_MODE==='nyuko')return effNyuko(p)===HK_SEL;return p.tantou===HK_SEL;}
+function hkAssign(id,v){if(!v)return;tantouSet(id,v);renderHoryu();}
+function hkAssignSel(p){if(HK_SEL!=='担当なし')return '';return '<select class="hk-assign" onclick="event.stopPropagation()" onchange="hkAssign(\''+p.id+'\',this.value)"><option value="">担当を割当…</option>'+STAFF.filter(function(s){return ['五嶋','店長'].indexOf(s)<0;}).map(function(s){return '<option>'+esc(s)+'</option>';}).join('')+'</select>';}
 function hkHolds(){return PROPS.filter(function(p){return p.status==='保留'&&p.confirmed!==false&&hkSelOk(p);});}
 function hkLive(){return PROPS.filter(function(p){return p.status==='掲載中'&&p.confirmed!==false&&!p.suumoTodo&&hkSelOk(p);});}
 function hkQueue(){return PROPS.filter(function(p){return p.suumoTodo&&hkSelOk(p);});}
@@ -3819,6 +3825,7 @@ function hkSelector(){
  var holds=PROPS.filter(function(p){return p.status==='保留'&&p.confirmed!==false;});
  var h='<div class="hk-modetab"><button class="hk-mbtn'+(HK_MODE==='tantou'?' on':'')+'" onclick="hkSetMode(\'tantou\')">物件担当者別</button><button class="hk-mbtn'+(HK_MODE==='nyuko'?' on':'')+'" onclick="hkSetMode(\'nyuko\')">入稿担当者別</button></div>';
  h+='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体 <b>'+holds.length+'</b></button>';
+ var _unc=holds.filter(function(p){return !p.tantou;}).length;
  if(HK_MODE==='nyuko'){
   var cnt={};holds.forEach(function(p){var k=effNyuko(p);cnt[k]=(cnt[k]||0)+1;});
   var all={};PROPS.forEach(function(p){if(p.confirmed!==false){var k=effNyuko(p);if(k&&k!=='未設定')all[k]=1;}});
@@ -3828,6 +3835,7 @@ function hkSelector(){
   var cntT={};holds.forEach(function(p){var k=p.tantou||'未設定';cntT[k]=(cntT[k]||0)+1;});
   STAFF.filter(function(s){return ['五嶋','店長'].indexOf(s)<0;}).forEach(function(s){h+='<button class="hk-selbtn'+(HK_SEL===s?' on':'')+'" onclick="hkSetSel(\''+s+'\')"><span class="hk-dot" style="background:'+(HK_COL[s]||'#888')+'"></span>'+esc(s)+' <b>'+(cntT[s]||0)+'</b></button>';});
  }
+ if(_unc>0||HK_SEL==='担当なし')h+='<button class="hk-selbtn nochg'+(HK_SEL==='担当なし'?' on':'')+'" onclick="hkSetSel(\'担当なし\')">担当なし <b>'+_unc+'</b></button>';
  return h+'</div>';
 }
 function hkSetMode(m){HK_MODE=m;HK_SEL='全体';HK_CALDAY='';renderHoryu();}
@@ -3835,7 +3843,7 @@ function hkHoldSection(){
  var hs=hkHolds().slice();
  hs.sort(function(a,b){return String(hkNyukoOf(b)||'').localeCompare(String(hkNyukoOf(a)||''));});
  var inner=hs.length?hs.map(function(p){var nd=hkNyukoOf(p),dd=daysSince(nd);var daysTxt=(dd!=null)?('入稿から '+Math.max(0,dd)+'日（'+hkMd(nd)+'）'):'入稿日不明';
-   return '<div class="hk-hold"><span class="hk-days">'+daysTxt+'</span>'+(HK_SEL==='全体'?hkTtag(p.tantou):'')+hkNyTag(p)+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkPdfBtn(p.id)+'<button class="hk-b live sm" onclick="hkPublish(\''+p.id+'\')">掲載中にする</button></span></div>';
+   return '<div class="hk-hold"><span class="hk-days">'+daysTxt+'</span>'+(HK_SEL==='全体'?hkTtag(p.tantou):'')+hkNyTag(p)+'<span class="hk-nmn hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span>'+hkStars(p.stars)+'<span class="hk-info">'+esc([p.station,p.madori,rentMan(p)].filter(Boolean).join(' ・ '))+'</span><span class="hk-right">'+hkAssignSel(p)+hkPdfBtn(p.id)+'<button class="hk-b live sm" onclick="hkPublish(\''+p.id+'\')">掲載中にする</button></span></div>';
  }).join(''):'<div class="hk-empty">保留中の物件はありません</div>';
  return '<div class="hk-sec"><div class="hk-sechd"><span class="hk-nm">保留中</span><span class="hk-cnt">'+hs.length+'件 ・ 掲載判断待ち</span><span class="hk-rule"></span></div>'+inner+'</div>';
 }
@@ -3848,7 +3856,7 @@ function hkDropSection(){
    var lv=hd?ss.lvAvg.toFixed(1):'—',dv=hd?ss.avg.toFixed(1):'—';
    var redDt=hd&&ss.avg<=0.3,redDay=hd&&ss.d>=30;
    return '<tr>'+(HK_SEL==='全体'?'<td class="l">'+hkTtag(p.tantou)+'</td>':'')
-    +'<td class="l"><span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span><div class="hk-psub">'+esc((p.station||'')+' / '+(p.madori||''))+'　'+hkNyTag(p)+'</div></td>'
+    +'<td class="l"><span class="hk-lk" onclick="openProp(\''+p.id+'\')">'+esc(hkName(p))+'</span><div class="hk-psub">'+esc((p.station||'')+' / '+(p.madori||''))+'　'+hkNyTag(p)+'</div>'+hkAssignSel(p)+'</td>'
     +'<td class="c">'+hkStars(p.stars)+'</td>'
     +'<td>'+(totalRent(p)?totalRent(p).toFixed(1):'—')+'</td>'
     +'<td><div class="hk-pvd">'+lv+'</div></td>'
