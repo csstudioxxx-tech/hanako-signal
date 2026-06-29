@@ -2155,6 +2155,7 @@ function regMemoTpl(i){var p=PEND[i];if(!p)return;var sel=document.getElementByI
 function regFeatAdd(i,f){var p=PEND[i];if(!p)return;if(!p.memos)p.memos=[];if(p.memos.some(function(m){return m.label==='特徴'&&m.text===f;})){p.memos=p.memos.filter(function(m){return !(m.label==='特徴'&&m.text===f);});}else{p.memos.push({label:'特徴',text:f});}renderRegStep();}
 function regTplNew(i){var name=(prompt('テンプレ名を入力（例：初期費用格安）','')||'').trim();if(!name)return;var body=(prompt('テンプレ本文を入力','')||'').trim();if(!body)return;var list=cmtTpls().slice();list.push({name:name,body:body});EVENTS['CMTTPL__list']=JSON.stringify(list);save();toast('テンプレ「'+name+'」を追加（全員で共有）');renderRegStep();}
 function viewPendPdf(i){var p=PEND[i];if(!p||!p.pdfData){toast('PDFがありません');return;}try{var bin=atob(p.pdfData);var u8=new Uint8Array(bin.length);for(var k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);var url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));var w=window.open(url,'_blank');if(!w){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}setTimeout(function(){URL.revokeObjectURL(url);},60000);}catch(e){toast('PDFを開けませんでした');}}
+function pickPendPdf(i){var inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,.pdf';inp.onchange=async function(){var ff=inp.files&&inp.files[0];if(!ff)return;var rec=PEND[i];if(!rec)return;if(!/pdf/i.test(ff.type)&&!/\.pdf$/i.test(ff.name)){toast('PDFファイルを選択してください');return;}try{var ab=await ff.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);rec.pdfData=btoa(bs);rec.pdfName=ff.name;renderRegStep();toast('PDFを添付しました（AI再読み込みで自動入力もできます）');}catch(e){toast('PDFの読み込みに失敗しました');}};inp.click();}
 /* ===== 物件ごと登録・必須チェック（データ確認画面 C+A案） ===== */
 function _pendReqKeys(){return ['name','room','madori','area','structure','age','line','station','address','rent','mgmtFee','deposit','keyMoney','mgmtCo','propNo'];}
 function _pendReqTotal(){return _pendReqKeys().length+2;}
@@ -2213,8 +2214,8 @@ function renderRegStep(){
  var dup=rd?pendDup(p):null;
  h+='<div class="rscard">';h+='<div class="rsprog'+(rem?'':' ok')+'" id="rsProg"><span class="rsprog-n" id="rsRemN">'+rem+'</span><span class="rsprog-t">'+(rem?'残り必須項目':'必須すべて入力済み ✓')+'</span><span class="rsprog-note">所感・コメント・TELは任意</span></div>';
  if(dup)h+='<div class="rsdup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div style="flex:1"><b>重複の可能性</b>同名または酷似の物件「'+esc(dup.name||'')+'」が既にあります（号室は無視 ・ 担当 '+esc(dup.tantou||'未割当')+' ・ '+esc(statusLabel(dup.status))+' ・ 登録 '+esc(dup.regDate||'未登録')+'）。重複ならこの読み込みを削除してください。</div><button class="btn-sm btn-danger" style="flex:none;align-self:center" onclick="regStepDel()">この物件を削除</button></div>';
- h+='<div class="rsprev"'+(p.pdfData?' onclick="viewPendPdf('+REGSTEP_I+')" style="cursor:pointer"':'')+'><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><span>'+(p.pdfData?'マイソクを開く':'PDFなし')+'</span></div>';
- h+='<div style="display:flex;align-items:center;gap:8px;margin:8px 0 2px"><button class="btn-sm" '+((p.pdfData&&rd)?'':'disabled')+' onclick="rereadPend('+REGSTEP_I+')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg> PDFを再読み込み</button><span style="font-size:10.5px;color:var(--text3)">読み取りがずれた時にもう一度AI解析します</span></div>';
+ h+='<div class="rsprev" onclick="'+(p.pdfData?('viewPendPdf('+REGSTEP_I+')'):('pickPendPdf('+REGSTEP_I+')'))+'" style="cursor:pointer"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><span>'+(p.pdfData?'マイソクを開く':'PDFを選択（要入稿に必須）')+'</span></div>';
+ h+='<div style="display:flex;align-items:center;gap:8px;margin:8px 0 2px"><button class="btn-sm" '+((p.pdfData&&rd)?'':'disabled')+' onclick="rereadPend('+REGSTEP_I+')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg> PDFを再読み込み</button><button class="btn-sm" onclick="pickPendPdf('+REGSTEP_I+')">PDFを選択/差し替え</button><span style="font-size:10.5px;color:var(--text3)">読み取りがずれた時にもう一度AI解析します</span></div>';
  h+='<div class="rsname">'+(rd?esc(p.name||p.pdfName||'(名称未設定)'):'<span class="rsloading"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg>読込中… '+esc(p.pdfName)+'</span>')+'</div>';
  h+='<div class="rsinfo">'+(([p.station,p.walkMin?'徒歩'+p.walkMin:'',p.madori,rentMan(p)].filter(Boolean).join(' ・ '))||(rd?'情報なし':'解析中…'))+'</div>';
  var _selSt=function(ok){return 'width:100%;padding:9px 11px;border:1.5px solid '+(ok?'#1f9d57':'#E8920A')+';border-radius:9px;font-size:13px;font-family:inherit;background:'+(ok?'#fff':'#fff7ec')+';color:var(--text)';};
@@ -2332,8 +2333,16 @@ async function savePend(){
  var complete=PEND.filter(function(p){return p.auto!=='読取中…'&&pendReqOk(p);});
  var incompleteN=PEND.filter(function(p){return p.auto!=='読取中…'&&!pendReqOk(p);}).length;
  if(!complete.length){toast(incompleteN?('必須をすべて入力すると登録できます（未完了 '+incompleteN+'件）'):'登録できる物件がありません');return;}
- var hasDup=complete.some(function(p){return !!pendDup(p);});
- if(hasDup){openBulkResolve(complete);return;}
+ var withPdf=complete.filter(function(p){return !!p.pdfData;});
+ var noPdf=complete.filter(function(p){return !p.pdfData;});
+ if(noPdf.length){
+  var nm=noPdf.map(function(p){return '・'+(p.name||p.pdfName||'(無題)')+(p.room?(' '+p.room):'');}).join('\n');
+  alert('次の物件はPDFが添付されていません。要入稿にはマイソクPDFが必要です。\n\n'+nm+'\n\n各物件の「PDFを選択」からPDFを入れて、もう一度「要入稿へ」を押してください。'+(withPdf.length?('\n\n（PDFのある '+withPdf.length+'件は先に登録します）'):''));
+  if(withPdf.length){await _bulkRegister(withPdf.map(function(p){return {p:p,dup:null,choice:'new'};}));}
+  var idx=PEND.indexOf(noPdf[0]);if(idx>=0)REGSTEP_I=idx;
+  renderRegStep();
+  return;
+ }
  await _bulkRegister(complete.map(function(p){return {p:p,dup:null,choice:'new'};}));
 }
 async function _bulkRegister(decisions){
