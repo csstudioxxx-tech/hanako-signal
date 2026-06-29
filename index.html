@@ -3156,6 +3156,41 @@ function rvConfirmPoints(p){
 function rvAmenChk(p){
  return '<div class="rvckrow">'+inChk(p.id,'btSep',p.btSep,'バス・トイレ別')+inChk(p.id,'washStand',p.washStand,'独立洗面台')+inChk(p.id,'petOk',p.petOk,'ペット相談可')+inChk(p.id,'autoLock',p.autoLock,'オートロック')+inChk(p.id,'delivBox',p.delivBox,'宅配BOX')+inChk(p.id,'twoBurner',p.twoBurner,'2口コンロ')+inChk(p.id,'dep0',p.dep0,'敷金0')+inChk(p.id,'key0',p.key0,'礼金0')+'</div>';
 }
+function _dupRegSection(){
+ var map={};
+ PROPS.forEach(function(p){if(!p||!p.name||p.isTest)return;var k=_nkey(p.name)+'|'+_nkey(p.room||'');if(!k||k==='|')return;(map[k]=map[k]||[]).push(p);});
+ var groups=Object.keys(map).map(function(k){return map[k];}).filter(function(g){return g.length>=2;});
+ if(!groups.length)return '';
+ groups.sort(function(a,b){return b.length-a.length||(a[0].name||'').localeCompare(b[0].name||'','ja');});
+ var totalDup=groups.reduce(function(s,g){return s+g.length;},0);
+ var h='<details class="card fade" open style="border:1.5px solid #f0c0bf;background:#fdf3f2;margin-bottom:12px">';
+ h+='<summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:#a83a35"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>重複登録の可能性あり <span style="background:#e5484d;color:#fff;border-radius:999px;font-size:11px;padding:2px 9px">'+groups.length+'組 / '+totalDup+'件</span></summary>';
+ h+='<div style="font-size:12px;color:#8a4a47;margin:8px 2px 12px;line-height:1.7">同じ<b>物件名＋号室</b>で複数登録されています。情報を見比べて、残す方以外の「この物件を削除」を押してください（PDFも一緒に削除されます）。</div>';
+ groups.forEach(function(g){
+  h+='<div style="border:1px solid #ecd4d2;border-radius:12px;background:#fff;padding:11px 12px;margin-bottom:10px">';
+  h+='<div style="font-size:13.5px;font-weight:800;color:#1A3D6B;margin-bottom:9px">'+esc(g[0].name||'(無題)')+(g[0].room?(' '+esc(g[0].room)):'')+' <span style="font-size:11px;font-weight:700;color:#a83a35">'+g.length+'件</span></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">';
+  g.forEach(function(p){
+   var pdfOk=!!(p.driveUrl||p.driveId);
+   var stLab=(typeof statusLabel==='function'?statusLabel(p.status):'')||(p.confirmed===false?'要データ確認':'登録済み');
+   var row=function(k,v){return '<div style="display:flex;gap:8px;font-size:12px;line-height:1.7"><span style="width:48px;flex:none;color:#9aa2ad">'+k+'</span><span style="flex:1;color:#2d3744;word-break:break-all">'+v+'</span></div>';};
+   h+='<div style="border:1px solid #e7eaee;border-radius:10px;padding:10px 11px;background:#fcfcfd">';
+   h+='<div style="font-size:12.5px;font-weight:700;color:#1A3D6B;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc((p.name||'(無題)')+(p.room?(' '+p.room):''))+'</div>';
+   h+=row('担当',esc(p.tantou||'未割当'));
+   h+=row('状態',esc(stLab));
+   h+=row('登録日',esc(p.regDate||p.listDate||p.uploadDate||'—'));
+   h+=row('賃料',esc(rentMan(p)||'—'));
+   h+=row('駅',esc(((p.line?p.line+' ':'')+(p.station||''))||'—')+(p.walkMin?(' 徒歩'+esc(p.walkMin)+'分'):''));
+   h+=row('間取',esc((p.madori||'—')+(p.area?(' / '+p.area+'㎡'):'')));
+   h+=row('PDF',pdfOk?'<b style="color:#1f7a52">あり</b>':'<b style="color:#e5484d">なし</b>');
+   h+='<div style="display:flex;gap:6px;margin-top:9px"><button class="btn-sm" style="flex:1" onclick="openProp(\''+p.id+'\')">詳細を見る</button><button class="btn-sm btn-danger" style="flex:1" onclick="deleteReviewProp(\''+p.id+'\')">この物件を削除</button></div>';
+   h+='</div>';
+  });
+  h+='</div></div>';
+ });
+ h+='</details>';
+ return h;
+}
 function renderReview(){
  var _rvLS=(function(){var _e=document.querySelector('.rvitems');return _e?_e.scrollTop:0;})();
  var _rvY=window.scrollY||window.pageYOffset||0;requestAnimationFrame(function(){try{window.scrollTo(0,_rvY);}catch(e){}});
@@ -3172,7 +3207,7 @@ function renderReview(){
   h+='<div class="rvsrc">'+[['all','全て'],['csv','CSV読み取り'],['pdf','PDFアップロード']].map(function(o){return '<button class="'+(REVSRC===o[0]?'on':'')+'" onclick="revSrc(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
  }
  h+='<div class="rvsrc" style="margin-left:8px">'+[['default','標準順'],['points','確認ポイント数順']].map(function(o){return '<button class="'+(REVSORT===o[0]?'on':'')+'" onclick="revSortSet(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
- if(!REG_SCOPE){h+=_bjMisSection();h+=todayListCard('reg');}
+ if(!REG_SCOPE){h+=_dupRegSection();h+=_bjMisSection();h+=todayListCard('reg');}
 if(!items.length){h+='<div class="rvempty">'+(REG_SCOPE?'登録した物件はすべて確認できました。<br><button class="btn btn-pri" style="margin-top:10px" onclick="regConfirmDone()">要入稿へ進む</button>':(REVSRC==='all'?'未確認の物件はありません。物件登録でPDFを取り込むとここに表示されます。':'この条件（'+(REVSRC==='csv'?'CSV読み取り':'PDFアップロード')+'）の未確認物件はありません。'))+'</div>';document.getElementById('reviewbody').innerHTML=h;updateBadges();return;}
  var _csvN=PROPS.filter(function(p){return p.confirmed===false&&p.fromCsv;}).length;
  if(_csvN)h+='<div class="rvcsvbar"><div class="rvcsv-t">CSV取込分 '+_csvN+'件（過去掲載・PDFなし等）。情報不備でもまとめて確定。ステータスは<b>ビジコンの掲載状況</b>（掲載中／掲載終了＝落とし）のまま、要入稿には送りません。</div><button class="btn-sm btn-pri" onclick="revConfirmAllCsv()">CSVを全選択して確定</button></div>';
