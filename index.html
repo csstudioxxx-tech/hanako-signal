@@ -5382,21 +5382,22 @@ function karteChart(p){
 }
 function _srchNorm(s){var t=(s==null?'':String(s));try{t=t.normalize('NFKC');}catch(e){}return t.toLowerCase().replace(/[\s\u3000・･]+/g,'');}
 function _karteData(p){
-  function kv(k,v){ if(v==null||v===''||v==='-'||v==='—')return ''; return '<div style="display:flex;gap:8px;padding:5px 0;border-top:0.5px solid #ededf0"><span style="min-width:92px;flex-shrink:0;font-size:11.5px;color:#8e8e93;font-weight:600">'+k+'</span><span style="flex:1;font-size:12.5px;color:#1d1d1f;word-break:break-all;white-space:pre-wrap">'+esc(String(v))+'</span></div>'; }
+  function kv(k,v){ if(v==null||v===''||v==='-'||v==='—')return ''; return '<div style="display:flex;gap:8px;padding:5px 0;border-top:0.5px solid #ededf0"><span style="min-width:96px;flex-shrink:0;font-size:11.5px;color:#8e8e93;font-weight:600">'+esc(k)+'</span><span style="flex:1;font-size:12.5px;color:#1d1d1f;word-break:break-all;white-space:pre-wrap">'+esc(String(v))+'</span></div>'; }
+  // ---- 紹介コメント・ネットコメント ----
   var cA=String(p.commentA||'').trim(), cB=String(p.commentB||'').trim(), nc=String(p.netComment||p.netKatch||'').trim();
   var ch='';
   if(cA||cB||nc){
-    ch='<div class="kmemo"><div class="kmemo-h">紹介コメント・ネットコメント</div>';
     function blk(t,v){return v?('<div style="margin:6px 0"><div style="font-size:11px;color:#8e8e93;font-weight:700;margin-bottom:2px">'+t+'</div><div style="font-size:12.5px;white-space:pre-wrap;line-height:1.6;color:#1d1d1f">'+esc(v)+'</div></div>'):'';}
-    ch+=blk('紹介コメント(A)',cA)+blk('紹介コメント(B)',cB)+blk('ネットコメント',nc)+'</div>';
+    ch='<div class="kmemo"><div class="kmemo-h">紹介コメント・ネットコメント</div>'+blk('紹介コメント(A)',cA)+blk('紹介コメント(B)',cB)+blk('ネットコメント',nc)+'</div>';
   }
+  // ---- 主要データ（常時表示） ----
   var rent=(typeof rentMan==='function')?rentMan(p):'';
   var st='';
   if(p.stations&&p.stations.length){ st=p.stations.map(function(x){return (x.line?x.line+' ':'')+(x.station||'')+(x.walk?(' 徒歩'+x.walk+'分'):'');}).filter(function(z){return z.trim();}).join(' / '); }
   if(!st){ st=((p.line?p.line+' ':'')+(p.station||'')).trim(); }
   var media=String(p.media||'').trim(); if(p.mediaOther)media=(media?media+' ':'')+p.mediaOther;
   var ny=(typeof effNyuko==='function')?effNyuko(p):(p.nyukoTanto||'');
-  var g='<div class="kmemo"><div class="kmemo-h">物件データ（すべて）</div>'
+  var g='<div class="kmemo"><div class="kmemo-h">物件データ（主要）</div>'
    +kv('物件名',(p.name||'')+(p.room?(' '+p.room):''))
    +kv('賃料',rent)
    +kv('駅・沿線',st)
@@ -5418,7 +5419,31 @@ function _karteData(p){
    +kv('FAX',p.fax)
    +kv('管理メモ',p.mgMemo)
    +'</div>';
-  return ch+g;
+  // ---- さらに詳細（全項目を展開） ----
+  var LBL={address:'住所',age:'築年数',analysisMemo:'分析メモ',analysisTarget:'分析対象',applyMethod:'申込方法',area:'専有面積',areaVideo:'面積(動画)',belowCount:'基準点以下',builtYM:'築年月',confirmMethod:'物確方法',deadline:'期限',delivBox:'宅配ボックス',deposit:'敷金',dep0:'敷金ゼロ',direction:'向き',driveUrl:'PDF(Drive)',equip:'設備',equipOk:'設備記入済',floor:'階',freshFast:'即見せ',guarantors:'保証会社',holiday:'定休日',hours:'営業時間',infoDate:'物確日',keyMoney:'礼金',key0:'礼金ゼロ',mgmt:'管理費',mgmtCo:'管理会社',mgmtFee:'管理費',navi:'ナビ',nearby:'周辺',needShoot:'撮影要否',netMemo:'ネットメモ',nyukoDate:'入稿日',nyukoTs:'入稿日時',optAppliedAt:'オプション適用日',optReviewed:'オプション確認',petOk:'ペット可',phone:'電話',photoCount:'写真枚数',postIntent:'投稿意図',prospect:'見込み',pubDate:'公開日',reviewReason:'確認理由',revStatus:'確認状態',rtMedia:'反響媒体',rtUrl:'反響URL',shootDate:'撮影日',smaPick:'スマピック',southFace:'南向き',specArea:'専有面積',stars:'評価(★)',storePick:'店舗ピック',structure:'構造',subStdAction:'基準点アクション',subStdJudge:'基準点判定',suumoUrl:'SUUMO URL',t1Count:'T1',t2Count:'T2',t3Count:'T3',title:'タイトル',twoBurner:'2口コンロ',uploadDate:'アップ日',vacancyLog:'空き状況履歴',value:'価値',video:'動画',walkMin:'徒歩(分)',washStand:'独立洗面',wakuLog:'枠履歴',csvInqB:'反響(B)',csvScore:'CSV得点',confirmed:'確定',fromCsv:'CSV由来',dealHistory:'取引履歴',passHistory:'パス履歴',summary:'要約',infoMemo:'情報メモ',layout:'間取り',built:'築年',management:'管理'};
+  var SKIP={name:1,room:1,rent:1,station:1,line:1,madori:1,suumoCode:1,propNo:1,waku:1,tantou:1,nyukoTanto:1,status:1,csvListPV:1,csvPV:1,csvInq:1,csvAsOf:1,regDate:1,listDate:1,suumoListStart:1,media:1,mediaOther:1,fax:1,mgMemo:1,compTotal:1,stations:1,shokan:1,memos:1,comments:1,stamps:1,statusLog:1,commentA:1,commentB:1,netComment:1,netKatch:1,id:1,pdfData:1,b64:1,image:1,file:1,cfg:1,rawText:1,key:1,gem:1,dupOk:1,auto:1,autoLock:1,repAlert:1,scorePre:1,updatedAt:1,regTs:1,bjRef:1,bjOkAt:1,pdfNA:1,pendMemo:1,statusSrc:1,statusSrcAt:1,suumoTodo:1,suumoAct:1,kind:1,freshFastAt:1,optReviewedAt:1,driveId:1,isTest:1,isMemo:1};
+  function fmt(v){
+    if(v==null)return '';
+    if(typeof v==='boolean')return v?'はい':'いいえ';
+    if(typeof v==='number')return v.toLocaleString('ja-JP');
+    if(Array.isArray(v)){ if(!v.length)return ''; if(v.every(function(x){return (typeof x!=='object')||x===null;}))return v.join(', '); var j;try{j=JSON.stringify(v);}catch(e){j='';} return v.length+'件'+(j?'：'+(j.length>400?j.slice(0,400)+'…':j):''); }
+    if(typeof v==='object'){ var keys=Object.keys(v); if(!keys.length)return ''; var j2;try{j2=JSON.stringify(v);}catch(e){j2='';} return j2.length>400?j2.slice(0,400)+'…':j2; }
+    return String(v);
+  }
+  var rows='';
+  try{
+    Object.keys(p).sort(function(a,b){return (LBL[a]||a).localeCompare(LBL[b]||b,'ja');}).forEach(function(k){
+      if(SKIP[k])return;
+      var v=p[k]; var fv=fmt(v);
+      if(fv===''||fv==null)return;
+      rows+=kv(LBL[k]||k, fv);
+    });
+  }catch(e){}
+  var more='';
+  if(rows){
+    more='<div class="kmemo"><button onclick="var e=this.nextElementSibling;var open=e.style.display!==\'none\';e.style.display=open?\'none\':\'block\';this.textContent=open?\'さらに詳細を見る ▾\':\'詳細を閉じる ▴\';" style="font:inherit;font-size:12.5px;font-weight:700;color:#1A3D6B;background:#f5f6f8;border:1px solid #e3e3e6;border-radius:9px;padding:9px 14px;cursor:pointer;width:100%;text-align:left">さらに詳細を見る ▾</button><div style="display:none;margin-top:8px">'+rows+'</div></div>';
+  }
+  return ch+g+more;
 }
 
 function openProp(id){
