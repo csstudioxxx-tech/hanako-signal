@@ -5484,7 +5484,7 @@ async function importJ(ev){const f=ev.target.files[0];if(!f)return;try{const o=J
 
 // ---------- init ----------
 (async function(){try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}catch(e){}
- await load();try{await restorePend();}catch(e){}navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}try{updateSaveState();}catch(e){}try{_lastSig=_dataSig();}catch(e){}})();
+ await load();if(API){var _lt=0;while(!LOADED&&_lt<4){_lt++;await new Promise(function(r){setTimeout(r,500*_lt);});try{await load();}catch(e){}}}try{await restorePend();}catch(e){}navInit();setupDrop();setupCSV();renderDash();updateBadges();try{updateDbDiag();}catch(e){}try{updateSaveState();}catch(e){}try{_lastSig=_dataSig();}catch(e){}})();
 let _lastRefresh=Date.now();
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')maybeAutoRefresh();else _beaconSave();});
 setInterval(function(){try{quietRefresh();}catch(e){}},30000);
@@ -5643,7 +5643,7 @@ var BETA_SIM_B64="PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImphIj4KPGhlYWQ+CjxtZXRhIG
 function betaSimHtml(){ try{ return decodeURIComponent(escape(window.atob(BETA_SIM_B64))); }catch(e){ return '<!doctype html><meta charset="utf-8"><p style="font-family:sans-serif;padding:20px">シミュレーターの読み込みに失敗しました。</p>'; } }
 function _betaSalToSim(){ var o={}; PLAN_NAMES.forEach(function(n){ var s=salOf(n); o[n]={base:+s.base||0, plan:+s.plan||0, tiers:(s.tiers||[]).map(function(t){return {from:+t.from||0,rate:+t.rate||0};}), rth:+s.rthr||0, rrate:+s.rrate||0}; }); return o; }
 function _betaState(){ var c=EVENTS['BETA__cfg']; var sc=EVENTS['BETA__scn']; var cfg=(c&&c.sim)?JSON.parse(JSON.stringify(c.sim)):null; var ok=okadaOf(); if(ok){ if(!cfg)cfg={}; cfg.okSales=ok.sales; cfg.okBudget=ok.budget; cfg.okSalesMemo=ok.salesMemo; cfg.okBudgetMemo=ok.budgetMemo; } return { cfg:cfg, salary:_betaSalToSim(), scn:(sc&&sc.store&&typeof sc.store==='object')?sc.store:{} }; }
-function sendBetaInit(){ var fr=document.getElementById('betaFrame'); if(fr&&fr.contentWindow){ fr.contentWindow.postMessage({type:'hanako-beta-init', state:_betaState()}, '*'); } }
+function sendBetaInit(){ try{ var fr=document.getElementById('betaFrame'); if(fr&&fr.contentWindow){ fr.contentWindow.postMessage({type:'hanako-beta-init', state:_betaState()}, '*'); } }catch(e){} }
 function applyBetaSave(state){ if(!state)return; if(state.cfg){EVENTS['BETA__cfg']={kind:'beta', sim:state.cfg}; EVENTS['OKD__cfg']={kind:'okada', sales:(state.cfg.okSales||[]).map(function(x){return {n:(x&&x.n)||'',a:+(x&&x.a)||0};}), budget:(state.cfg.okBudget||[]).map(function(x){return {n:(x&&x.n)||'',a:+(x&&x.a)||0};}), salesMemo:state.cfg.okSalesMemo||'', budgetMemo:state.cfg.okBudgetMemo||''};} if(state.scn)EVENTS['BETA__scn']={kind:'scn', store:state.scn}; if(state.salary){ PLAN_NAMES.forEach(function(n){ var s=state.salary[n]; if(!s)return; EVENTS['SAL__'+n]={kind:'sal', plan:+s.plan||0, base:+s.base||0, tiers:(s.tiers||[]).map(function(t){return {from:+t.from||0,rate:+t.rate||0};}), rthr:+s.rth||0, rrate:+s.rrate||0}; }); } if(typeof _saveDB==='function')_saveDB(); if(typeof flushPush==='function'){try{flushPush();}catch(e){}} }
 if(typeof window!=='undefined' && !window.__hanakoBetaBridge){ window.__hanakoBetaBridge=true; window.addEventListener('message', function(e){ var d=e.data; if(!d||typeof d!=='object')return; if(d.type==='hanako-beta-ready'){ sendBetaInit(); } else if(d.type==='hanako-beta-save'){ applyBetaSave(d.state); } else if(d.type==='hanako-beta-height'){ var fr=document.getElementById('betaFrame'); if(fr&&d.h){ fr.style.height=(d.h+24)+'px'; } } }); }
 
@@ -5996,7 +5996,7 @@ function renderBeta(){
   h+='<div class="pl-internal"><span class="pl-tag beta">β 経営</span><b style="font-size:15px">経営シミュレーション（β）</b><button class="pl-btn sm" onclick="betaLock()" style="margin-left:auto">ロック</button></div>';
   h+='<iframe id="betaFrame" title="経営シミュレーション" style="width:100%;border:0;min-height:1400px;display:block;background:transparent" referrerpolicy="no-referrer"></iframe>';
   host.innerHTML=h;
-  var fr=document.getElementById('betaFrame'); if(fr){ fr.srcdoc=betaSimHtml(); }
+  var fr=document.getElementById('betaFrame'); if(fr){ fr.onload=function(){try{sendBetaInit();}catch(e){} setTimeout(function(){try{sendBetaInit();}catch(e){}},200);}; fr.srcdoc=betaSimHtml(); }
 }
 function renderBetaResults(){
  var host=document.getElementById('beta_results'); if(!host)return;
