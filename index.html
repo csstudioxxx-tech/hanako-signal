@@ -981,7 +981,7 @@ async function apiGet(){var u=API+(API.indexOf('?')>=0?'&':'?')+'action=all&_='+
 let _pushT=null,_pushing=false,_again=false,LOADED=false,_dirty=false,_saveErr=false,_lastSaveTs=0;
 var _BASE={props:{},hist:{},events:{},mgmt:{},guar:{}};var _needBase=false;var _lastSig='';
 function _snapBase(){var b={props:{},hist:{},events:{},mgmt:{},guar:{}};(PROPS||[]).forEach(function(p){if(p&&p.id!=null)b.props[p.id]=JSON.stringify(p);});(MGMT||[]).forEach(function(m){if(m&&m.id!=null)b.mgmt[m.id]=JSON.stringify(m);});(GUAR||[]).forEach(function(g){if(g&&g.id!=null)b.guar[g.id]=JSON.stringify(g);});Object.keys(HIST||{}).forEach(function(k){b.hist[k]=JSON.stringify(HIST[k]);});Object.keys(EVENTS||{}).forEach(function(k){b.events[k]=JSON.stringify(EVENTS[k]);});_BASE=b;}
-function _deltaPayload(){var now=Date.now();var o={action:'upsert',props:[],delProps:[],mgmt:[],delMgmt:[],guar:[],delGuar:[],hist:{},delHist:[],events:{},delEvents:[]};var cP={};(PROPS||[]).forEach(function(pp){if(!pp||pp.id==null)return;cP[pp.id]=1;if(_BASE.props[pp.id]!==JSON.stringify(pp)){pp.updatedAt=now;o.props.push(pp);}});Object.keys(_BASE.props).forEach(function(id){if(!cP[id])o.delProps.push(id);});var cM={};(MGMT||[]).forEach(function(m){if(!m||m.id==null)return;cM[m.id]=1;if(_BASE.mgmt[m.id]!==JSON.stringify(m)){m.updatedAt=now;o.mgmt.push(m);}});Object.keys(_BASE.mgmt).forEach(function(id){if(!cM[id])o.delMgmt.push(id);});var cG={};(GUAR||[]).forEach(function(g){if(!g||g.id==null)return;cG[g.id]=1;if(_BASE.guar[g.id]!==JSON.stringify(g)){g.updatedAt=now;o.guar.push(g);}});Object.keys(_BASE.guar).forEach(function(id){if(!cG[id])o.delGuar.push(id);});Object.keys(HIST||{}).forEach(function(k){if(_BASE.hist[k]!==JSON.stringify(HIST[k]))o.hist[k]=HIST[k];});Object.keys(_BASE.hist).forEach(function(k){if(!(k in HIST))o.delHist.push(k);});Object.keys(EVENTS||{}).forEach(function(k){if(_BASE.events[k]!==JSON.stringify(EVENTS[k]))o.events[k]=EVENTS[k];});Object.keys(_BASE.events).forEach(function(k){if(!(k in EVENTS))o.delEvents.push(k);});return o;}
+function _deltaPayload(){var now=Date.now();var o={action:'upsert',props:[],delProps:[],mgmt:[],delMgmt:[],guar:[],delGuar:[],hist:{},delHist:[],events:{},delEvents:[]};var cP={};(PROPS||[]).forEach(function(pp){if(!pp||pp.id==null)return;cP[pp.id]=1;if(_BASE.props[pp.id]!==JSON.stringify(pp)){pp.updatedAt=Math.max(now,(Number(pp.updatedAt)||0)+1);o.props.push(pp);}});Object.keys(_BASE.props).forEach(function(id){if(!cP[id])o.delProps.push(id);});var cM={};(MGMT||[]).forEach(function(m){if(!m||m.id==null)return;cM[m.id]=1;if(_BASE.mgmt[m.id]!==JSON.stringify(m)){m.updatedAt=Math.max(now,(Number(m.updatedAt)||0)+1);o.mgmt.push(m);}});Object.keys(_BASE.mgmt).forEach(function(id){if(!cM[id])o.delMgmt.push(id);});var cG={};(GUAR||[]).forEach(function(g){if(!g||g.id==null)return;cG[g.id]=1;if(_BASE.guar[g.id]!==JSON.stringify(g)){g.updatedAt=Math.max(now,(Number(g.updatedAt)||0)+1);o.guar.push(g);}});Object.keys(_BASE.guar).forEach(function(id){if(!cG[id])o.delGuar.push(id);});Object.keys(HIST||{}).forEach(function(k){if(_BASE.hist[k]!==JSON.stringify(HIST[k]))o.hist[k]=HIST[k];});Object.keys(_BASE.hist).forEach(function(k){if(!(k in HIST))o.delHist.push(k);});Object.keys(EVENTS||{}).forEach(function(k){if(_BASE.events[k]!==JSON.stringify(EVENTS[k]))o.events[k]=EVENTS[k];});Object.keys(_BASE.events).forEach(function(k){if(!(k in EVENTS))o.delEvents.push(k);});return o;}
 function _deltaEmpty(d){return !d.props.length&&!d.delProps.length&&!d.mgmt.length&&!d.delMgmt.length&&!d.guar.length&&!d.delGuar.length&&!Object.keys(d.hist).length&&!d.delHist.length&&!Object.keys(d.events).length&&!d.delEvents.length;}
 function _baseAdvance(d){d.props.forEach(function(pp){_BASE.props[pp.id]=JSON.stringify(pp);});d.delProps.forEach(function(id){delete _BASE.props[id];});d.mgmt.forEach(function(m){_BASE.mgmt[m.id]=JSON.stringify(m);});d.delMgmt.forEach(function(id){delete _BASE.mgmt[id];});d.guar.forEach(function(g){_BASE.guar[g.id]=JSON.stringify(g);});d.delGuar.forEach(function(id){delete _BASE.guar[id];});Object.keys(d.hist).forEach(function(k){_BASE.hist[k]=JSON.stringify(d.hist[k]);});d.delHist.forEach(function(k){delete _BASE.hist[k];});Object.keys(d.events).forEach(function(k){_BASE.events[k]=JSON.stringify(d.events[k]);});d.delEvents.forEach(function(k){delete _BASE.events[k];});}
 function _payload(){return JSON.stringify({props:PROPS,hist:HIST,events:EVENTS,mgmt:MGMT,guar:GUAR});}
@@ -2162,7 +2162,7 @@ function schedulePersistPend(){clearTimeout(_pendPersistT);_pendPersistT=setTime
 function persistPend(){try{if(typeof idbSet!=='function')return;idbSet('__PEND__',JSON.stringify({pend:PEND,i:REGSTEP_I,ts:Date.now()}));}catch(e){}}
 async function restorePend(){try{if(typeof idbGet!=='function')return;var raw=await idbGet('__PEND__');if(!raw)return;var o=JSON.parse(raw);if(o&&Array.isArray(o.pend)&&o.pend.length){PEND=o.pend.map(function(p){if(p&&p.auto==='読取中…')p.auto='要確認';return p;});REGSTEP_I=(o.i!=null&&o.i>=0&&o.i<PEND.length)?o.i:0;setTimeout(function(){try{toast('前回の読み込み中だった '+PEND.length+'件を復元しました');}catch(e){}},900);}}catch(e){}}
 var PFF={pdfs:[],gap:[],exist:[],none:[],applied:[],busy:false,showApplied:false};
-function _pffMissing(){return PROPS.filter(function(p){return p.confirmed!==false&&!(p.driveUrl||p.driveId);});}
+function _pffMissing(){return PROPS.filter(function(p){return p.name&&!p.isTest&&!(p.driveUrl||p.driveId);});}
 function _pffScore(prop,pdf){var nk=_nkey(prop.name||'');if(!nk||nk.length<2)return 0;if(pdf.key.indexOf(nk)<0)return 0;var s=50;var rk=_nkey(prop.room||'');if(rk&&rk.length>=1&&pdf.key.indexOf(rk)>=0)s+=40;return s;}
 function _pffSrc(p){return (p&&p.fromCsv)?'CSV読み取り':'自社物件登録';}
 function _pffUp(p){if(!p)return '—';return p.regDate||p.uploadDate||p.listDate||((p.regTs&&p.regTs.length>=10)?p.regTs.slice(0,10):'')||'—';}
@@ -2196,12 +2196,12 @@ async function handlePffFiles(files){
   var ff=fs[i],b64='',txt='';
   try{var ab=await ff.arrayBuffer();var u8=new Uint8Array(ab);var bs='';for(var j=0;j<u8.length;j++)bs+=String.fromCharCode(u8[j]);b64=btoa(bs);}catch(e){}
   try{txt=(await pdfText(ff))||'';}catch(e){txt='';}
-  PFF.pdfs.push({name:ff.name,b64:b64,key:_nkey(txt)});
+  PFF.pdfs.push({name:ff.name,b64:b64,file:ff,key:_nkey((txt||'')+' '+ff.name),gem:false});
  }
  computePffMatches();renderPffResult();
 }
 function computePffMatches(){
- var missing=_pffMissing();var have=PROPS.filter(function(p){return p.confirmed!==false&&(p.driveUrl||p.driveId);});
+ var missing=_pffMissing();var have=PROPS.filter(function(p){return p.name&&!p.isTest&&(p.driveUrl||p.driveId);});
  var cands=[];
  missing.forEach(function(prop,pi){PFF.pdfs.forEach(function(pdf,fi){var s=_pffScore(prop,pdf);if(s>=50)cands.push({pi:pi,fi:fi,s:s});});});
  cands.sort(function(a,b){return b.s-a.s;});
@@ -2239,9 +2239,22 @@ function renderPffResult(){
  if(exist.length){h+='<div style="border:1px solid #e7eaee;border-radius:12px;overflow:hidden;margin-top:8px">'+exist.map(function(x){return '<div style="padding:10px 12px;border-bottom:1px solid #eceef1">'+_pffPropLine(x.prop)+'<div style="font-size:11px;color:#9aa2ad;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\u2190 '+esc(x.pdf.name)+' <span style="color:#1f7a52;font-weight:700">既にPDFあり</span></div></div>';}).join('')+'</div>';}
  h+='</details>';
  h+='<details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;font-weight:800;color:#9a6500">③ 花子にそもそもない '+none.length+'件</summary>';
- if(none.length){h+='<div style="font-size:11.5px;color:#8a6500;margin:6px 2px 4px">花子に一致する物件がありません。必要なら物件登録から取り込んでください。</div><div style="border:1px solid #f0d9a8;border-radius:12px;overflow:hidden;background:#fffdf8">'+none.map(function(x){return '<div style="padding:9px 12px;border-bottom:1px solid #f4e6c8;font-size:12px;color:#5f5638;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'+esc(x.pdf.name)+'</div>';}).join('')+'</div>';}
+ if(none.length){h+='<div style="font-size:11.5px;color:#8a6500;margin:6px 2px 6px">花子に一致する物件がありません。画像だけのPDF（文字が読めない）の可能性があります。下のボタンでAIに読ませると照合できることがあります（Gemini利用料がかかります）。</div><button class="btn-sm" style="margin-bottom:8px;border-color:#f0d9a8;color:#9a6500" onclick="pffGeminiNone()">🔍 テキストの無いPDFをAIで再照合（'+none.length+'件）</button><div style="border:1px solid #f0d9a8;border-radius:12px;overflow:hidden;background:#fffdf8">'+none.map(function(x){return '<div style="padding:9px 12px;border-bottom:1px solid #f4e6c8;font-size:12px;color:#5f5638;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'+esc(x.pdf.name)+'</div>';}).join('')+'</div>';}
  h+='</details>';
  res.innerHTML=h;
+}
+async function pffGeminiNone(){
+ if(PFF.busy)return;
+ var targets=(PFF.none||[]).map(function(x){return x.pdf;}).filter(function(p){return p&&p.file&&!p.gem;});
+ if(!targets.length){toast('AI再照合の対象がありません');return;}
+ if(!confirm(targets.length+'件のPDFをAIで読み取って再照合します。\nGeminiの利用料がかかります。よろしいですか？'))return;
+ PFF.busy=true;var res=document.getElementById('pffresult');
+ for(var i=0;i<targets.length;i++){var p=targets[i];
+  if(res)res.innerHTML='<div style="font-size:13px;color:#2a6df5;font-weight:700">AIで読み取り中\u2026 '+(i+1)+' / '+targets.length+'</div>';
+  try{var j=await geminiReadFile(p.file,p.b64);if(j&&(j.bukken_mei||j.goushitsu||j.room)){p.key=_nkey(((j.bukken_mei||'')+' '+(j.goushitsu||'')+' '+(j.room||''))+' '+(p.key||''));}}catch(e){}
+  p.gem=true;
+ }
+ PFF.busy=false;computePffMatches();renderPffResult();toast('AI再照合が完了しました');
 }
 async function pffApply(){
  if(PFF.busy)return;var sel=(PFF.gap||[]).filter(function(x){return x.apply;});
@@ -4231,7 +4244,7 @@ function hkNoPdf(p){return hkInScope(p)&&!listHasPdf(p)&&!p.pdfNA;}
 function hkLHCount(pred){var l=0,hd=0,np=0;PROPS.forEach(function(p){if(p.confirmed===false)return;if(!pred(p))return;if(p.status==='保留')hd++;else if(p.status==='掲載中'&&!p.suumoTodo)l++;if(hkNoPdf(p))np++;});return {live:l,hold:hd,nopdf:np};}
 function hkLHBadge(c){var s='';if(c.live)s+='<span class="hk-bdg bl" title="掲載中">'+c.live+'</span>';if(c.hold)s+='<span class="hk-bdg rd" title="保留中">'+c.hold+'</span>';if(c.nopdf)s+='<span class="hk-bdg yl" title="PDFなし">'+c.nopdf+'</span>';return s?(' '+s):'';}
 function hkSelector(){
- var h='<div class="hk-modetab"><button class="hk-mbtn'+(HK_MODE==='tantou'?' on':'')+'" onclick="hkSetMode(\'tantou\')">物件担当者別</button><button class="hk-mbtn'+(HK_MODE==='nyuko'?' on':'')+'" onclick="hkSetMode(\'nyuko\')">入稿担当者別</button></div>';
+ var h='';
  h+='<div class="hk-sel"><button class="hk-selbtn'+(HK_SEL==='全体'?' on':'')+'" onclick="hkSetSel(\'全体\')">全体'+hkLHBadge(hkLHCount(function(){return true;}))+'</button>';
  if(HK_MODE==='nyuko'){
   var all={};PROPS.forEach(function(p){if(p.confirmed!==false){var k=effNyuko(p);if(k&&k!=='未設定')all[k]=1;}});
@@ -4348,7 +4361,7 @@ function hkCalendarCard(){
  h+='<div class="hkcal-sum"><div class="hkcal-sumhd">今月の集計（'+(today0.getMonth()+1)+'月）<span>保留・掲載にした物件</span></div><div class="hkcal-sumgrid"><div class="hkcal-sc"><span class="l">合計</span><span class="n">'+ids.length+'</span></div><div class="hkcal-sc hold"><span class="l">保留</span><span class="n">'+Object.keys(holdSet).length+'</span></div><div class="hkcal-sc live"><span class="l">掲載</span><span class="n">'+Object.keys(liveSet).length+'</span></div><div class="hkcal-sc atbb"><span class="l">atbb</span><span class="n">'+atbb+'</span></div><div class="hkcal-sc other"><span class="l">その他</span><span class="n">'+other+'</span></div></div></div>';
  h+='</div>';return h;
 }
-function renderHoryu(){
+function renderHoryu(){HK_MODE='tantou';
  hkInjectCSS();
  var host=document.getElementById('horyubody');if(!host)return;
  var sec=(HK_STATUS==='hold')?hkHoldSection():(HK_STATUS==='live')?hkDropSection():(HK_STATUS==='nopdf')?hkNoPdfSection():(hkHoldSection()+hkDropSection());
