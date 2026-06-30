@@ -5632,7 +5632,7 @@ function genCostText(){
    既存ループは .propId / .date でガードしているため無害。
    ============================================================ */
 var PLAN_NAMES=['弘中','横山','宮本','田邊','生沼'];
-var PLAN_WHO='全体';
+var PLAN_WHO='全体';var PP_TAB='plan';var PP_LISTV='all';
 var PLAN_EDIT=null, PLAN_CUR='';
 var BETA_EDIT=null;
 var PAY_OK={};
@@ -5793,6 +5793,79 @@ function renderPlanAll(){
 }
 
 /* ---- 個人ページ ---- */
+function planPTab(t){PP_TAB=t;renderPlanPerson(PLAN_CUR);}
+function ppListView(v){PP_LISTV=v;renderPlanPerson(PLAN_CUR);}
+function ppTabBar(name){
+  var tabs=[['plan','計画'],['month','当月(実績)'],['quarter','3Q(実績)'],['props','物件一覧']];
+  var h='<div class="pp-tabs" style="display:flex;gap:4px;margin:10px 0 14px;border-bottom:1px solid #ededf0">';
+  tabs.forEach(function(t){var on=(PP_TAB===t[0]);
+    h+='<button onclick="planPTab(\''+t[0]+'\')" style="font:inherit;font-size:13px;font-weight:'+(on?'700':'500')+';padding:9px 14px;border:0;border-bottom:2px solid '+(on?'#1A3D6B':'transparent')+';background:none;color:'+(on?'#1A3D6B':'#8e8e93')+';cursor:pointer">'+t[1]+'</button>';
+  });
+  h+='</div>';
+  return h;
+}
+function ppOtherTab(name){
+  if(PP_TAB==='month')return ppActualTab(name,'month');
+  if(PP_TAB==='quarter')return ppActualTab(name,'quarter');
+  if(PP_TAB==='props')return ppPropsTab(name);
+  return '';
+}
+function _ppProps(name){
+  return PROPS.filter(function(p){return p.confirmed!==false&&!p.isTest&&p.name&&(name==='全体'||p.tantou===name);});
+}
+function _ppDays(p){var s=p.suumoListStart||p.listDate||p.regDate||''; if(!s)return 0; var t=new Date(String(s).replace(/-/g,'/')).getTime(); if(isNaN(t))return 0; return Math.max(1,Math.round((Date.now()-t)/86400000));}
+function _ppAgg(name){
+  var ps=_ppProps(name); var a={waku:0,keisai:0,listPV:0,pv:0,inq:0};
+  ps.forEach(function(p){a.waku++; if(p.status==='掲載中')a.keisai++; a.listPV+=(+p.csvListPV||0); a.pv+=(+p.csvPV||0); a.inq+=(+p.csvInq||0);});
+  return a;
+}
+function ppActualTab(name,span){
+  var a=_ppAgg(name);
+  var ttl=(span==='quarter')?'第3Q（実績累計）':'当月（実績・途中経過）';
+  var note=(span==='quarter')?'ビジコン(PV)・JDS(反響)取込の累計値です。':'ビジコン(PV)・JDS(反響)取込の最新値です。';
+  function stat(lb,v,sub){return '<div style="flex:1;min-width:90px;background:#f7f8fa;border:1px solid #eef0f3;border-radius:12px;padding:12px 13px"><div style="font-size:10.5px;color:#8e8e93">'+lb+'</div><div style="font-size:20px;font-weight:800;color:#1A3D6B;margin-top:2px">'+v+'</div>'+(sub?'<div style="font-size:10px;color:#aeb3bb;margin-top:1px">'+sub+'</div>':'')+'</div>';}
+  function wait(lb){return '<div style="flex:1;min-width:90px;background:#fff;border:1px dashed #d7dbe0;border-radius:12px;padding:12px 13px"><div style="font-size:10.5px;color:#aeb3bb">'+lb+'</div><div style="font-size:13px;font-weight:700;color:#c2c7ce;margin-top:4px">記録待ち</div></div>';}
+  var h='<div style="font-size:13px;color:#6e6e73;margin-bottom:12px">'+ttl+'。'+note+'</div>';
+  h+='<div style="font-size:11px;font-weight:700;color:#8e8e93;margin:0 2px 6px">付与枠 → 反響（自動集計）</div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'
+   + stat('付与枠',plN(a.waku),'物件数')
+   + stat('掲載中',plN(a.keisai),'')
+   + stat('一覧PV',plN(a.listPV),'')
+   + stat('詳細PV',plN(a.pv),'')
+   + stat('反響',plN(a.inq),'')
+   +'</div>';
+  h+='<div style="font-size:11px;font-weight:700;color:#8e8e93;margin:0 2px 6px">アポ設定 → 契約（営業記録）</div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap">'+wait('アポ設定')+wait('アポ実施')+wait('契約')+wait('売上')+'</div>';
+  h+='<div style="font-size:11px;color:#aeb3bb;margin-top:12px;line-height:1.6">アポ設定以降は営業記録機能の導入後に自動反映されます。今は自動集計できる反響・PVのみ表示しています。</div>';
+  return h;
+}
+function ppPropsTab(name){
+  var ps=_ppProps(name).filter(function(p){return p.status==='掲載中'||p.status==='保留';});
+  ps.forEach(function(p){p._d=_ppDays(p); p._pvd=p._d?Math.round((+p.csvPV||0)/p._d*100)/100:0;});
+  var drops=ps.filter(function(p){return p._pvd<=0.3&&p._d>20;});
+  var isDrop=(PP_LISTV==='drop');
+  var rows=(isDrop?drops:ps).slice().sort(function(a,b){return a._pvd-b._pvd;});
+  var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap"><div style="font-size:13px;font-weight:700;color:#1A3D6B">物件一覧（'+esc(name)+'）</div>'
+   +'<div style="margin-left:auto;display:flex;gap:6px">'
+   +'<button onclick="ppListView(\'all\')" style="font:inherit;font-size:12px;font-weight:'+(!isDrop?'700':'500')+';padding:6px 12px;border:1px solid '+(!isDrop?'#1A3D6B':'#e3e3e6')+';color:'+(!isDrop?'#fff':'#6e6e73')+';background:'+(!isDrop?'#1A3D6B':'#fff')+';border-radius:8px;cursor:pointer">掲載中・保留 '+ps.length+'</button>'
+   +'<button onclick="ppListView(\'drop\')" style="font:inherit;font-size:12px;font-weight:'+(isDrop?'700':'500')+';padding:6px 12px;border:1px solid '+(isDrop?'#e5484d':'#e3e3e6')+';color:'+(isDrop?'#fff':'#6e6e73')+';background:'+(isDrop?'#e5484d':'#fff')+';border-radius:8px;cursor:pointer">落とし候補 '+drops.length+'</button>'
+   +'</div></div>';
+  if(!rows.length){h+='<div style="padding:30px;text-align:center;color:#aeb3bb;font-size:13px">該当する物件がありません</div>';return h;}
+  h+='<div style="display:flex;flex-direction:column;gap:6px">';
+  rows.forEach(function(p){
+    var red=(p._pvd<=0.3&&p._d>20);
+    var sub=esc(statusLabel(p.status))+' ・ '+p._d+'日'+(p.station?(' ・ '+esc(p.station)):'')+(p.madori?(' ・ '+esc(p.madori)):'');
+    h+='<div onclick="openProp(\''+p.id+'\')" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:#fff;border:1px solid #eef0f3;border-radius:11px;cursor:pointer">'
+     +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:#1d1d1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(p.name||'(無名)')+(p.room?(' '+esc(p.room)):'')+'</div>'
+     +'<div style="font-size:11px;color:#8e8e93;margin-top:2px">'+sub+'</div></div>'
+     +'<div style="text-align:right;flex-shrink:0"><div style="font-size:10.5px;color:#8e8e93">詳細PV/日</div><div style="font-size:16px;font-weight:800;color:'+(red?'#e5484d':'#1A3D6B')+'">'+p._pvd+'</div></div>'
+     +'</div>';
+  });
+  h+='</div>';
+  h+='<div style="font-size:11px;color:#aeb3bb;margin-top:10px;line-height:1.6">詳細PV/日が0.3以下かつ掲載20日超を落とし候補として表示しています。物件名をタップで詳細が開きます。</div>';
+  return h;
+}
+
 function renderPlanPerson(name){
  PLAN_EDIT=planOf(name); PLAN_CUR=name;
  var p=PLAN_EDIT; var host=document.getElementById('planbody');
@@ -5808,6 +5881,8 @@ function renderPlanPerson(name){
  var ROW=function(lb,sub,fld,val,mn2,mx,st,un,rid){return '<div style="'+_rc+'"><div style="'+_kc+'">'+lb+'<small style="'+_sc+'">'+sub+'</small></div><input type="range" style="flex:1;min-width:90px;accent-color:#1A3D6B" id="s_'+fld+'" min="'+mn2+'" max="'+mx+'" step="'+st+'" value="'+val+'" oninput="planInput(\''+name+'\',\''+fld+'\',this.value)"><input type="number" style="'+_nc+'" id="n_'+fld+'" min="'+mn2+'" max="'+mx+'" step="'+st+'" value="'+val+'" oninput="planInput(\''+name+'\',\''+fld+'\',this.value)"><span style="width:16px;font-size:12px;color:#8e8e93">'+un+'</span><span style="'+_xc+'" id="'+rid+'"></span></div>';};
  var h=topBar();
  h+='<div class="pl-internal"><span class="pl-tag">営業マン</span><b style="font-size:15px">'+esc(name)+'</b><button class="pl-yen" title="給与確認" onclick="salaryGate(\''+name+'\')">¥</button></div>';
+ h+=ppTabBar(name);
+ if(PP_TAB!=='plan'){host.innerHTML=h+ppOtherTab(name);return;}
  var _slot1=Math.round((p.m[0]+p.m[1]+p.m[2])/3);
  h+='<div class="pl-card"><div class="pl-h">計画を立てる<span class="sm">スライダーで結果が動きます／率・単価は3ヶ月共通</span></div>';
  h+=ROW('付与枠','単月の担当枠数','slotAll',_slot1,0,300,1,'','x_slot');
