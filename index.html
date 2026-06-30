@@ -1044,7 +1044,7 @@ function maybeAutoRefresh(){
  if(Date.now()-_lastRefresh<=4000)return;
  if(isEditing()||_modalOpen()){_pendingRefresh=true;updatePendingHint();return;}
  _lastRefresh=Date.now();
- flushPush().then(function(){if(_saveErr)return null;return load().then(function(){recompute();if(/^(staff|review|regstep|regconf|cost)$/.test(CURTAB||'')){_pendingRefresh=true;updatePendingHint();}else{tab(CURTAB||'dash');}try{_lastSig=_dataSig();}catch(e){}});});
+ flushPush().then(function(){if(_saveErr)return null;return load().then(function(){recompute();if(/^(staff|review|regstep|regconf|cost|plan)$/.test(CURTAB||'')){_pendingRefresh=true;updatePendingHint();}else{tab(CURTAB||'dash');}try{_lastSig=_dataSig();}catch(e){}});});
 }
 function _hashStr(s){var h=5381;for(var i=0;i<s.length;i++){h=((h*33)^s.charCodeAt(i))>>>0;}return h;}
 function _dataSig(){var s='';for(var i=0;i<PROPS.length;i++){var p=PROPS[i];s+=(p.id||'')+'~'+(p.status||'')+'~'+(p.tantou||'')+'~'+(p.stars||0)+'~'+(p.confirmed?1:0)+'~'+(p.revStatus||'')+'~'+(p.waku||'')+'~'+(p.csvPV||0)+'~'+(p.csvInq||0)+'~'+(p.name||'')+'|';}s+='#'+PROPS.length+'#'+Object.keys(HIST).length+'#'+Object.keys(EVENTS).length+'#'+((MGMT&&MGMT.length)||0)+'#'+((GUAR&&GUAR.length)||0);return _hashStr(s);}
@@ -1057,7 +1057,7 @@ async function quietRefresh(){
  try{
   await flushPush();if(_saveErr)return;await load();recompute();
   var sig=_dataSig();
-  if(_lastSig!==''&&sig!==_lastSig){if(/^(staff|review|regstep|regconf|cost)$/.test(CURTAB||'')){_pendingRefresh=true;updatePendingHint();}else{var y=window.scrollY||window.pageYOffset||0;tab(CURTAB||'dash');try{window.scrollTo(0,y);}catch(e){}}}
+  if(_lastSig!==''&&sig!==_lastSig){if(/^(staff|review|regstep|regconf|cost|plan)$/.test(CURTAB||'')){_pendingRefresh=true;updatePendingHint();}else{var y=window.scrollY||window.pageYOffset||0;tab(CURTAB||'dash');try{window.scrollTo(0,y);}catch(e){}}}
   _lastSig=sig;
  }catch(e){}
 }
